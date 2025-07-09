@@ -112,11 +112,11 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     logInfo('watch-mode', 'Completed refresh of all watched repositories');
   };
 
-  // Auto-refresh every 5 seconds
+  // Auto-refresh every 30 seconds to avoid spamming the GitHub API
   useEffect(() => {
     if (watchedRepos.length === 0) return;
 
-    const interval = setInterval(refreshAllWatched, 5000);
+    const interval = setInterval(refreshAllWatched, 30000);
     return () => clearInterval(interval);
   }, [watchedRepos, enabledRepos]);
 
