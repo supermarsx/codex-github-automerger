@@ -512,6 +512,13 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.darkMode}
               onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
             />
+            <ConfigSelector
+              id="accentColor"
+              label="Accent Color"
+              value={config.accentColor}
+              onChange={(value) => onConfigChange({ ...config, accentColor: value })}
+              type="color"
+            />
             <ConfigToggle
               id="hideHeader"
               label="Hide Header"

@@ -10,7 +10,7 @@ interface ConfigSelectorProps {
   value: string | number;
   onChange: (value: string) => void;
   options?: Array<{ value: string; label: string }>;
-  type?: 'select' | 'number';
+  type?: 'select' | 'number' | 'color';
   placeholder?: string;
   min?: number;
   max?: number;
@@ -60,7 +60,7 @@ export const ConfigSelector: React.FC<ConfigSelectorProps> = ({
         ) : (
           <Input
             id={id}
-            type="number"
+            type={type === 'number' ? 'number' : 'color'}
             value={value}
             onChange={(e) => handleChange(e.target.value)}
             className="neo-input"
@@ -71,5 +71,4 @@ export const ConfigSelector: React.FC<ConfigSelectorProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  );};
