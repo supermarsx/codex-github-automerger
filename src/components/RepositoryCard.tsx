@@ -25,6 +25,7 @@ import { Repository, ActivityItem } from '@/types/dashboard';
 interface RepositoryCardProps {
   repo: Repository;
   onToggle: (id: string) => void;
+  onToggleAutoMerge: (id: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
   onRemoveBranch: (repoId: string, index: number) => void;
   onAddUser: (repoId: string, user: string) => void;
@@ -37,6 +38,7 @@ interface RepositoryCardProps {
 export const RepositoryCard: React.FC<RepositoryCardProps> = ({
   repo,
   onToggle,
+  onToggleAutoMerge,
   onAddBranch,
   onRemoveBranch,
   onAddUser,
@@ -99,7 +101,10 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               </CardTitle>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="secondary" className={`neo-card ${repo.enabled ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
-                  {repo.enabled ? 'Enabled' : 'Disabled'}
+                  {repo.enabled ? 'Active' : 'Inactive'}
+                </Badge>
+                <Badge variant="secondary" className={`neo-card ${repo.autoMergeEnabled ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
+                  {repo.autoMergeEnabled ? 'Automerge On' : 'Automerge Off'}
                 </Badge>
                 <Badge variant="secondary" className="neo-card neo-blue text-black font-bold text-xs">
                   {successRate}% Success
@@ -128,6 +133,11 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             <Switch
               checked={repo.enabled}
               onCheckedChange={() => onToggle(repo.id)}
+              className="scale-125"
+            />
+            <Switch
+              checked={repo.autoMergeEnabled}
+              onCheckedChange={() => onToggleAutoMerge(repo.id)}
               className="scale-125"
             />
           </div>

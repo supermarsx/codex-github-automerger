@@ -3,6 +3,7 @@ export interface Repository {
   name: string;
   owner: string;
   enabled: boolean;
+  autoMergeEnabled: boolean;
   allowedBranches: string[];
   allowedUsers: string[];
   allowAllBranches?: boolean;

@@ -17,6 +17,7 @@ export const useRepositories = () => {
         // Convert date strings back to Date objects
         return parsed.map((repo: any) => ({
           ...repo,
+          autoMergeEnabled: repo.autoMergeEnabled ?? repo.enabled ?? true,
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
           recentPull: repo.recentPull ? {
             ...repo.recentPull,
@@ -45,12 +46,29 @@ export const useRepositories = () => {
       repos.map(repo => {
         if (repo.id === id) {
           const newEnabled = !repo.enabled;
-          logInfo('repository', `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}`, { repo: repo.name, enabled: newEnabled });
-          toast({ 
-            title: `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}`,
-            description: newEnabled ? 'Auto-merge is now active for this repository' : 'Auto-merge is now inactive for this repository'
+          logInfo('repository', `Repository ${repo.name} ${newEnabled ? 'activated' : 'deactivated'}`, { repo: repo.name, enabled: newEnabled });
+          toast({
+            title: `Repository ${repo.name} ${newEnabled ? 'activated' : 'deactivated'}`,
+            description: newEnabled ? 'Repository is now active' : 'Repository is now inactive'
           });
           return { ...repo, enabled: newEnabled };
+        }
+        return repo;
+      })
+    );
+  };
+
+  const toggleAutoMerge = (id: string) => {
+    setRepositories(repos =>
+      repos.map(repo => {
+        if (repo.id === id) {
+          const newStatus = !repo.autoMergeEnabled;
+          logInfo('repository', `Auto-merge for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, { repo: repo.name, autoMergeEnabled: newStatus });
+          toast({
+            title: `Auto-merge ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
+            description: newStatus ? 'Pull requests will be merged automatically' : 'Automatic merging disabled'
+          });
+          return { ...repo, autoMergeEnabled: newStatus };
         }
         return repo;
       })
@@ -73,6 +91,7 @@ export const useRepositories = () => {
       name,
       owner,
       enabled: true,
+      autoMergeEnabled: true,
       allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
       allowedUsers: ['github-actions[bot]'],
       allowAllBranches: false,
@@ -257,6 +276,7 @@ export const useRepositories = () => {
     addRepository,
     deleteRepository,
     updateRepository,
+    toggleAutoMerge,
     addBranch,
     removeBranch,
     addUser,
@@ -264,5 +284,4 @@ export const useRepositories = () => {
     updateRepositoryStats,
     addRepositoryActivity,
     clearAllRepositories
-  };
-};
+  };};
