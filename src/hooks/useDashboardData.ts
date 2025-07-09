@@ -37,7 +37,9 @@ export const useDashboardData = () => {
   const {
     activities,
     mergeStats,
-    exportReport
+    isLoading,
+    exportReport,
+    fetchActivities
   } = useActivities();
 
   return {
@@ -49,6 +51,7 @@ export const useDashboardData = () => {
     mergeStats,
     logs,
     deletedApiKeys,
+    isLoading,
     toggleRepository,
     addRepository,
     deleteRepository,
@@ -63,6 +66,7 @@ export const useDashboardData = () => {
     toggleShowApiKey,
     exportReport,
     setGlobalConfig,
-    exportLogs
+    exportLogs,
+    fetchActivities
   };
 };

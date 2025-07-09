@@ -9,9 +9,10 @@ import { ActivityItem } from '@/types/dashboard';
 interface RealtimeFeedProps {
   activities: ActivityItem[];
   onExportReport: () => void;
+  isLoading?: boolean;
 }
 
-export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExportReport }) => {
+export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExportReport, isLoading }) => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'merge': return <GitMerge className="w-4 h-4" />;
@@ -35,51 +36,57 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <Button onClick={onExportReport} className="neo-button-secondary">
-          <Download className="w-4 h-4 mr-2" />
-          Export Report
-        </Button>
-      </div>
-      
-      <Card className="neo-card">
-        <CardHeader>
+    <Card className="neo-card">
+      <CardHeader>
+        <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-black flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Recent Activity
           </CardTitle>
-        </CardHeader>
+          <Button onClick={onExportReport} variant="outline" size="sm">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
+      </CardHeader>
         <CardContent>
           <ScrollArea className="h-96">
             <div className="space-y-3">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-3 p-3 rounded neo-card">
-                  <div className={`neo-card p-2 ${getActivityColor(activity.type)}`}>
-                    {getActivityIcon(activity.type)}
+              {activities.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No recent activity</p>
+                  <p className="text-sm">Enable repositories and API keys to see activity</p>
+                </div>
+              ) : (
+                activities.map((activity) => (
+                  <div key={activity.id} className="flex items-center gap-3 p-3 rounded neo-card">
+                    <div className={`neo-card p-2 ${getActivityColor(activity.type)}`}>
+                      {getActivityIcon(activity.type)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-foreground">{activity.message}</p>
+                      <p className="text-sm text-muted-foreground">{activity.repo}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {new Date(activity.timestamp).toLocaleString()}
+                      </Badge>
+                      <Button
+                        onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
+                        variant="outline"
+                        size="sm"
+                        className="neo-button-secondary"
+                      >
+                        View
+                      </Button>
+                    </div>
                   </div>
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="font-bold text-foreground">{activity.message}</p>
-                  <p className="text-sm text-muted-foreground">{activity.repo} • {new Date(activity.timestamp).toLocaleString()}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
-                    variant="outline"
-                    size="sm"
-                    className="neo-button-secondary"
-                  >
-                    View
-                  </Button>
-                </div>
-              </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </ScrollArea>
         </CardContent>
       </Card>
-    </div>
   );
 };

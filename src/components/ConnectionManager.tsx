@@ -10,46 +10,66 @@ interface ConnectionManagerProps {
 }
 
 export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, compact = false, checkInterval = 10000 }) => {
-  const [socketConnected, setSocketConnected] = useState(true);
-  const [githubConnected, setGithubConnected] = useState(true);
-  const [publicApiConnected, setPublicApiConnected] = useState(true);
-  const [latency, setLatency] = useState(42);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [githubConnected, setGithubConnected] = useState(false);
+  const [publicApiConnected, setPublicApiConnected] = useState(false);
+  const [latency, setLatency] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const activeApiKeys = apiKeys.filter(k => k.isActive).length;
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    
+    try {
+      // Check GitHub API connection
+      const startTime = Date.now();
+      const githubResponse = await fetch('https://api.github.com');
+      const githubLatency = Date.now() - startTime;
+      
+      setGithubConnected(githubResponse.ok);
+      setPublicApiConnected(true); // Assuming public API is always available
+      setLatency(githubLatency);
+      
+      // Simulate socket connection based on API key availability
+      setSocketConnected(activeApiKeys > 0);
+    } catch (error) {
+      console.error('Connection check failed:', error);
+      setGithubConnected(false);
+      setPublicApiConnected(false);
+      setSocketConnected(false);
+      setLatency(0);
+    } finally {
       setIsRefreshing(false);
-      setLatency(Math.floor(Math.random() * 100) + 20);
-    }, 1000);
+    }
   };
 
-  // Simulate periodic server checks
+  // Periodic server checks
   useEffect(() => {
+    handleRefresh(); // Initial check
+    
     const interval = setInterval(() => {
-      setLatency(Math.floor(Math.random() * 100) + 20);
+      handleRefresh();
     }, checkInterval);
     
     return () => clearInterval(interval);
-  }, [checkInterval]);
+  }, [checkInterval, activeApiKeys]);
 
   if (compact) {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
-          <Server className="w-3 h-3 mr-1" />
-          {latency}ms
-        </Badge>
-        <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white text-xs px-2 py-1`}>
-          <Github className="w-3 h-3 mr-1" />
-          GH
-        </Badge>
-        <Badge variant="secondary" className={`neo-card ${activeApiKeys > 0 ? 'neo-yellow' : 'neo-red'} text-white text-xs px-2 py-1`}>
-          <Key className="w-3 h-3 mr-1" />
-          {activeApiKeys}
-        </Badge>
+      <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
+        <Server className="w-3 h-3 mr-1" />
+        {latency > 0 ? `${latency}ms` : 'N/A'}
+      </Badge>
+      <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white text-xs px-2 py-1`}>
+        <Github className="w-3 h-3 mr-1" />
+        GH
+      </Badge>
+      <Badge variant="secondary" className={`neo-card ${activeApiKeys > 0 ? 'neo-yellow' : 'neo-red'} text-white text-xs px-2 py-1`}>
+        <Key className="w-3 h-3 mr-1" />
+        {activeApiKeys}
+      </Badge>
       </div>
     );
   }
@@ -67,7 +87,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       
       <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white font-bold`}>
         {socketConnected ? <Server className="w-4 h-4 mr-2" /> : <WifiOff className="w-4 h-4 mr-2" />}
-        Server {socketConnected ? `(${latency}ms)` : 'Disconnected'}
+        Server {socketConnected ? (latency > 0 ? `(${latency}ms)` : 'Connected') : 'Disconnected'}
       </Badge>
       
       <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white font-bold`}>

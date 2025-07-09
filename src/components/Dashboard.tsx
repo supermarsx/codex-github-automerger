@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatsCards } from '@/components/StatsCards';
 import { RealtimeFeed } from '@/components/RealtimeFeed';
@@ -23,8 +23,10 @@ import {
   BarChart3
 } from 'lucide-react';
 import { DetailedStatistics } from '@/components/DetailedStatistics';
+import { WatchMode } from '@/components/WatchMode';
 
 export const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState('feed');
   const {
     repositories,
     apiKeys,
@@ -33,6 +35,7 @@ export const Dashboard = () => {
     activities,
     mergeStats,
     logs,
+    isLoading,
     toggleRepository,
     addRepository,
     deleteRepository,
@@ -47,8 +50,23 @@ export const Dashboard = () => {
     toggleShowApiKey,
     exportReport,
     setGlobalConfig,
-    exportLogs
+    exportLogs,
+    fetchActivities
   } = useDashboardData();
+
+  // Auto-refresh activities every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchActivities(repositories, apiKeys);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [repositories, apiKeys, fetchActivities]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchActivities(repositories, apiKeys);
+  }, [repositories, apiKeys, fetchActivities]);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -63,44 +81,16 @@ export const Dashboard = () => {
         <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
 
         {/* Main Content */}
-        <Tabs defaultValue="feed" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 h-16 gap-2 p-0">
-            <TabsTrigger value="feed" className="neo-button-secondary h-12 min-w-0">
-              <Activity className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Feed</span>
-            </TabsTrigger>
-            <TabsTrigger value="repositories" className="neo-button-secondary h-12 min-w-0">
-              <GitBranch className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Repos</span>
-            </TabsTrigger>
-            <TabsTrigger value="api-keys" className="neo-button-secondary h-12 min-w-0">
-              <Key className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Keys</span>
-            </TabsTrigger>
-            <TabsTrigger value="actions" className="neo-button-secondary h-12 min-w-0">
-              <Zap className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Actions</span>
-            </TabsTrigger>
-            <TabsTrigger value="config" className="neo-button-secondary h-12 min-w-0">
-              <Settings className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Config</span>
-            </TabsTrigger>
-            <TabsTrigger value="security" className="neo-button-secondary h-12 min-w-0">
-              <Shield className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Security</span>
-            </TabsTrigger>
-            <TabsTrigger value="statistics" className="neo-button-secondary h-12 min-w-0">
-              <BarChart3 className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Stats</span>
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="neo-button-secondary h-12 min-w-0">
-              <FileText className="w-4 h-4 flex-shrink-0" />
-              <span className="truncate ml-2 hidden sm:inline">Logs</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="pb-24">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
 
           <TabsContent value="feed" className="space-y-6 max-w-4xl mx-auto">
-            <RealtimeFeed activities={activities} onExportReport={exportReport} />
+            <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} />
+            <WatchMode 
+              repositories={repositories} 
+              apiKeys={apiKeys} 
+              onUpdateRepository={(repoId, updates) => console.log('Update repo:', repoId, updates)}
+            />
           </TabsContent>
 
           <TabsContent value="repositories" className="space-y-6 max-w-4xl mx-auto">
@@ -172,7 +162,80 @@ export const Dashboard = () => {
               </div>
             )}
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
+        
+        {/* Floating Action Bar */}
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+          <div className="bg-card/95 backdrop-blur-sm border rounded-full p-2 shadow-lg">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveTab('feed')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'feed' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <Activity className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('repositories')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'repositories' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <GitBranch className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('api-keys')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'api-keys' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <Key className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('actions')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'actions' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <Zap className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('config')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'config' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('security')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'security' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('statistics')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'statistics' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setActiveTab('logs')}
+                className={`p-3 rounded-full transition-all ${
+                  activeTab === 'logs' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
