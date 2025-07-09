@@ -13,47 +13,49 @@ interface StatsCardsProps {
 export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, mergeStats, statsPeriod }) => {
   const getStatsForPeriod = () => {
     // For session, use session stats, otherwise use total stats
+    if (!mergeStats) return { pending: 0, merged: 0, failed: 0 };
     return statsPeriod === 'session' ? mergeStats.session : mergeStats.total;
   };
 
   const currentStats = getStatsForPeriod();
+  const hasData = repositories.length > 0 || apiKeys.length > 0;
   
   const stats = [
     {
-      title: repositories.filter(r => r.enabled).length.toString(),
+      title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : 'N/A',
       label: 'Active Repos',
       color: 'neo-green',
-      subtitle: `${repositories.length} total`
+      subtitle: repositories.length > 0 ? `${repositories.length} total` : 'No repositories'
     },
     {
-      title: apiKeys.filter(k => k.isActive).length.toString(),
+      title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : 'N/A',
       label: 'Active Keys',
       color: 'neo-blue',
-      subtitle: `${apiKeys.length} total`
+      subtitle: apiKeys.length > 0 ? `${apiKeys.length} total` : 'No API keys'
     },
     {
-      title: currentStats.pending.toString(),
+      title: hasData ? currentStats.pending.toString() : 'N/A',
       label: 'Pending',
       color: 'neo-yellow',
-      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: currentStats.merged.toString(),
+      title: hasData ? currentStats.merged.toString() : 'N/A',
       label: 'Merged',
       color: 'neo-green',
-      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: currentStats.failed.toString(),
+      title: hasData ? currentStats.failed.toString() : 'N/A',
       label: 'Failed',
       color: 'neo-red',
-      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: `${((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toFixed(1)}%`,
+      title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : 'N/A',
       label: 'Success Rate',
       color: 'neo-purple',
-      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
+      subtitle: hasData ? 'Overall performance' : 'No data available'
     }
   ];
 

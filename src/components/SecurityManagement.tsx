@@ -451,9 +451,9 @@ export const SecurityManagement: React.FC = () => {
                           <p className="text-sm font-bold mb-2 text-destructive">
                             Save this recovery phrase securely:
                           </p>
-                          <div className="p-4 bg-muted rounded">
+                          <div className="p-4 bg-muted rounded max-w-full">
                             {showRecoveryPhrase ? (
-                              <div className="font-mono text-sm break-all">
+                              <div className="font-mono text-sm break-words whitespace-pre-wrap max-h-32 overflow-y-auto">
                                 {recoveryPhrase}
                               </div>
                             ) : (

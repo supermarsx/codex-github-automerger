@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { DetailedStatistics } from '@/components/DetailedStatistics';
 import { WatchMode } from '@/components/WatchMode';
+import { SelectiveRepositoryLoader } from '@/components/SelectiveRepositoryLoader';
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('feed');
@@ -56,17 +57,21 @@ export const Dashboard = () => {
 
   // Auto-refresh activities every 30 seconds
   useEffect(() => {
+    if (repositories.length === 0 || apiKeys.length === 0) return;
+    
     const interval = setInterval(() => {
       fetchActivities(repositories, apiKeys);
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [repositories, apiKeys, fetchActivities]);
+  }, [repositories.length, apiKeys.length]);
 
-  // Initial fetch
+  // Initial fetch when repos or keys change
   useEffect(() => {
-    fetchActivities(repositories, apiKeys);
-  }, [repositories, apiKeys, fetchActivities]);
+    if (repositories.length > 0 && apiKeys.length > 0) {
+      fetchActivities(repositories, apiKeys);
+    }
+  }, [repositories.length, apiKeys.length]);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -94,6 +99,19 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="repositories" className="space-y-6 max-w-4xl mx-auto">
+            <SelectiveRepositoryLoader 
+              apiKeys={apiKeys}
+              existingRepos={repositories.map(r => `${r.owner}/${r.name}`)}
+              onAddRepository={(repoData) => {
+                addRepository(repoData.name, repoData.owner);
+                // Associate with API key
+                const newRepo = repositories.find(r => r.name === repoData.name && r.owner === repoData.owner);
+                if (newRepo) {
+                  // Update the repository with API key association
+                  console.log('Repository added from API key:', repoData);
+                }
+              }}
+            />
             <RepositoryManagement
               repositories={repositories}
               apiKeys={apiKeys}
