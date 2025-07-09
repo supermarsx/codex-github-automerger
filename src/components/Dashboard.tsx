@@ -224,6 +224,7 @@ export const Dashboard = () => {
           <div className="bg-card/95 backdrop-blur-sm border rounded-full p-2 shadow-lg">
             <div className="flex items-center gap-2">
               <button
+                title="Feed"
                 onClick={() => {
                   updateActiveTab('feed');
                   markActivity();
@@ -236,6 +237,7 @@ export const Dashboard = () => {
                 <Activity className="w-4 h-4" />
               </button>
               <button
+                title="Repositories"
                 onClick={() => {
                   updateActiveTab('repositories');
                   markActivity();
@@ -248,6 +250,7 @@ export const Dashboard = () => {
                 <GitBranch className="w-4 h-4" />
               </button>
               <button
+                title="API Keys"
                 onClick={() => {
                   updateActiveTab('api-keys');
                   markActivity();
@@ -260,6 +263,7 @@ export const Dashboard = () => {
                 <Key className="w-4 h-4" />
               </button>
               <button
+                title="Actions"
                 onClick={() => {
                   updateActiveTab('actions');
                   markActivity();
@@ -272,6 +276,7 @@ export const Dashboard = () => {
                 <Zap className="w-4 h-4" />
               </button>
               <button
+                title="Config"
                 onClick={() => {
                   updateActiveTab('config');
                   markActivity();
@@ -284,6 +289,7 @@ export const Dashboard = () => {
                 <Settings className="w-4 h-4" />
               </button>
               <button
+                title="Security"
                 onClick={() => {
                   updateActiveTab('security');
                   markActivity();
@@ -296,6 +302,7 @@ export const Dashboard = () => {
                 <Shield className="w-4 h-4" />
               </button>
               <button
+                title="Statistics"
                 onClick={() => {
                   updateActiveTab('statistics');
                   markActivity();
@@ -308,6 +315,7 @@ export const Dashboard = () => {
                 <BarChart3 className="w-4 h-4" />
               </button>
               <button
+                title="Logs"
                 onClick={() => {
                   updateActiveTab('logs');
                   markActivity();
