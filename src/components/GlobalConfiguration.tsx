@@ -169,7 +169,10 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
             Global Configuration
           </CardTitle>
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+            <ThemeToggle 
+              theme={config.darkMode ? 'dark' : 'light'} 
+              onThemeChange={(theme) => onConfigChange({ ...config, darkMode: theme === 'dark' })}
+            />
             <div className="h-6 w-px bg-border" />
             <div className="flex gap-2">
               <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>

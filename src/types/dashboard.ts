@@ -61,6 +61,15 @@ export interface MergeStats {
   };
 }
 
+export interface FeedAction {
+  id: string;
+  name: string;
+  eventType: 'merge' | 'pull' | 'alert' | 'success' | 'failure' | 'all';
+  actionType: 'webhook' | 'email' | 'slack';
+  endpoint: string;
+  enabled: boolean;
+}
+
 export interface GlobalConfig {
   autoMergeEnabled: boolean;
   requireApproval: boolean;
@@ -77,4 +86,7 @@ export interface GlobalConfig {
   serverCheckInterval: number;
   logLevel: 'info' | 'warn' | 'error' | 'debug';
   darkMode: boolean;
+  customCss?: string;
+  customJs?: string;
+  feedActions: FeedAction[];
 }

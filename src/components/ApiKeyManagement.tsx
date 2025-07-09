@@ -11,6 +11,7 @@ interface ApiKeyManagementProps {
   onAddApiKey: (name: string, key: string) => void;
   onToggleApiKey: (id: string) => void;
   onDeleteApiKey: (id: string) => void;
+  onRevertDelete: (id: string) => void;
   showApiKey: string | null;
   onToggleShowApiKey: (id: string) => void;
 }
@@ -20,6 +21,7 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
   onAddApiKey,
   onToggleApiKey,
   onDeleteApiKey,
+  onRevertDelete,
   showApiKey,
   onToggleShowApiKey
 }) => {

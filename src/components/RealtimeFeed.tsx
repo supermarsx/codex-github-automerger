@@ -36,8 +36,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-black">Realtime Feed</h3>
+      <div className="flex items-center justify-end">
         <Button onClick={onExportReport} className="neo-button-secondary">
           <Download className="w-4 h-4 mr-2" />
           Export Report

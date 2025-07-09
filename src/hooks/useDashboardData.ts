@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Repository, ApiKey, MergeStats, GlobalConfig, ActivityItem } from '@/types/dashboard';
 import { useLogger } from './useLogger';
 import { useToast } from './use-toast';
+import { Button } from '@/components/ui/button';
 
 export const useDashboardData = () => {
   const { toast } = useToast();
@@ -93,7 +94,10 @@ export const useDashboardData = () => {
     fetchMode: 'github-api',
     serverCheckInterval: 10000,
     logLevel: 'info',
-    darkMode: false
+    darkMode: localStorage.getItem('theme') === 'light' ? false : true,
+    customCss: '',
+    customJs: '',
+    feedActions: []
   });
 
   const [activities, setActivities] = useState<ActivityItem[]>([
@@ -136,6 +140,15 @@ export const useDashboardData = () => {
     setRepositories([...repositories, newRepository]);
     logInfo('repository', `Repository ${owner}/${name} added`, { repo: `${owner}/${name}` });
     toast({ title: `Repository ${owner}/${name} added successfully!` });
+  };
+
+  const deleteRepository = (id: string) => {
+    const repo = repositories.find(r => r.id === id);
+    setRepositories(repos => repos.filter(r => r.id !== id));
+    if (repo) {
+      logInfo('repository', `Repository ${repo.owner}/${repo.name} deleted`, { repo: `${repo.owner}/${repo.name}` });
+      toast({ title: `Repository ${repo.owner}/${repo.name} deleted` });
+    }
   };
 
   const addBranch = (repoId: string, branch: string) => {
@@ -183,6 +196,8 @@ export const useDashboardData = () => {
   };
 
   // API Key handlers
+  const [deletedApiKeys, setDeletedApiKeys] = useState<Map<string, { key: ApiKey; timeout: NodeJS.Timeout }>>(new Map());
+
   const addApiKey = (name: string, key: string) => {
     const newKey: ApiKey = {
       id: Date.now().toString(),
@@ -213,10 +228,43 @@ export const useDashboardData = () => {
 
   const deleteApiKey = (id: string) => {
     const key = apiKeys.find(k => k.id === id);
+    if (!key) return;
+    
     setApiKeys(keys => keys.filter(key => key.id !== id));
-    if (key) {
-      logInfo('api-key', `API Key "${key.name}" deleted`, { keyName: key.name });
-      toast({ title: `API Key "${key.name}" deleted` });
+    logInfo('api-key', `API Key "${key.name}" deleted`, { keyName: key.name });
+    
+    // Set up revert functionality
+    const timeout = setTimeout(() => {
+      setDeletedApiKeys(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(id);
+        return newMap;
+      });
+    }, 15000);
+    
+    setDeletedApiKeys(prev => {
+      const newMap = new Map(prev);
+      newMap.set(id, { key, timeout });
+      return newMap;
+    });
+    
+    toast({
+      title: `API Key "${key.name}" deleted`,
+      description: "You can revert this action within 15 seconds"
+    });
+  };
+
+  const revertApiKeyDeletion = (id: string) => {
+    const deleted = deletedApiKeys.get(id);
+    if (deleted) {
+      clearTimeout(deleted.timeout);
+      setApiKeys(keys => [...keys, deleted.key]);
+      setDeletedApiKeys(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(id);
+        return newMap;
+      });
+      toast({ title: `API Key "${deleted.key.name}" restored` });
     }
   };
 
@@ -239,6 +287,7 @@ export const useDashboardData = () => {
     logs,
     toggleRepository,
     addRepository,
+    deleteRepository,
     addBranch,
     removeBranch,
     addUser,
@@ -246,6 +295,7 @@ export const useDashboardData = () => {
     addApiKey,
     toggleApiKey,
     deleteApiKey,
+    revertApiKeyDeletion,
     toggleShowApiKey,
     exportReport,
     setGlobalConfig,

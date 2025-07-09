@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export const ThemeToggle = () => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+interface ThemeToggleProps {
+  theme: 'light' | 'dark';
+  onThemeChange: (theme: 'light' | 'dark') => void;
+}
 
+export const ThemeToggle = ({ theme, onThemeChange }: ThemeToggleProps) => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    onThemeChange(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (

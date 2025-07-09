@@ -14,6 +14,7 @@ interface RepositoryManagementProps {
   apiKeys: any[];
   onToggleRepository: (id: string) => void;
   onAddRepository: (name: string, owner: string) => void;
+  onDeleteRepository: (id: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
   onRemoveBranch: (repoId: string, branchIndex: number) => void;
   onAddUser: (repoId: string, user: string) => void;
@@ -26,6 +27,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   apiKeys,
   onToggleRepository,
   onAddRepository,
+  onDeleteRepository,
   onAddBranch,
   onRemoveBranch,
   onAddUser,

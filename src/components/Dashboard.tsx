@@ -8,6 +8,7 @@ import { DashboardHeader } from '@/components/DashboardHeader';
 import { RepositoryManagement } from '@/components/RepositoryManagement';
 import { ApiKeyManagement } from '@/components/ApiKeyManagement';
 import { SecurityManagement } from '@/components/SecurityManagement';
+import { FeedActions } from '@/components/FeedActions';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { ConnectionManager } from '@/components/ConnectionManager';
 import { LogsTab } from '@/components/LogsTab';
@@ -17,7 +18,8 @@ import {
   Key, 
   Settings, 
   Activity,
-  FileText
+  FileText,
+  Zap
 } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -31,6 +33,7 @@ export const Dashboard = () => {
     logs,
     toggleRepository,
     addRepository,
+    deleteRepository,
     addBranch,
     removeBranch,
     addUser,
@@ -38,6 +41,7 @@ export const Dashboard = () => {
     addApiKey,
     toggleApiKey,
     deleteApiKey,
+    revertApiKeyDeletion,
     toggleShowApiKey,
     exportReport,
     setGlobalConfig,
@@ -58,7 +62,7 @@ export const Dashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="feed" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 h-16 gap-2 p-0">
+          <TabsList className="grid w-full grid-cols-7 h-16 gap-2 p-0">
             <TabsTrigger value="feed" className="neo-button-secondary h-12">
               <Activity className="w-4 h-4 mr-2" />
               Feed
@@ -70,6 +74,10 @@ export const Dashboard = () => {
             <TabsTrigger value="api-keys" className="neo-button-secondary h-12">
               <Key className="w-4 h-4 mr-2" />
               API Keys
+            </TabsTrigger>
+            <TabsTrigger value="actions" className="neo-button-secondary h-12">
+              <Zap className="w-4 h-4 mr-2" />
+              Actions
             </TabsTrigger>
             <TabsTrigger value="config" className="neo-button-secondary h-12">
               <Settings className="w-4 h-4 mr-2" />
@@ -95,6 +103,7 @@ export const Dashboard = () => {
               apiKeys={apiKeys}
               onToggleRepository={toggleRepository}
               onAddRepository={addRepository}
+              onDeleteRepository={deleteRepository}
               onAddBranch={addBranch}
               onRemoveBranch={removeBranch}
               onAddUser={addUser}
@@ -112,20 +121,30 @@ export const Dashboard = () => {
               onAddApiKey={addApiKey}
               onToggleApiKey={toggleApiKey}
               onDeleteApiKey={deleteApiKey}
+              onRevertDelete={revertApiKeyDeletion}
               showApiKey={showApiKey}
               onToggleShowApiKey={toggleShowApiKey}
             />
           </TabsContent>
 
-          <TabsContent value="config" className="space-y-6">
-            <GlobalConfiguration 
-              config={globalConfig} 
-              repositories={repositories}
-              apiKeys={apiKeys}
-              onConfigChange={setGlobalConfig}
-              onExportConfig={exportReport}
-              onImportConfig={() => console.log('Import config')}
+          <TabsContent value="actions" className="space-y-6">
+            <FeedActions
+              actions={globalConfig.feedActions}
+              onActionsChange={(actions) => setGlobalConfig({ ...globalConfig, feedActions: actions })}
             />
+          </TabsContent>
+
+          <TabsContent value="config" className="space-y-6">
+            <div className="max-w-4xl mx-auto">
+              <GlobalConfiguration 
+                config={globalConfig} 
+                repositories={repositories}
+                apiKeys={apiKeys}
+                onConfigChange={setGlobalConfig}
+                onExportConfig={exportReport}
+                onImportConfig={() => console.log('Import config')}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
