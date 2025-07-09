@@ -41,6 +41,7 @@ export const Dashboard = () => {
     logs,
     isLoading,
     toggleRepository,
+    toggleAutoMerge,
     addRepository,
     deleteRepository,
     updateRepository,
@@ -141,6 +142,7 @@ export const Dashboard = () => {
               repositories={repositories}
               apiKeys={apiKeys}
               onToggleRepository={toggleRepository}
+              onToggleAutoMerge={toggleAutoMerge}
               onAddRepository={addRepository}
               onDeleteRepository={deleteRepository}
               onAddBranch={addBranch}

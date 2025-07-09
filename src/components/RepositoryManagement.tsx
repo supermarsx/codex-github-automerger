@@ -16,6 +16,7 @@ interface RepositoryManagementProps {
   repositories: Repository[];
   apiKeys: any[];
   onToggleRepository: (id: string) => void;
+  onToggleAutoMerge: (id: string) => void;
   onAddRepository: (name: string, owner: string) => void;
   onDeleteRepository: (id: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
@@ -29,6 +30,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   repositories,
   apiKeys,
   onToggleRepository,
+  onToggleAutoMerge,
   onAddRepository,
   onDeleteRepository,
   onAddBranch,
@@ -190,7 +192,8 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         {repo.owner}/{repo.name}
                       </CardTitle>
                       <CardDescription className="font-bold">
-                        {repo.enabled ? 'Automerge Enabled' : 'Automerge Disabled'}
+                        {repo.enabled ? 'Active' : 'Inactive'} |
+                        {repo.autoMergeEnabled ? ' Automerge On' : ' Automerge Off'}
                       </CardDescription>
                     </div>
                   </div>
@@ -198,6 +201,11 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     <Switch
                       checked={repo.enabled}
                       onCheckedChange={() => onToggleRepository(repo.id)}
+                      className="scale-125"
+                    />
+                    <Switch
+                      checked={repo.autoMergeEnabled}
+                      onCheckedChange={() => onToggleAutoMerge(repo.id)}
                       className="scale-125"
                     />
                     <Button

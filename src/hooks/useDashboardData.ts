@@ -10,6 +10,7 @@ export const useDashboardData = () => {
   const {
     repositories,
     toggleRepository,
+    toggleAutoMerge,
     addRepository,
     deleteRepository,
     updateRepository,
@@ -66,6 +67,7 @@ export const useDashboardData = () => {
     deletedApiKeys,
     isLoading,
     toggleRepository,
+    toggleAutoMerge,
     addRepository,
     deleteRepository,
     updateRepository,
