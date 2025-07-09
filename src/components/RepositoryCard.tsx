@@ -135,11 +135,6 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               onCheckedChange={() => onToggle(repo.id)}
               className="scale-125"
             />
-            <Switch
-              checked={repo.autoMergeEnabled}
-              onCheckedChange={() => onToggleAutoMerge(repo.id)}
-              className="scale-125"
-            />
           </div>
         </div>
         
@@ -180,6 +175,19 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               <Switch
                 checked={repo.alertsEnabled}
                 onCheckedChange={() => onToggleAlerts(repo.id)}
+                className="scale-125"
+              />
+            </div>
+
+            {/* Auto-merge Toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-black text-sm">Auto-merge</h4>
+                <p className="text-xs text-muted-foreground">Automatically merge PRs when checks pass</p>
+              </div>
+              <Switch
+                checked={repo.autoMergeEnabled}
+                onCheckedChange={() => onToggleAutoMerge(repo.id)}
                 className="scale-125"
               />
             </div>
