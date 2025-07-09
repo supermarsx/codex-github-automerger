@@ -328,7 +328,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         {/* Auto-merge Settings */}
         <div className="space-y-4">
           <h4 className="font-black text-lg">Auto-merge Settings</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center justify-between">
               <Label htmlFor="autoMerge">Enable Auto-merge</Label>
               <Switch
@@ -427,42 +427,42 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         {/* Advanced Settings */}
         <div className="space-y-4">
           <h4 className="font-black text-lg">Advanced Settings</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="autoDeleteBranch">Auto Delete Branch After Merge</Label>
-              <Switch
-                id="autoDeleteBranch"
-                checked={config.autoDeleteBranch}
-                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="allowAllBranches">Allow All Branches</Label>
-                <Shield className="w-4 h-4 text-destructive" />
-              </div>
-              <Switch
-                id="allowAllBranches"
-                checked={config.allowAllBranches}
-                onCheckedChange={(checked) => onConfigChange({ ...config, allowAllBranches: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Label htmlFor="allowAllUsers">Allow All Users</Label>
-                <Shield className="w-4 h-4 text-destructive" />
-              </div>
-              <Switch
-                id="allowAllUsers"
-                checked={config.allowAllUsers}
-                onCheckedChange={(checked) => onConfigChange({ ...config, allowAllUsers: checked })}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="darkMode">Dark Mode</Label>
-              <Switch
-                id="darkMode"
-                checked={config.darkMode}
+           <div className="grid grid-cols-1 gap-4">
+             <div className="flex items-center justify-between">
+               <Label htmlFor="autoDeleteBranch">Auto Delete Branch After Merge</Label>
+               <Switch
+                 id="autoDeleteBranch"
+                 checked={config.autoDeleteBranch}
+                 onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
+               />
+             </div>
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                 <Label htmlFor="allowAllBranches">Allow All Branches</Label>
+                 <Shield className="w-4 h-4 text-destructive" />
+               </div>
+               <Switch
+                 id="allowAllBranches"
+                 checked={config.allowAllBranches}
+                 onCheckedChange={(checked) => onConfigChange({ ...config, allowAllBranches: checked })}
+               />
+             </div>
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                 <Label htmlFor="allowAllUsers">Allow All Users</Label>
+                 <Shield className="w-4 h-4 text-destructive" />
+               </div>
+               <Switch
+                 id="allowAllUsers"
+                 checked={config.allowAllUsers}
+                 onCheckedChange={(checked) => onConfigChange({ ...config, allowAllUsers: checked })}
+               />
+             </div>
+             <div className="flex items-center justify-between">
+               <Label htmlFor="darkMode">Dark Mode</Label>
+               <Switch
+                 id="darkMode"
+                 checked={config.darkMode}
                 onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
               />
             </div>

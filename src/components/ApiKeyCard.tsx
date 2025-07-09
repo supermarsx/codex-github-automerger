@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Eye, EyeOff, Trash2, Key, Shield, ShieldAlert } from 'lucide-react';
+import { Eye, EyeOff, Trash2, Key, Shield, ShieldAlert, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { ApiKey } from '@/types/dashboard';
 
 interface ApiKeyCardProps {
@@ -46,6 +46,20 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
                   <Badge variant="secondary" className="neo-card neo-yellow text-black font-bold">
                     <ShieldAlert className="w-3 h-3 mr-1" />
                     Unencrypted
+                  </Badge>
+                )}
+                {apiKey.isActive && (
+                  <Badge variant="secondary" className={`neo-card font-bold ${
+                    apiKey.connectionStatus === 'connected' ? 'neo-green text-black' :
+                    apiKey.connectionStatus === 'disconnected' ? 'neo-red text-white' :
+                    'neo-yellow text-black'
+                  }`}>
+                    {apiKey.connectionStatus === 'connected' && <CheckCircle className="w-3 h-3 mr-1" />}
+                    {apiKey.connectionStatus === 'disconnected' && <XCircle className="w-3 h-3 mr-1" />}
+                    {apiKey.connectionStatus === 'testing' && <Clock className="w-3 h-3 mr-1" />}
+                    {apiKey.connectionStatus === 'connected' ? 'Connected' :
+                     apiKey.connectionStatus === 'disconnected' ? 'Disconnected' :
+                     'Testing'}
                   </Badge>
                 )}
               </div>

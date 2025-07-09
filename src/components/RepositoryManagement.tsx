@@ -18,6 +18,7 @@ interface RepositoryManagementProps {
   onRemoveBranch: (repoId: string, branchIndex: number) => void;
   onAddUser: (repoId: string, user: string) => void;
   onRemoveUser: (repoId: string, userIndex: number) => void;
+  onAddRepositoryFromApiKey: (apiKeyId: string, repoName: string, repoOwner: string) => void;
 }
 
 export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
@@ -28,9 +29,11 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   onAddBranch,
   onRemoveBranch,
   onAddUser,
-  onRemoveUser
+  onRemoveUser,
+  onAddRepositoryFromApiKey
 }) => {
   const [newRepo, setNewRepo] = useState({ name: '', owner: '', branch: '', user: '' });
+  const [selectedApiKey, setSelectedApiKey] = useState<string>('');
   const { toast } = useToast();
 
   const handleAddRepository = () => {
@@ -78,10 +81,39 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
               className="neo-input"
             />
           </div>
-          <Button onClick={handleAddRepository} className="neo-button">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Repository
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleAddRepository} className="neo-button">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Repository
+            </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Or load from API key:</span>
+              <Select value={selectedApiKey} onValueChange={setSelectedApiKey}>
+                <SelectTrigger className="neo-input w-48">
+                  <SelectValue placeholder="Select API key" />
+                </SelectTrigger>
+                <SelectContent>
+                  {apiKeys.filter(k => k.isActive).map(key => (
+                    <SelectItem key={key.id} value={key.id}>{key.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button 
+                onClick={() => {
+                  if (selectedApiKey) {
+                    // Mock loading repositories from API key
+                    toast({ title: "Loading repositories from API key..." });
+                    // In a real app, this would call the GitHub API
+                    // For now, we'll just show a message
+                  }
+                }}
+                className="neo-button-secondary"
+                disabled={!selectedApiKey}
+              >
+                Load Repos
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -225,15 +257,16 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     <GitBranch className="w-5 h-5" />
                     Fetch Mode
                   </h4>
-                  <Select defaultValue={repo.fetchMode || "github-api"}>
-                    <SelectTrigger className="neo-input">
-                      <SelectValue placeholder="Select fetch mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="github-api">GitHub API</SelectItem>
-                      <SelectItem value="no-auth">Public (No Auth)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                   <Select defaultValue={repo.fetchMode || "global"}>
+                     <SelectTrigger className="neo-input">
+                       <SelectValue placeholder="Select fetch mode" />
+                     </SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="global">Use Global Config</SelectItem>
+                       <SelectItem value="github-api">GitHub API</SelectItem>
+                       <SelectItem value="no-auth">Public (No Auth)</SelectItem>
+                     </SelectContent>
+                   </Select>
                 </div>
 
                 <div>

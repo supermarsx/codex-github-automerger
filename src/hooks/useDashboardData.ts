@@ -62,7 +62,8 @@ export const useDashboardData = () => {
       created: new Date('2024-01-15'),
       lastUsed: new Date('2024-01-20'),
       isActive: true,
-      encrypted: true
+      encrypted: true,
+      connectionStatus: 'connected'
     },
     {
       id: '2',
@@ -70,7 +71,8 @@ export const useDashboardData = () => {
       key: 'ghp_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy',
       created: new Date('2024-01-10'),
       isActive: false,
-      encrypted: false
+      encrypted: false,
+      connectionStatus: 'disconnected'
     }
   ]);
 

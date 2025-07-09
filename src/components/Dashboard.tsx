@@ -86,9 +86,6 @@ export const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="feed" className="space-y-6">
-            <div className="mb-4">
-              <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
-            </div>
             <RealtimeFeed activities={activities} onExportReport={exportReport} />
           </TabsContent>
 
@@ -102,6 +99,10 @@ export const Dashboard = () => {
               onRemoveBranch={removeBranch}
               onAddUser={addUser}
               onRemoveUser={removeUser}
+              onAddRepositoryFromApiKey={(apiKeyId, repoName, repoOwner) => {
+                // Mock implementation - in real app would fetch from GitHub API
+                console.log('Adding repository from API key:', { apiKeyId, repoName, repoOwner });
+              }}
             />
           </TabsContent>
 

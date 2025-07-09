@@ -9,7 +9,7 @@ export interface Repository {
   allowAllUsers?: boolean;
   alertsEnabled: boolean;
   apiKeyId?: string;
-  fetchMode?: 'no-auth' | 'github-api';
+  fetchMode?: 'no-auth' | 'github-api' | 'global';
   webhookMethod?: 'global' | 'custom' | 'disabled';
   webhookUrl?: string;
   lastActivity?: Date;
@@ -36,6 +36,7 @@ export interface ApiKey {
   lastUsed?: Date;
   isActive: boolean;
   encrypted: boolean;
+  connectionStatus?: 'connected' | 'disconnected' | 'testing';
 }
 
 export interface ActivityItem {
