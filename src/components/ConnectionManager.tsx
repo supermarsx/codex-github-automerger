@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Github, Server, Key } from 'lucide-react';
+import { useLogger } from '@/hooks/useLogger';
 
 interface ConnectionManagerProps {
   apiKeys: any[];
@@ -16,6 +17,8 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
   const [latency, setLatency] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const { logInfo } = useLogger();
+
   const activeApiKeys = apiKeys.filter(k => k.isActive).length;
 
   const handleRefresh = async () => {
@@ -26,11 +29,21 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       const startTime = Date.now();
       const githubResponse = await fetch('https://api.github.com');
       const githubLatency = Date.now() - startTime;
-      
+
       setGithubConnected(githubResponse.ok);
       setPublicApiConnected(true); // Assuming public API is always available
       setLatency(githubLatency);
-      
+
+      const rateLimit = githubResponse.headers.get('X-RateLimit-Limit');
+      const rateRemaining = githubResponse.headers.get('X-RateLimit-Remaining');
+      if (activeApiKeys === 0 && rateLimit && rateRemaining) {
+        logInfo(
+          'connection',
+          `GitHub unauthenticated rate limit: ${rateRemaining}/${rateLimit}`,
+          { limit: rateLimit, remaining: rateRemaining }
+        );
+      }
+
       // Simulate socket connection based on API key availability
       setSocketConnected(activeApiKeys > 0);
     } catch (error) {
