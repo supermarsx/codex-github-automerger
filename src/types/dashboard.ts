@@ -104,6 +104,18 @@ export interface DetailedStats {
   };
 }
 
+export interface Webhook {
+  id: string;
+  name: string;
+  url: string;
+  events: string[];
+  enabled: boolean;
+  secret?: string;
+  headers?: Record<string, string>;
+  created: Date;
+  lastUsed?: Date;
+}
+
 export interface GlobalConfig {
   autoMergeEnabled: boolean;
   requireApproval: boolean;
@@ -124,4 +136,7 @@ export interface GlobalConfig {
   customJs: string;
   feedActions: FeedAction[];
   statsPeriod: StatsPeriod;
+  webhooks: Webhook[];
+  hideHeader: boolean;
+  logsDisabled: boolean;
 }

@@ -21,7 +21,10 @@ export const useGlobalConfig = () => {
     customCss: '',
     customJs: '',
     feedActions: [],
-    statsPeriod: 'session'
+    statsPeriod: 'session',
+    webhooks: [],
+    hideHeader: false,
+    logsDisabled: false
   });
 
   return {

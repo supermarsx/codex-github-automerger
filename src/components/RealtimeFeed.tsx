@@ -72,9 +72,6 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                   >
                     View
                   </Button>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">{new Date(activity.timestamp).toLocaleTimeString()}</p>
-                  </div>
                 </div>
               </div>
                 </div>

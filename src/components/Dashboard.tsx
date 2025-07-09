@@ -54,7 +54,7 @@ export const Dashboard = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <DashboardHeader apiKeys={apiKeys} />
+        {!globalConfig.hideHeader && <DashboardHeader apiKeys={apiKeys} />}
 
         {/* Stats Cards */}
         <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} statsPeriod={globalConfig.statsPeriod} />
@@ -65,37 +65,37 @@ export const Dashboard = () => {
         {/* Main Content */}
         <Tabs defaultValue="feed" className="space-y-6">
           <TabsList className="grid w-full grid-cols-8 h-16 gap-2 p-0">
-            <TabsTrigger value="feed" className="neo-button-secondary h-12">
-              <Activity className="w-4 h-4 mr-2" />
-              Feed
+            <TabsTrigger value="feed" className="neo-button-secondary h-12 min-w-0">
+              <Activity className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Feed</span>
             </TabsTrigger>
-            <TabsTrigger value="repositories" className="neo-button-secondary h-12">
-              <GitBranch className="w-4 h-4 mr-2" />
-              Repositories
+            <TabsTrigger value="repositories" className="neo-button-secondary h-12 min-w-0">
+              <GitBranch className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Repos</span>
             </TabsTrigger>
-            <TabsTrigger value="api-keys" className="neo-button-secondary h-12">
-              <Key className="w-4 h-4 mr-2" />
-              API Keys
+            <TabsTrigger value="api-keys" className="neo-button-secondary h-12 min-w-0">
+              <Key className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Keys</span>
             </TabsTrigger>
-            <TabsTrigger value="actions" className="neo-button-secondary h-12">
-              <Zap className="w-4 h-4 mr-2" />
-              Actions
+            <TabsTrigger value="actions" className="neo-button-secondary h-12 min-w-0">
+              <Zap className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Actions</span>
             </TabsTrigger>
-            <TabsTrigger value="config" className="neo-button-secondary h-12">
-              <Settings className="w-4 h-4 mr-2" />
-              Config
+            <TabsTrigger value="config" className="neo-button-secondary h-12 min-w-0">
+              <Settings className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Config</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="neo-button-secondary h-12">
-              <Shield className="w-4 h-4 mr-2" />
-              Security
+            <TabsTrigger value="security" className="neo-button-secondary h-12 min-w-0">
+              <Shield className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Security</span>
             </TabsTrigger>
-            <TabsTrigger value="statistics" className="neo-button-secondary h-12">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Statistics
+            <TabsTrigger value="statistics" className="neo-button-secondary h-12 min-w-0">
+              <BarChart3 className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Stats</span>
             </TabsTrigger>
-            <TabsTrigger value="logs" className="neo-button-secondary h-12">
-              <FileText className="w-4 h-4 mr-2" />
-              Logs
+            <TabsTrigger value="logs" className="neo-button-secondary h-12 min-w-0">
+              <FileText className="w-4 h-4 flex-shrink-0" />
+              <span className="truncate ml-2 hidden sm:inline">Logs</span>
             </TabsTrigger>
           </TabsList>
 
@@ -162,7 +162,15 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="logs" className="space-y-6">
-            <LogsTab logs={logs} onExportLogs={exportLogs} />
+            {!globalConfig.logsDisabled ? (
+              <LogsTab logs={logs} onExportLogs={exportLogs} />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Logs are currently disabled</p>
+                <p className="text-sm">Enable logs in System Configuration to view them here.</p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

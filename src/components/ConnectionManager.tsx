@@ -56,6 +56,15 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
 
   return (
     <div className="flex items-center gap-4 mb-6">
+      <Button
+        onClick={handleRefresh}
+        disabled={isRefreshing}
+        className="neo-button-secondary"
+        size="sm"
+      >
+        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      </Button>
+      
       <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white font-bold`}>
         {socketConnected ? <Server className="w-4 h-4 mr-2" /> : <WifiOff className="w-4 h-4 mr-2" />}
         Server {socketConnected ? `(${latency}ms)` : 'Disconnected'}
@@ -75,15 +84,6 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
         <Key className="w-4 h-4 mr-2" />
         {activeApiKeys} Active Keys
       </Badge>
-      
-      <Button
-        onClick={handleRefresh}
-        disabled={isRefreshing}
-        className="neo-button-secondary"
-        size="sm"
-      >
-        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-      </Button>
     </div>
   );
 };

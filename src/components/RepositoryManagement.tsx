@@ -137,10 +137,30 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
               <Button 
                 onClick={() => {
                   if (selectedApiKey) {
-                    // Mock loading repositories from API key
-                    toast({ title: "Loading repositories from API key..." });
-                    // In a real app, this would call the GitHub API
-                    // For now, we'll just show a message
+                    const selectedKey = apiKeys.find(k => k.id === selectedApiKey);
+                    if (selectedKey) {
+                      // Mock loading repositories from API key
+                      toast({ title: "Loading repositories from API key..." });
+                      
+                      // Simulate API call with timeout
+                      setTimeout(() => {
+                        const mockRepos = [
+                          { name: 'example-repo', owner: 'user' },
+                          { name: 'another-repo', owner: 'user' },
+                          { name: 'test-project', owner: 'organization' }
+                        ];
+                        
+                        // Add each repo
+                        mockRepos.forEach(repo => {
+                          onAddRepository(repo.name, repo.owner);
+                        });
+                        
+                        toast({ 
+                          title: "Repositories loaded successfully!",
+                          description: `Added ${mockRepos.length} repositories from ${selectedKey.name}`
+                        });
+                      }, 2000);
+                    }
                   }
                 }}
                 className="neo-button-secondary"

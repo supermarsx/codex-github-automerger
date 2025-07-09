@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ActivityItem, MergeStats } from '@/types/dashboard';
+import { ActivityItem } from '@/types/dashboard';
+import { useStatsPersistence } from './useStatsPersistence';
 
 export const useActivities = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([
@@ -19,6 +20,8 @@ export const useActivities = () => {
   return {
     activities,
     mergeStats,
+    updateStats,
+    resetSessionStats,
     exportReport
   };
 };
