@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { Repository, ActivityItem } from '@/types/dashboard';
 import { createGitHubService } from '@/components/GitHubService';
+import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
+import { useLogger } from '@/hooks/useLogger';
 
 interface WatchModeProps {
   repositories: Repository[];
@@ -26,51 +28,71 @@ interface WatchModeProps {
 }
 
 export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, onUpdateRepository }) => {
-  const [watchedRepos, setWatchedRepos] = useState<string[]>([]);
-  const [repoActivities, setRepoActivities] = useState<Record<string, ActivityItem[]>>({});
-  const [repoPullRequests, setRepoPullRequests] = useState<Record<string, any[]>>({});
+  const { 
+    watchModeState, 
+    updateWatchedRepos, 
+    updateRepoActivities, 
+    updateRepoPullRequests, 
+    updateLastUpdateTime 
+  } = useWatchModePersistence();
+  
+  const { logInfo, logError, logWarn } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+
+  const watchedRepos = watchModeState.watchedRepos;
+  const repoActivities = watchModeState.repoActivities;
+  const repoPullRequests = watchModeState.repoPullRequests;
+  const lastUpdateTime = watchModeState.lastUpdateTime;
 
   const enabledRepos = repositories.filter(repo => repo.enabled);
 
   const toggleWatch = (repoId: string) => {
-    setWatchedRepos(prev => 
-      prev.includes(repoId) 
-        ? prev.filter(id => id !== repoId)
-        : [...prev, repoId]
-    );
+    const repo = repositories.find(r => r.id === repoId);
+    const newWatchedRepos = watchedRepos.includes(repoId) 
+      ? watchedRepos.filter(id => id !== repoId)
+      : [...watchedRepos, repoId];
+    
+    updateWatchedRepos(newWatchedRepos);
+    logInfo('watch-mode', `${watchedRepos.includes(repoId) ? 'Stopped' : 'Started'} watching ${repo?.owner}/${repo?.name}`);
   };
 
   const fetchRepoData = async (repo: Repository) => {
     const apiKey = apiKeys.find(key => key.id === repo.apiKeyId && key.isActive);
-    if (!apiKey) return;
+    if (!apiKey) {
+      logWarn('watch-mode', `No active API key found for ${repo.owner}/${repo.name}`);
+      return;
+    }
 
     try {
+      logInfo('watch-mode', `Fetching data for ${repo.owner}/${repo.name}`);
       const service = createGitHubService(apiKey.key);
       
       // Fetch pull requests
       const pullRequests = await service.fetchPullRequests(repo.owner, repo.name);
-      setRepoPullRequests(prev => ({ ...prev, [repo.id]: pullRequests }));
+      updateRepoPullRequests({ ...repoPullRequests, [repo.id]: pullRequests });
+      logInfo('watch-mode', `Fetched ${pullRequests.length} pull requests for ${repo.owner}/${repo.name}`);
 
       // Fetch recent activity
       const activities = await service.fetchRecentActivity([repo]);
-      setRepoActivities(prev => ({ ...prev, [repo.id]: activities }));
+      updateRepoActivities({ ...repoActivities, [repo.id]: activities });
+      logInfo('watch-mode', `Fetched ${activities.length} activities for ${repo.owner}/${repo.name}`);
       
     } catch (error) {
-      console.error(`Error fetching data for ${repo.name}:`, error);
+      logError('watch-mode', `Error fetching data for ${repo.owner}/${repo.name}`, error);
     }
   };
 
   const refreshAllWatched = async () => {
     setIsLoading(true);
-    const promises = enabledRepos
-      .filter(repo => watchedRepos.includes(repo.id))
-      .map(repo => fetchRepoData(repo));
+    const watchedReposList = enabledRepos.filter(repo => watchedRepos.includes(repo.id));
+    logInfo('watch-mode', `Refreshing ${watchedReposList.length} watched repositories`);
+    
+    const promises = watchedReposList.map(repo => fetchRepoData(repo));
     
     await Promise.all(promises);
-    setLastUpdateTime(new Date());
+    updateLastUpdateTime(new Date());
     setIsLoading(false);
+    logInfo('watch-mode', 'Completed refresh of all watched repositories');
   };
 
   // Auto-refresh every 30 seconds

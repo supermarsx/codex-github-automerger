@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Settings, Plus, Trash2, Download, Upload, Shield, Lock, Webhook } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
 import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
 import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
@@ -18,6 +17,7 @@ import { WebhookManagement } from '@/components/WebhookManagement';
 import { ConfigToggle } from '@/components/ConfigToggle';
 import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
+import { useLogger } from '@/hooks/useLogger';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -26,8 +26,6 @@ interface GlobalConfigurationProps {
   onConfigChange: (config: GlobalConfig) => void;
   onExportConfig: () => void;
   onImportConfig: () => void;
-  theme?: 'light' | 'dark';
-  onThemeChange?: (theme: 'light' | 'dark') => void;
 }
 
 export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
@@ -36,9 +34,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   apiKeys,
   onConfigChange,
   onExportConfig,
-  onImportConfig,
-  theme = 'light',
-  onThemeChange
+  onImportConfig
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
@@ -55,6 +51,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   const [importPassword, setImportPassword] = useState('');
   const [importFile, setImportFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const { logInfo, logError, logWarn } = useLogger('info');
 
   const addBranchPattern = () => {
     if (newPattern) {
@@ -63,15 +60,18 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         defaultBranchPatterns: [...config.defaultBranchPatterns, newPattern]
       });
       setNewPattern('');
+      logInfo('global-config', `Added branch pattern: ${newPattern}`);
       toast({ title: "Branch pattern added successfully!" });
     }
   };
 
   const removeBranchPattern = (index: number) => {
+    const removedPattern = config.defaultBranchPatterns[index];
     onConfigChange({
       ...config,
       defaultBranchPatterns: config.defaultBranchPatterns.filter((_, i) => i !== index)
     });
+    logInfo('global-config', `Removed branch pattern: ${removedPattern}`);
     toast({ title: "Branch pattern removed successfully!" });
   };
 
@@ -82,19 +82,23 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         defaultAllowedUsers: [...config.defaultAllowedUsers, newUser]
       });
       setNewUser('');
+      logInfo('global-config', `Added allowed user: ${newUser}`);
       toast({ title: "User added successfully!" });
     }
   };
 
   const removeAllowedUser = (index: number) => {
+    const removedUser = config.defaultAllowedUsers[index];
     onConfigChange({
       ...config,
       defaultAllowedUsers: config.defaultAllowedUsers.filter((_, i) => i !== index)
     });
+    logInfo('global-config', `Removed allowed user: ${removedUser}`);
     toast({ title: "User removed successfully!" });
   };
 
   const handleExport = async () => {
+    logInfo('global-config', 'Starting configuration export', exportOptions);
     try {
       const securityConfig: SecurityConfig = {
         passkeyEnabled: false,
@@ -116,12 +120,14 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
       
       ExportImportService.downloadFile(exportData, filename);
       
+      logInfo('global-config', `Configuration exported successfully: ${filename}`);
       toast({ 
         title: "Configuration exported successfully!",
         description: `Saved as ${filename}`
       });
       setShowExportDialog(false);
     } catch (error) {
+      logError('global-config', 'Export failed', error);
       toast({ 
         title: "Export failed", 
         description: "Failed to export configuration",
@@ -132,6 +138,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
   const handleImport = async () => {
     if (!importFile) {
+      logWarn('global-config', 'Import attempted with no file selected');
       toast({ 
         title: "No file selected", 
         description: "Please select a file to import",
@@ -140,11 +147,13 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
       return;
     }
 
+    logInfo('global-config', `Starting configuration import from file: ${importFile.name}`);
     try {
       const exportData = await ExportImportService.readFile(importFile);
       const result = await ExportImportService.importData(exportData, importPassword);
 
       if (!result.success) {
+        logError('global-config', 'Import failed', result.error);
         toast({ 
           title: "Import failed", 
           description: result.error,
@@ -155,6 +164,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
       if (result.data?.globalConfig) {
         onConfigChange(result.data.globalConfig);
+        logInfo('global-config', 'Configuration imported and applied successfully');
       }
 
       toast({ 
@@ -165,6 +175,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
       setImportFile(null);
       setImportPassword('');
     } catch (error) {
+      logError('global-config', 'Import failed due to invalid file format', error);
       toast({ 
         title: "Import failed", 
         description: "Invalid file format",
@@ -501,12 +512,6 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.darkMode}
               onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
             />
-            {onThemeChange && (
-              <div className="grid grid-cols-2 items-center gap-4">
-                <Label className="font-bold">Theme</Label>
-                <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
-              </div>
-            )}
             <ConfigToggle
               id="hideHeader"
               label="Hide Header"

@@ -25,13 +25,12 @@ import {
 import { DetailedStatistics } from '@/components/DetailedStatistics';
 import { WatchMode } from '@/components/WatchMode';
 import { SelectiveRepositoryLoader } from '@/components/SelectiveRepositoryLoader';
+import { useAppPersistence } from '@/hooks/useAppPersistence';
+import { useLogger } from '@/hooks/useLogger';
 
 export const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('feed');
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    const saved = localStorage.getItem('theme');
-    return (saved as 'light' | 'dark') || 'light';
-  });
+  const { appState, updateActiveTab, markActivity } = useAppPersistence();
+  const { logInfo, logError, logWarn } = useLogger('info');
   const {
     repositories,
     apiKeys,
@@ -64,19 +63,33 @@ export const Dashboard = () => {
   useEffect(() => {
     if (repositories.length === 0 || apiKeys.length === 0) return;
     
+    logInfo('dashboard', `Setting up auto-refresh for ${repositories.length} repositories`);
     const interval = setInterval(() => {
+      logInfo('dashboard', 'Auto-refreshing activities');
       fetchActivities(repositories, apiKeys);
     }, 30000);
 
-    return () => clearInterval(interval);
+    return () => {
+      logInfo('dashboard', 'Clearing auto-refresh interval');
+      clearInterval(interval);
+    };
   }, [repositories.length, apiKeys.length]);
 
   // Initial fetch when repos or keys change
   useEffect(() => {
     if (repositories.length > 0 && apiKeys.length > 0) {
+      logInfo('dashboard', `Initial fetch for ${repositories.length} repositories with ${apiKeys.length} API keys`);
       fetchActivities(repositories, apiKeys);
     }
   }, [repositories.length, apiKeys.length]);
+
+  // Log app initialization
+  useEffect(() => {
+    logInfo('dashboard', 'Dashboard initialized', { 
+      sessionStart: appState.sessionStartTime,
+      activeTab: appState.activeTab
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -92,7 +105,11 @@ export const Dashboard = () => {
 
         {/* Main Content */}
         <div className="pb-24">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs value={appState.activeTab} onValueChange={(tab) => {
+            updateActiveTab(tab);
+            markActivity();
+            logInfo('dashboard', `Switched to tab: ${tab}`);
+          }} className="space-y-6">
 
           <TabsContent value="feed" className="space-y-6 max-w-4xl mx-auto">
             <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} />
@@ -161,9 +178,7 @@ export const Dashboard = () => {
                 apiKeys={apiKeys}
                 onConfigChange={setGlobalConfig}
                 onExportConfig={exportReport}
-                onImportConfig={() => console.log('Import config')}
-                theme={theme}
-                onThemeChange={setTheme}
+                onImportConfig={() => logInfo('dashboard', 'Import config triggered')}
               />
             </div>
           </TabsContent>
@@ -208,65 +223,97 @@ export const Dashboard = () => {
           <div className="bg-card/95 backdrop-blur-sm border rounded-full p-2 shadow-lg">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setActiveTab('feed')}
+                onClick={() => {
+                  updateActiveTab('feed');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to feed tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'feed' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'feed' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <Activity className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('repositories')}
+                onClick={() => {
+                  updateActiveTab('repositories');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to repositories tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'repositories' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'repositories' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <GitBranch className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('api-keys')}
+                onClick={() => {
+                  updateActiveTab('api-keys');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to api-keys tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'api-keys' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'api-keys' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <Key className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('actions')}
+                onClick={() => {
+                  updateActiveTab('actions');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to actions tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'actions' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'actions' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <Zap className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('config')}
+                onClick={() => {
+                  updateActiveTab('config');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to config tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'config' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'config' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <Settings className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('security')}
+                onClick={() => {
+                  updateActiveTab('security');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to security tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'security' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'security' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <Shield className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('statistics')}
+                onClick={() => {
+                  updateActiveTab('statistics');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to statistics tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'statistics' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'statistics' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setActiveTab('logs')}
+                onClick={() => {
+                  updateActiveTab('logs');
+                  markActivity();
+                  logInfo('dashboard', 'Switched to logs tab via floating action bar');
+                }}
                 className={`p-3 rounded-full transition-all ${
-                  activeTab === 'logs' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  appState.activeTab === 'logs' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
                 }`}
               >
                 <FileText className="w-4 h-4" />
