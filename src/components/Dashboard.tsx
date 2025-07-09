@@ -56,7 +56,8 @@ export const Dashboard = () => {
     exportReport,
     setGlobalConfig,
     exportLogs,
-    fetchActivities
+    fetchActivities,
+    getDecryptedApiKey
   } = useDashboardData();
 
   // Auto-refresh activities every 30 seconds
@@ -66,7 +67,7 @@ export const Dashboard = () => {
     logInfo('dashboard', `Setting up auto-refresh for ${repositories.length} repositories`);
     const interval = setInterval(() => {
       logInfo('dashboard', 'Auto-refreshing activities');
-      fetchActivities(repositories, apiKeys);
+      fetchActivities(repositories, apiKeys, getDecryptedApiKey);
     }, 30000);
 
     return () => {
@@ -79,7 +80,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (repositories.length > 0 && apiKeys.length > 0) {
       logInfo('dashboard', `Initial fetch for ${repositories.length} repositories with ${apiKeys.length} API keys`);
-      fetchActivities(repositories, apiKeys);
+      fetchActivities(repositories, apiKeys, getDecryptedApiKey);
     }
   }, [repositories.length, apiKeys.length]);
 
@@ -113,17 +114,19 @@ export const Dashboard = () => {
 
           <TabsContent value="feed" className="space-y-6 max-w-4xl mx-auto">
             <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} />
-            <WatchMode 
-              repositories={repositories} 
-              apiKeys={apiKeys} 
-              onUpdateRepository={updateRepository}
-            />
+          <WatchMode
+            repositories={repositories}
+            apiKeys={apiKeys}
+            getDecryptedApiKey={getDecryptedApiKey}
+            onUpdateRepository={updateRepository}
+          />
           </TabsContent>
 
           <TabsContent value="repositories" className="space-y-6 max-w-4xl mx-auto">
-            <SelectiveRepositoryLoader 
+            <SelectiveRepositoryLoader
               apiKeys={apiKeys}
               existingRepos={repositories.map(r => `${r.owner}/${r.name}`)}
+              getDecryptedApiKey={getDecryptedApiKey}
               onAddRepository={(repoData) => {
                 addRepository(repoData.name, repoData.owner);
                 // Associate with API key
@@ -184,7 +187,7 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
-            <SecurityManagement />
+            <SecurityManagement apiKeys={apiKeys} repositories={repositories} config={globalConfig} />
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-6">

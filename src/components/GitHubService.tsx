@@ -12,10 +12,14 @@ export class GitHubService {
 
   async fetchRepositories(owner: string): Promise<Repository[]> {
     try {
-      const { data } = await this.octokit.rest.repos.listForAuthenticatedUser({
-        type: 'all',
-        per_page: 100,
-      });
+      let data;
+      if (owner) {
+        const res = await this.octokit.rest.repos.listForUser({ username: owner, per_page: 100 });
+        data = res.data;
+      } else {
+        const res = await this.octokit.rest.repos.listForAuthenticatedUser({ type: 'all', per_page: 100 });
+        data = res.data;
+      }
 
       return data.map(repo => ({
         id: repo.id.toString(),

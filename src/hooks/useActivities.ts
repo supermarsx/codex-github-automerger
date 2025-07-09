@@ -2,13 +2,31 @@ import { useState, useEffect } from 'react';
 import { ActivityItem } from '@/types/dashboard';
 import { useStatsPersistence } from './useStatsPersistence';
 import { createGitHubService } from '@/components/GitHubService';
+import type { LogEntry } from './useLogger';
 
 export const useActivities = () => {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { mergeStats, updateStats, resetSessionStats } = useStatsPersistence();
 
-  const fetchActivities = async (repositories: any[], apiKeys: any[]) => {
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<LogEntry>).detail;
+      const item: ActivityItem = {
+        id: detail.id,
+        type: detail.level === 'error' ? 'failure' : detail.level === 'warn' ? 'alert' : 'success',
+        message: detail.message,
+        repo: detail.category,
+        timestamp: detail.timestamp,
+        details: detail.details
+      };
+      setActivities(prev => [item, ...prev].slice(0, 50));
+    };
+    window.addEventListener('log-entry', handler);
+    return () => window.removeEventListener('log-entry', handler);
+  }, []);
+
+  const fetchActivities = async (repositories: any[], apiKeys: any[], getKey: (id: string) => string | null) => {
     if (!repositories.length || !apiKeys.length) {
       setActivities([]);
       return;
@@ -19,7 +37,9 @@ export const useActivities = () => {
       const allActivities: ActivityItem[] = [];
       
       for (const apiKey of apiKeys.filter(k => k.isActive)) {
-        const service = createGitHubService(apiKey.key);
+        const token = getKey(apiKey.id);
+        if (!token) continue;
+        const service = createGitHubService(token);
         const enabledRepos = repositories.filter(r => r.enabled && r.apiKeyId === apiKey.id);
         
         if (enabledRepos.length > 0) {

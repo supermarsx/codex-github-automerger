@@ -44,6 +44,7 @@ export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
     };
 
     setLogs(prev => [entry, ...prev].slice(0, 1000)); // Keep only last 1000 logs
+    window.dispatchEvent(new CustomEvent<LogEntry>('log-entry', { detail: entry }));
     
     // Also log to console for debugging
     const consoleMethod = level === 'debug' ? 'log' : level === 'info' ? 'info' : level === 'warn' ? 'warn' : 'error';
