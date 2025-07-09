@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatsCards } from '@/components/StatsCards';
+import { RealtimeFeed } from '@/components/RealtimeFeed';
+import { RepositoryCard } from '@/components/RepositoryCard';
+import { ApiKeyCard } from '@/components/ApiKeyCard';
+import { GlobalConfiguration } from '@/components/GlobalConfiguration';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { 
   Shield, 
   GitBranch, 
@@ -21,26 +28,10 @@ import {
   Users,
   Lock,
   Unlock,
-  Bot
+  Bot,
+  Activity
 } from 'lucide-react';
-
-interface Repository {
-  id: string;
-  name: string;
-  owner: string;
-  enabled: boolean;
-  allowedBranches: string[];
-  allowedUsers: string[];
-}
-
-interface ApiKey {
-  id: string;
-  name: string;
-  key: string;
-  created: Date;
-  lastUsed?: Date;
-  isActive: boolean;
-}
+import { Repository, ApiKey, MergeStats, GlobalConfig, ActivityItem } from '@/types/dashboard';
 
 export const Dashboard = () => {
   const [repositories, setRepositories] = useState<Repository[]>([
@@ -50,7 +41,25 @@ export const Dashboard = () => {
       owner: 'username',
       enabled: true,
       allowedBranches: ['codex-feature/*', 'codex-fix/*', 'codex-update/*'],
-      allowedUsers: ['github-actions[bot]', 'codex-merger']
+      allowedUsers: ['github-actions[bot]', 'codex-merger'],
+      alertsEnabled: true,
+      lastActivity: new Date('2024-01-20'),
+      recentPull: {
+        number: 123,
+        title: 'Add new feature',
+        status: 'merged',
+        timestamp: new Date('2024-01-20')
+      },
+      stats: {
+        totalMerges: 45,
+        successfulMerges: 42,
+        failedMerges: 3,
+        pendingMerges: 2
+      },
+      activities: [
+        { id: '1', type: 'merge', message: 'PR #123 merged successfully', repo: 'my-project', timestamp: new Date('2024-01-20') },
+        { id: '2', type: 'success', message: 'Codex branch auto-merged', repo: 'my-project', timestamp: new Date('2024-01-19') }
+      ]
     },
     {
       id: '2',
@@ -58,7 +67,18 @@ export const Dashboard = () => {
       owner: 'username',
       enabled: false,
       allowedBranches: ['codex-*'],
-      allowedUsers: ['github-actions[bot]']
+      allowedUsers: ['github-actions[bot]'],
+      alertsEnabled: false,
+      lastActivity: new Date('2024-01-15'),
+      stats: {
+        totalMerges: 12,
+        successfulMerges: 10,
+        failedMerges: 2,
+        pendingMerges: 1
+      },
+      activities: [
+        { id: '3', type: 'failure', message: 'PR #45 failed to merge', repo: 'another-repo', timestamp: new Date('2024-01-15') }
+      ]
     }
   ]);
 
@@ -69,20 +89,43 @@ export const Dashboard = () => {
       key: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
       created: new Date('2024-01-15'),
       lastUsed: new Date('2024-01-20'),
-      isActive: true
+      isActive: true,
+      encrypted: true
     },
     {
       id: '2',
       name: 'Development Key',
       key: 'ghp_yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy',
       created: new Date('2024-01-10'),
-      isActive: false
+      isActive: false,
+      encrypted: false
     }
   ]);
 
   const [newRepo, setNewRepo] = useState({ name: '', owner: '', branch: '', user: '' });
   const [newApiKey, setNewApiKey] = useState({ name: '', key: '' });
   const [showApiKey, setShowApiKey] = useState<string | null>(null);
+  
+  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>({
+    autoMergeEnabled: true,
+    requireApproval: false,
+    alertsEnabled: true,
+    encryptionEnabled: true,
+    defaultBranchPatterns: ['codex-*'],
+    defaultAllowedUsers: ['github-actions[bot]'],
+    alertThreshold: 30,
+    maxRetries: 3
+  });
+
+  const [activities, setActivities] = useState<ActivityItem[]>([
+    { id: '1', type: 'merge', message: 'PR #123 merged successfully', repo: 'my-project', timestamp: new Date() },
+    { id: '2', type: 'alert', message: 'Non-mergeable PR detected', repo: 'another-repo', timestamp: new Date() }
+  ]);
+
+  const mergeStats: MergeStats = {
+    session: { pending: 3, merged: 12, failed: 1 },
+    total: { pending: 5, merged: 67, failed: 8 }
+  };
 
   const toggleRepository = (id: string) => {
     setRepositories(repos =>
@@ -100,7 +143,10 @@ export const Dashboard = () => {
         owner: newRepo.owner,
         enabled: true,
         allowedBranches: ['codex-*'],
-        allowedUsers: ['github-actions[bot]']
+        allowedUsers: ['github-actions[bot]'],
+        alertsEnabled: true,
+        stats: { totalMerges: 0, successfulMerges: 0, failedMerges: 0, pendingMerges: 0 },
+        activities: []
       };
       setRepositories([...repositories, newRepository]);
       setNewRepo({ name: '', owner: '', branch: '', user: '' });
@@ -114,7 +160,8 @@ export const Dashboard = () => {
         name: newApiKey.name,
         key: newApiKey.key,
         created: new Date(),
-        isActive: true
+        isActive: true,
+        encrypted: true
       };
       setApiKeys([...apiKeys, newKey]);
       setNewApiKey({ name: '', key: '' });
@@ -182,6 +229,10 @@ export const Dashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <ConnectionStatus />
+            <ThemeToggle />
+          </div>
           <div className="flex items-center justify-center gap-4">
             <div className="neo-card p-4 neo-purple">
               <Bot className="w-8 h-8 text-black" />
@@ -199,44 +250,11 @@ export const Dashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="neo-card neo-yellow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-black font-black text-2xl">
-                {repositories.filter(r => r.enabled).length}
-              </CardTitle>
-              <CardDescription className="text-black font-bold">
-                Active Repositories
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          
-          <Card className="neo-card neo-pink">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-black font-black text-2xl">
-                {apiKeys.filter(k => k.isActive).length}
-              </CardTitle>
-              <CardDescription className="text-black font-bold">
-                Active API Keys
-              </CardDescription>
-            </CardHeader>
-          </Card>
-          
-          <Card className="neo-card neo-blue">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-black font-black text-2xl">
-                {repositories.reduce((acc, repo) => acc + repo.allowedBranches.length, 0)}
-              </CardTitle>
-              <CardDescription className="text-black font-bold">
-                Allowed Branches
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+        <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} />
 
         {/* Main Content */}
         <Tabs defaultValue="repositories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 neo-card bg-secondary h-16">
+          <TabsList className="grid w-full grid-cols-5 neo-card bg-secondary h-16">
             <TabsTrigger value="repositories" className="neo-button-secondary h-12">
               <GitBranch className="w-4 h-4 mr-2" />
               Repositories
@@ -244,6 +262,14 @@ export const Dashboard = () => {
             <TabsTrigger value="api-keys" className="neo-button-secondary h-12">
               <Key className="w-4 h-4 mr-2" />
               API Keys
+            </TabsTrigger>
+            <TabsTrigger value="feed" className="neo-button-secondary h-12">
+              <Activity className="w-4 h-4 mr-2" />
+              Feed
+            </TabsTrigger>
+            <TabsTrigger value="config" className="neo-button-secondary h-12">
+              <Settings className="w-4 h-4 mr-2" />
+              Config
             </TabsTrigger>
             <TabsTrigger value="security" className="neo-button-secondary h-12">
               <Shield className="w-4 h-4 mr-2" />

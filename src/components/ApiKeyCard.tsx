@@ -1,0 +1,92 @@
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
+import { Eye, EyeOff, Trash2, Key, Shield, ShieldAlert } from 'lucide-react';
+import { ApiKey } from '@/types/dashboard';
+
+interface ApiKeyCardProps {
+  apiKey: ApiKey;
+  onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
+  showKey: string | null;
+  onToggleShow: (id: string) => void;
+}
+
+export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
+  apiKey,
+  onToggle,
+  onDelete,
+  showKey,
+  onToggleShow
+}) => {
+  const maskKey = (key: string) => {
+    return key.substring(0, 8) + '*'.repeat(32);
+  };
+
+  return (
+    <Card className="neo-card">
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`neo-card p-2 ${apiKey.isActive ? 'neo-green' : 'neo-red'}`}>
+              <Key className="w-5 h-5 text-black" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-lg">{apiKey.name}</h3>
+                {apiKey.encrypted && (
+                  <Badge variant="secondary" className="neo-card neo-purple text-black font-bold">
+                    <Shield className="w-3 h-3 mr-1" />
+                    Encrypted
+                  </Badge>
+                )}
+                {!apiKey.encrypted && (
+                  <Badge variant="secondary" className="neo-card neo-yellow text-black font-bold">
+                    <ShieldAlert className="w-3 h-3 mr-1" />
+                    Unencrypted
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground font-bold">
+                Created: {apiKey.created.toLocaleDateString()}
+                {apiKey.lastUsed && ` • Last used: ${apiKey.lastUsed.toLocaleDateString()}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onToggleShow(apiKey.id)}
+              className="neo-button-secondary"
+            >
+              {showKey === apiKey.id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </Button>
+            <Switch
+              checked={apiKey.isActive}
+              onCheckedChange={() => onToggle(apiKey.id)}
+              className="scale-125"
+            />
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => onDelete(apiKey.id)}
+              className="neo-button bg-red-500 hover:bg-red-600"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+        {showKey === apiKey.id && (
+          <div className="mt-4 p-3 bg-muted rounded neo-card">
+            <code className="text-sm font-mono break-all">
+              {apiKey.encrypted ? '[ENCRYPTED] ' + maskKey(apiKey.key) : apiKey.key}
+            </code>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
