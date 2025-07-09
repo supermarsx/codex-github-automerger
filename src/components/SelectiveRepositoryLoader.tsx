@@ -239,7 +239,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
           <Button
             onClick={() => selectedApiKey && loadRepositories(selectedApiKey)}
             disabled={!selectedApiKey || isLoading}
-            variant="outline"
+            className="neo-button-secondary"
             size="sm"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
