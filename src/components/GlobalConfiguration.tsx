@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
 import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
 import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;

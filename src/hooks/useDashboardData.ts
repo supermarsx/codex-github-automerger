@@ -118,7 +118,10 @@ export const useDashboardData = () => {
         if (repo.id === id) {
           const newEnabled = !repo.enabled;
           logInfo('repository', `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}`, { repo: repo.name, enabled: newEnabled });
-          toast({ title: `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}` });
+          toast({ 
+            title: `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}`,
+            description: newEnabled ? 'Auto-merge is now active for this repository' : 'Auto-merge is now inactive for this repository'
+          });
           return { ...repo, enabled: newEnabled };
         }
         return repo;
@@ -161,10 +164,14 @@ export const useDashboardData = () => {
             : repo
         )
       );
+      toast({ title: `Branch pattern "${branch}" added successfully!` });
     }
   };
 
   const removeBranch = (repoId: string, branchIndex: number) => {
+    const repo = repositories.find(r => r.id === repoId);
+    const branchName = repo?.allowedBranches[branchIndex];
+    
     setRepositories(repos =>
       repos.map(repo =>
         repo.id === repoId
@@ -172,6 +179,10 @@ export const useDashboardData = () => {
           : repo
       )
     );
+    
+    if (branchName) {
+      toast({ title: `Branch pattern "${branchName}" removed successfully!` });
+    }
   };
 
   const addUser = (repoId: string, user: string) => {
@@ -183,10 +194,14 @@ export const useDashboardData = () => {
             : repo
         )
       );
+      toast({ title: `User "${user}" added successfully!` });
     }
   };
 
   const removeUser = (repoId: string, userIndex: number) => {
+    const repo = repositories.find(r => r.id === repoId);
+    const userName = repo?.allowedUsers[userIndex];
+    
     setRepositories(repos =>
       repos.map(repo =>
         repo.id === repoId
@@ -194,6 +209,10 @@ export const useDashboardData = () => {
           : repo
       )
     );
+    
+    if (userName) {
+      toast({ title: `User "${userName}" removed successfully!` });
+    }
   };
 
   // API Key handlers
@@ -219,7 +238,10 @@ export const useDashboardData = () => {
         if (key.id === id) {
           const newActive = !key.isActive;
           logInfo('api-key', `API Key "${key.name}" ${newActive ? 'activated' : 'deactivated'}`, { keyName: key.name, active: newActive });
-          toast({ title: `API Key "${key.name}" ${newActive ? 'activated' : 'deactivated'}` });
+          toast({ 
+            title: `API Key "${key.name}" ${newActive ? 'activated' : 'deactivated'}`,
+            description: newActive ? 'API key is now active and ready to use' : 'API key is now inactive'
+          });
           return { ...key, isActive: newActive };
         }
         return key;

@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Eye, EyeOff, Trash2, Key, Shield, ShieldAlert, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { ApiKey } from '@/types/dashboard';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 interface ApiKeyCardProps {
   apiKey: ApiKey;
@@ -21,8 +22,19 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
   showKey,
   onToggleShow
 }) => {
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean }>({ open: false });
+  
   const maskKey = (key: string) => {
     return key.substring(0, 8) + '*'.repeat(32);
+  };
+
+  const handleDelete = () => {
+    setDeleteDialog({ open: true });
+  };
+
+  const confirmDelete = () => {
+    onDelete(apiKey.id);
+    setDeleteDialog({ open: false });
   };
 
   return (
@@ -70,6 +82,11 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Switch
+              checked={apiKey.isActive}
+              onCheckedChange={() => onToggle(apiKey.id)}
+              className="scale-125"
+            />
             <Button
               variant="outline"
               size="sm"
@@ -78,15 +95,10 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
             >
               {showKey === apiKey.id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </Button>
-            <Switch
-              checked={apiKey.isActive}
-              onCheckedChange={() => onToggle(apiKey.id)}
-              className="scale-125"
-            />
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => onDelete(apiKey.id)}
+              onClick={handleDelete}
               className="neo-button bg-red-500 hover:bg-red-600"
             >
               <Trash2 className="w-4 h-4" />
@@ -101,6 +113,17 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
           </div>
         )}
       </CardContent>
+      
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open })}
+        title="Delete API Key"
+        description={`Are you sure you want to delete the API key "${apiKey.name}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
     </Card>
   );
 };
