@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { ConnectionManager } from '@/components/ConnectionManager';
 import { Activity, GitMerge } from 'lucide-react';
 
@@ -24,7 +23,6 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [] }
           </div>
           <div className="flex items-center gap-4">
             <ConnectionManager apiKeys={apiKeys} compact={true} />
-            <ThemeToggle />
           </div>
         </div>
       </CardHeader>

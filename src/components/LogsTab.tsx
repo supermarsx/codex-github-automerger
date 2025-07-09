@@ -9,51 +9,21 @@ import { useToast } from '@/hooks/use-toast';
 interface LogEntry {
   id: string;
   timestamp: Date;
-  level: 'info' | 'warn' | 'error' | 'success';
+  level: 'info' | 'warn' | 'error' | 'success' | 'debug';
   category: string;
   message: string;
   details?: any;
 }
 
-export const LogsTab: React.FC = () => {
+interface LogsTabProps {
+  logs: LogEntry[];
+  onExportLogs: () => void;
+}
+
+export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const { toast } = useToast();
-
-  const [logs] = useState<LogEntry[]>([
-    {
-      id: '1',
-      timestamp: new Date(),
-      level: 'success',
-      category: 'merge',
-      message: 'Successfully merged PR #123 in my-project',
-      details: { repo: 'my-project', pr: 123 }
-    },
-    {
-      id: '2',
-      timestamp: new Date(Date.now() - 60000),
-      level: 'info',
-      category: 'fetch',
-      message: 'Fetching repository data for username/my-project',
-      details: { repo: 'username/my-project' }
-    },
-    {
-      id: '3',
-      timestamp: new Date(Date.now() - 120000),
-      level: 'warn',
-      category: 'webhook',
-      message: 'Webhook delivery failed, retrying in 5 minutes',
-      details: { url: 'https://api.example.com/webhook' }
-    },
-    {
-      id: '4',
-      timestamp: new Date(Date.now() - 180000),
-      level: 'error',
-      category: 'api',
-      message: 'GitHub API rate limit exceeded',
-      details: { remaining: 0, resetTime: new Date(Date.now() + 3600000) }
-    }
-  ]);
 
   const filteredLogs = logs.filter(log => {
     const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -62,22 +32,8 @@ export const LogsTab: React.FC = () => {
     return matchesSearch && matchesLevel;
   });
 
-  const exportLogs = () => {
-    const logData = {
-      exported: new Date().toISOString(),
-      logs: filteredLogs
-    };
-    
-    const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `automerger-logs-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
+  const handleExportLogs = () => {
+    onExportLogs();
     toast({ title: "Logs exported successfully!" });
   };
 
@@ -87,6 +43,7 @@ export const LogsTab: React.FC = () => {
       case 'info': return 'neo-blue';
       case 'warn': return 'neo-yellow';
       case 'error': return 'neo-red';
+      case 'debug': return 'neo-purple';
       default: return 'neo-blue';
     }
   };
@@ -105,7 +62,7 @@ export const LogsTab: React.FC = () => {
                 Track all system actions and events
               </CardDescription>
             </div>
-            <Button onClick={exportLogs} className="neo-button">
+            <Button onClick={handleExportLogs} className="neo-button">
               <Download className="w-4 h-4 mr-2" />
               Export Logs
             </Button>
@@ -127,6 +84,7 @@ export const LogsTab: React.FC = () => {
               className="neo-input px-3 py-2"
             >
               <option value="all">All Levels</option>
+              <option value="debug">Debug</option>
               <option value="info">Info</option>
               <option value="success">Success</option>
               <option value="warn">Warning</option>

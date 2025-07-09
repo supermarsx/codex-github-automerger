@@ -73,4 +73,7 @@ export interface GlobalConfig {
   allowAllBranches: boolean;
   allowAllUsers: boolean;
   fetchMode: 'no-auth' | 'github-api';
+  serverCheckInterval: number;
+  logLevel: 'info' | 'warn' | 'error' | 'debug';
+  darkMode: boolean;
 }

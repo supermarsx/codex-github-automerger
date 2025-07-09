@@ -11,7 +11,7 @@ import { Shield, Lock, Settings, CheckCircle, AlertCircle, Plus, Trash2, Webhook
 import { useToast } from '@/hooks/use-toast';
 import { PasskeyService, PasskeyCredential } from '@/utils/passkeyAuth';
 import { WebhookService, WebhookConfig, WebhookEvent } from '@/utils/webhooks';
-import { EncryptionService, BenchmarkResult } from '@/utils/encryption';
+import { EncryptionService } from '@/utils/encryption';
 
 export const SecurityManagement: React.FC = () => {
   const [passkeySupported, setPasskeySupported] = useState(false);

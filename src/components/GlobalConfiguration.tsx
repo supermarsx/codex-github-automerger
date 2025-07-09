@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Settings, Plus, Trash2, Download, Upload, Shield, Lock } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
 import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
 import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
@@ -167,14 +168,17 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
             <Settings className="w-6 h-6" />
             Global Configuration
           </CardTitle>
-          <div className="flex gap-2">
-            <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-              <DialogTrigger asChild>
-                <Button className="neo-button-secondary" size="sm">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export
-                </Button>
-              </DialogTrigger>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <div className="h-6 w-px bg-border" />
+            <div className="flex gap-2">
+              <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+                <DialogTrigger asChild>
+                  <Button className="neo-button-secondary" size="sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="neo-card">
                 <DialogHeader>
                   <DialogTitle>Export Configuration</DialogTitle>
@@ -315,7 +319,8 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                   </div>
                 </div>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -454,6 +459,14 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               />
             </div>
             <div className="flex items-center justify-between">
+              <Label htmlFor="darkMode">Dark Mode</Label>
+              <Switch
+                id="darkMode"
+                checked={config.darkMode}
+                onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
               <Label htmlFor="fetchMode">Fetch Mode</Label>
               <select
                 id="fetchMode"
@@ -506,6 +519,39 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 className="neo-input"
                 min="0"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* System Configuration */}
+        <div className="space-y-3">
+          <h4 className="font-black text-lg">System Configuration</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="serverCheckInterval">Server Check Interval (seconds)</Label>
+              <Input
+                id="serverCheckInterval"
+                type="number"
+                value={config.serverCheckInterval / 1000}
+                onChange={(e) => onConfigChange({ ...config, serverCheckInterval: parseInt(e.target.value) * 1000 })}
+                className="neo-input"
+                min="5"
+                max="300"
+              />
+            </div>
+            <div>
+              <Label htmlFor="logLevel">Log Level</Label>
+              <select
+                id="logLevel"
+                value={config.logLevel}
+                onChange={(e) => onConfigChange({ ...config, logLevel: e.target.value as 'info' | 'warn' | 'error' | 'debug' })}
+                className="neo-input w-full"
+              >
+                <option value="debug">Debug</option>
+                <option value="info">Info</option>
+                <option value="warn">Warning</option>
+                <option value="error">Error</option>
+              </select>
             </div>
           </div>
         </div>

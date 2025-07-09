@@ -4,6 +4,7 @@ interface SocketConfig {
   url: string;
   reconnectInterval?: number;
   maxReconnectAttempts?: number;
+  checkInterval?: number;
 }
 
 interface SocketMessage {
@@ -34,7 +35,7 @@ export const useSocket = (config: SocketConfig) => {
       if (pingInterval.current) clearInterval(pingInterval.current);
       pingInterval.current = setInterval(() => {
         setLatency(Math.floor(Math.random() * 100) + 20);
-      }, 5000);
+      }, config.checkInterval || 10000);
       
     } catch (error) {
       console.error('Socket connection failed:', error);

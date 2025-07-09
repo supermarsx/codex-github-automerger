@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Repository, ApiKey, MergeStats, GlobalConfig, ActivityItem } from '@/types/dashboard';
+import { useLogger } from './useLogger';
+import { useToast } from './use-toast';
 
 export const useDashboardData = () => {
+  const { toast } = useToast();
+  const { logs, logInfo, logWarn, logError, logSuccess, exportLogs } = useLogger();
   const [repositories, setRepositories] = useState<Repository[]>([
     {
       id: '1',
@@ -84,7 +88,10 @@ export const useDashboardData = () => {
     autoDeleteBranch: true,
     allowAllBranches: false,
     allowAllUsers: false,
-    fetchMode: 'github-api'
+    fetchMode: 'github-api',
+    serverCheckInterval: 10000,
+    logLevel: 'info',
+    darkMode: false
   });
 
   const [activities, setActivities] = useState<ActivityItem[]>([
@@ -100,9 +107,15 @@ export const useDashboardData = () => {
   // Repository handlers
   const toggleRepository = (id: string) => {
     setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === id ? { ...repo, enabled: !repo.enabled } : repo
-      )
+      repos.map(repo => {
+        if (repo.id === id) {
+          const newEnabled = !repo.enabled;
+          logInfo('repository', `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}`, { repo: repo.name, enabled: newEnabled });
+          toast({ title: `Repository ${repo.name} ${newEnabled ? 'enabled' : 'disabled'}` });
+          return { ...repo, enabled: newEnabled };
+        }
+        return repo;
+      })
     );
   };
 
@@ -119,6 +132,8 @@ export const useDashboardData = () => {
       activities: []
     };
     setRepositories([...repositories, newRepository]);
+    logInfo('repository', `Repository ${owner}/${name} added`, { repo: `${owner}/${name}` });
+    toast({ title: `Repository ${owner}/${name} added successfully!` });
   };
 
   const addBranch = (repoId: string, branch: string) => {
@@ -176,18 +191,31 @@ export const useDashboardData = () => {
       encrypted: true
     };
     setApiKeys([...apiKeys, newKey]);
+    logInfo('api-key', `API Key "${name}" added`, { keyName: name });
+    toast({ title: `API Key "${name}" added successfully!` });
   };
 
   const toggleApiKey = (id: string) => {
     setApiKeys(keys =>
-      keys.map(key =>
-        key.id === id ? { ...key, isActive: !key.isActive } : key
-      )
+      keys.map(key => {
+        if (key.id === id) {
+          const newActive = !key.isActive;
+          logInfo('api-key', `API Key "${key.name}" ${newActive ? 'activated' : 'deactivated'}`, { keyName: key.name, active: newActive });
+          toast({ title: `API Key "${key.name}" ${newActive ? 'activated' : 'deactivated'}` });
+          return { ...key, isActive: newActive };
+        }
+        return key;
+      })
     );
   };
 
   const deleteApiKey = (id: string) => {
+    const key = apiKeys.find(k => k.id === id);
     setApiKeys(keys => keys.filter(key => key.id !== id));
+    if (key) {
+      logInfo('api-key', `API Key "${key.name}" deleted`, { keyName: key.name });
+      toast({ title: `API Key "${key.name}" deleted` });
+    }
   };
 
   const toggleShowApiKey = (id: string) => {
@@ -206,6 +234,7 @@ export const useDashboardData = () => {
     globalConfig,
     activities,
     mergeStats,
+    logs,
     toggleRepository,
     addRepository,
     addBranch,
@@ -217,6 +246,7 @@ export const useDashboardData = () => {
     deleteApiKey,
     toggleShowApiKey,
     exportReport,
-    setGlobalConfig
+    setGlobalConfig,
+    exportLogs
   };
 };

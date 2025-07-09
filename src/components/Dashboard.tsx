@@ -28,6 +28,7 @@ export const Dashboard = () => {
     globalConfig,
     activities,
     mergeStats,
+    logs,
     toggleRepository,
     addRepository,
     addBranch,
@@ -39,7 +40,8 @@ export const Dashboard = () => {
     deleteApiKey,
     toggleShowApiKey,
     exportReport,
-    setGlobalConfig
+    setGlobalConfig,
+    exportLogs
   } = useDashboardData();
 
   return (
@@ -52,11 +54,15 @@ export const Dashboard = () => {
         <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} />
 
         {/* Connection Status */}
-        <ConnectionManager apiKeys={apiKeys} />
+        <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
 
         {/* Main Content */}
-        <Tabs defaultValue="repositories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 h-16 gap-2 bg-transparent p-0 border-0">
+        <Tabs defaultValue="feed" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6 h-16 gap-2 p-0">
+            <TabsTrigger value="feed" className="neo-button-secondary h-12">
+              <Activity className="w-4 h-4 mr-2" />
+              Feed
+            </TabsTrigger>
             <TabsTrigger value="repositories" className="neo-button-secondary h-12">
               <GitBranch className="w-4 h-4 mr-2" />
               Repositories
@@ -64,10 +70,6 @@ export const Dashboard = () => {
             <TabsTrigger value="api-keys" className="neo-button-secondary h-12">
               <Key className="w-4 h-4 mr-2" />
               API Keys
-            </TabsTrigger>
-            <TabsTrigger value="feed" className="neo-button-secondary h-12">
-              <Activity className="w-4 h-4 mr-2" />
-              Feed
             </TabsTrigger>
             <TabsTrigger value="config" className="neo-button-secondary h-12">
               <Settings className="w-4 h-4 mr-2" />
@@ -83,9 +85,17 @@ export const Dashboard = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="feed" className="space-y-6">
+            <div className="mb-4">
+              <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
+            </div>
+            <RealtimeFeed activities={activities} onExportReport={exportReport} />
+          </TabsContent>
+
           <TabsContent value="repositories" className="space-y-6">
             <RepositoryManagement
               repositories={repositories}
+              apiKeys={apiKeys}
               onToggleRepository={toggleRepository}
               onAddRepository={addRepository}
               onAddBranch={addBranch}
@@ -106,10 +116,6 @@ export const Dashboard = () => {
             />
           </TabsContent>
 
-          <TabsContent value="feed" className="space-y-6">
-            <RealtimeFeed activities={activities} onExportReport={exportReport} />
-          </TabsContent>
-
           <TabsContent value="config" className="space-y-6">
             <GlobalConfiguration 
               config={globalConfig} 
@@ -126,7 +132,7 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="logs" className="space-y-6">
-            <LogsTab />
+            <LogsTab logs={logs} onExportLogs={exportLogs} />
           </TabsContent>
         </Tabs>
       </div>

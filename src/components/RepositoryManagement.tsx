@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface RepositoryManagementProps {
   repositories: Repository[];
+  apiKeys: any[];
   onToggleRepository: (id: string) => void;
   onAddRepository: (name: string, owner: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
@@ -21,6 +22,7 @@ interface RepositoryManagementProps {
 
 export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   repositories,
+  apiKeys,
   onToggleRepository,
   onAddRepository,
   onAddBranch,
@@ -205,13 +207,15 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     <Key className="w-5 h-5" />
                     API Key
                   </h4>
-                  <Select defaultValue="global">
+                  <Select defaultValue={repo.apiKeyId || "global"}>
                     <SelectTrigger className="neo-input">
                       <SelectValue placeholder="Select API key" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="global">Use Global Config</SelectItem>
-                      <SelectItem value="custom">Custom API Key</SelectItem>
+                      {apiKeys.filter(k => k.isActive).map(key => (
+                        <SelectItem key={key.id} value={key.id}>{key.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -221,7 +225,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     <GitBranch className="w-5 h-5" />
                     Fetch Mode
                   </h4>
-                  <Select defaultValue="github-api">
+                  <Select defaultValue={repo.fetchMode || "github-api"}>
                     <SelectTrigger className="neo-input">
                       <SelectValue placeholder="Select fetch mode" />
                     </SelectTrigger>
@@ -237,7 +241,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     <Webhook className="w-5 h-5" />
                     Webhook Method
                   </h4>
-                  <Select defaultValue="global">
+                  <Select defaultValue={repo.webhookMethod || "global"}>
                     <SelectTrigger className="neo-input">
                       <SelectValue placeholder="Select webhook method" />
                     </SelectTrigger>

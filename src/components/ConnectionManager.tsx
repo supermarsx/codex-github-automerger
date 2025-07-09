@@ -6,9 +6,10 @@ import { Wifi, WifiOff, RefreshCw, Github, Server, Key } from 'lucide-react';
 interface ConnectionManagerProps {
   apiKeys: any[];
   compact?: boolean;
+  checkInterval?: number;
 }
 
-export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, compact = false }) => {
+export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, compact = false, checkInterval = 10000 }) => {
   const [socketConnected, setSocketConnected] = useState(true);
   const [githubConnected, setGithubConnected] = useState(true);
   const [publicApiConnected, setPublicApiConnected] = useState(true);
@@ -24,6 +25,15 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       setLatency(Math.floor(Math.random() * 100) + 20);
     }, 1000);
   };
+
+  // Simulate periodic server checks
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLatency(Math.floor(Math.random() * 100) + 20);
+    }, checkInterval);
+    
+    return () => clearInterval(interval);
+  }, [checkInterval]);
 
   if (compact) {
     return (
