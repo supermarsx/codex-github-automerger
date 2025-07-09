@@ -53,7 +53,27 @@ export class GitHubService {
         per_page: 100,
       });
 
-      return data;
+      const detailed = await Promise.all(
+        data.map(async pr => {
+          try {
+            const { data: details } = await this.octokit.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pr.number,
+            });
+
+            return {
+              ...pr,
+              mergeable: details.mergeable,
+              mergeable_state: details.mergeable_state,
+            };
+          } catch {
+            return pr;
+          }
+        })
+      );
+
+      return detailed;
     } catch (error) {
       console.error('Error fetching pull requests:', error);
       throw error;

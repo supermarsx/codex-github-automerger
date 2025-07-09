@@ -291,6 +291,12 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <span>{pr.user.login}</span>
                                     <span>•</span>
                                     <span>{pr.head.ref} → {pr.base.ref}</span>
+                                    {pr.mergeable_state && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="capitalize">{pr.mergeable_state}</span>
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               ))
