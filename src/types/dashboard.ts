@@ -4,6 +4,8 @@ export interface Repository {
   owner: string;
   enabled: boolean;
   autoMergeEnabled: boolean;
+  /** Whether this repository should be included in watch mode */
+  watchEnabled?: boolean;
   allowedBranches: string[];
   allowedUsers: string[];
   allowAllBranches?: boolean;
