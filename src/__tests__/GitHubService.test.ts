@@ -33,12 +33,12 @@ beforeEach(() => {
 
 describe('fetchPullRequests', () => {
   it('requests pull list and details', async () => {
-    octokitInstance.paginate.mockResolvedValue([{ number: 1 }]);
+    octokitInstance.rest.pulls.list.mockResolvedValue({ data: [{ number: 1 }] });
     octokitInstance.rest.pulls.get.mockResolvedValue({ data: { mergeable: true, mergeable_state: 'clean' } });
 
     const prs = await service.fetchPullRequests('o', 'r');
 
-    expect(octokitInstance.paginate).toHaveBeenCalledWith(octokitInstance.rest.pulls.list, { owner: 'o', repo: 'r', state: 'open', per_page: 100 });
+    expect(octokitInstance.rest.pulls.list).toHaveBeenCalledWith({ owner: 'o', repo: 'r', state: 'open', per_page: 10 });
     expect(octokitInstance.rest.pulls.get).toHaveBeenCalledWith({ owner: 'o', repo: 'r', pull_number: 1 });
     expect(prs[0]).toMatchObject({ number: 1, mergeable: true, mergeable_state: 'clean' });
   });
@@ -47,11 +47,11 @@ describe('fetchPullRequests', () => {
 describe('fetchRecentActivity', () => {
   it('requests repository events', async () => {
     const event = { id: '1', type: 'PullRequestEvent', payload: { action: 'opened', pull_request: { number: 2, merged: false } }, created_at: '2024-01-01T00:00:00Z' };
-    octokitInstance.paginate.mockResolvedValue([event]);
+    octokitInstance.rest.activity.listRepoEvents.mockResolvedValue({ data: [event] });
 
     const activities = await service.fetchRecentActivity([{ owner: 'o', name: 'r' } as any]);
 
-    expect(octokitInstance.paginate).toHaveBeenCalledWith(octokitInstance.rest.activity.listRepoEvents, { owner: 'o', repo: 'r', per_page: 10 });
+    expect(octokitInstance.rest.activity.listRepoEvents).toHaveBeenCalledWith({ owner: 'o', repo: 'r', per_page: 10 });
     expect(activities[0]).toMatchObject({ message: 'PR #2 opened', repo: 'o/r' });
   });
 });
