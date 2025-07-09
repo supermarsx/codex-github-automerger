@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Plus, Trash2, Download, Upload, Shield } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { GlobalConfig } from '@/types/dashboard';
 
 interface GlobalConfigurationProps {
@@ -23,6 +24,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
+  const { toast } = useToast();
 
   const addBranchPattern = () => {
     if (newPattern) {
@@ -67,11 +69,25 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
             Global Configuration
           </CardTitle>
           <div className="flex gap-2">
-            <Button onClick={onExportConfig} className="neo-button-secondary" size="sm">
+            <Button 
+              onClick={() => {
+                onExportConfig();
+                toast({ title: "Configuration exported successfully!" });
+              }} 
+              className="neo-button-secondary" 
+              size="sm"
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button onClick={onImportConfig} className="neo-button-secondary" size="sm">
+            <Button 
+              onClick={() => {
+                onImportConfig();
+                toast({ title: "Configuration imported successfully!" });
+              }} 
+              className="neo-button-secondary" 
+              size="sm"
+            >
               <Upload className="w-4 h-4 mr-2" />
               Import
             </Button>
@@ -123,7 +139,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Default Branch Patterns</h4>
           <div className="flex flex-wrap gap-2">
             {config.defaultBranchPatterns.map((pattern, index) => (
-              <Badge key={index} variant="secondary" className="neo-card neo-blue text-black font-bold">
+              <Badge key={index} variant="secondary" className="neo-card neo-blue text-black dark:text-white font-bold">
                 {pattern}
                 <button
                   onClick={() => removeBranchPattern(index)}
@@ -153,7 +169,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Default Allowed Users</h4>
           <div className="flex flex-wrap gap-2">
             {config.defaultAllowedUsers.map((user, index) => (
-              <Badge key={index} variant="secondary" className="neo-card neo-green text-black font-bold">
+              <Badge key={index} variant="secondary" className="neo-card neo-green text-black dark:text-white font-bold">
                 {user}
                 <button
                   onClick={() => removeAllowedUser(index)}
@@ -176,6 +192,68 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               <Plus className="w-4 h-4" />
             </Button>
           </div>
+        </div>
+
+        {/* Advanced Settings */}
+        <div className="space-y-4">
+          <h4 className="font-black text-lg">Advanced Settings</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="autoDeleteBranch">Auto Delete Branch After Merge</Label>
+              <Switch
+                id="autoDeleteBranch"
+                checked={config.autoDeleteBranch}
+                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="allowAllBranches">Allow All Branches</Label>
+                <Shield className="w-4 h-4 text-destructive" />
+              </div>
+              <Switch
+                id="allowAllBranches"
+                checked={config.allowAllBranches}
+                onCheckedChange={(checked) => onConfigChange({ ...config, allowAllBranches: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="allowAllUsers">Allow All Users</Label>
+                <Shield className="w-4 h-4 text-destructive" />
+              </div>
+              <Switch
+                id="allowAllUsers"
+                checked={config.allowAllUsers}
+                onCheckedChange={(checked) => onConfigChange({ ...config, allowAllUsers: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="fetchMode">Fetch Mode</Label>
+              <select
+                id="fetchMode"
+                value={config.fetchMode}
+                onChange={(e) => onConfigChange({ ...config, fetchMode: e.target.value as 'no-auth' | 'github-api' })}
+                className="neo-input w-48"
+              >
+                <option value="no-auth">No Authentication</option>
+                <option value="github-api">GitHub API</option>
+              </select>
+            </div>
+          </div>
+          {(config.allowAllBranches || config.allowAllUsers) && (
+            <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+              <div className="flex items-center gap-2 text-destructive font-bold">
+                <Shield className="w-4 h-4" />
+                Security Warning
+              </div>
+              <p className="text-sm text-destructive mt-1">
+                {config.allowAllBranches && "Allowing all branches can be risky. "}
+                {config.allowAllUsers && "Allowing all users can compromise security. "}
+                Please review your security settings.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Alert Configuration */}

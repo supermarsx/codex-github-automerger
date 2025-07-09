@@ -65,9 +65,19 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                       {activity.repo} • {activity.timestamp.toLocaleString()}
                     </p>
                   </div>
-                  <Badge variant="secondary" className="neo-card neo-yellow text-black font-bold">
-                    {activity.type}
-                  </Badge>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="neo-card neo-yellow text-black dark:text-white font-bold">
+                      {activity.type}
+                    </Badge>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="neo-button-secondary h-6 px-2 text-xs"
+                      onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
+                    >
+                      View
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

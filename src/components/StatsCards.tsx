@@ -54,13 +54,13 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
       {stats.map((stat, index) => (
         <Card key={index} className={`neo-card ${stat.color} p-2`}>
           <CardHeader className="pb-1">
-            <CardTitle className="text-black font-black text-lg text-center">
+            <CardTitle className="text-black dark:text-white font-black text-lg text-center">
               {stat.title}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 text-center">
-            <p className="text-black font-bold text-sm">{stat.label}</p>
-            <p className="text-black text-xs opacity-75">{stat.subtitle}</p>
+            <p className="text-black dark:text-white font-bold text-sm">{stat.label}</p>
+            <p className="text-black dark:text-white text-xs opacity-75">{stat.subtitle}</p>
           </CardContent>
         </Card>
       ))}

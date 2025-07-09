@@ -50,7 +50,7 @@ export const Dashboard = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="repositories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 neo-card bg-secondary h-16">
+          <TabsList className="grid w-full grid-cols-5 neo-card bg-secondary h-16 border-0">
             <TabsTrigger value="repositories" className="neo-button-secondary h-12">
               <GitBranch className="w-4 h-4 mr-2" />
               Repositories
@@ -101,7 +101,12 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="config" className="space-y-6">
-            <GlobalConfiguration globalConfig={globalConfig} onUpdateConfig={setGlobalConfig} />
+            <GlobalConfiguration 
+              config={globalConfig} 
+              onConfigChange={setGlobalConfig}
+              onExportConfig={exportReport}
+              onImportConfig={() => console.log('Import config')}
+            />
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">

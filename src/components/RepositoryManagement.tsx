@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Github, GitBranch, Users } from 'lucide-react';
 import { Repository } from '@/types/dashboard';
+import { useToast } from '@/hooks/use-toast';
 
 interface RepositoryManagementProps {
   repositories: Repository[];
@@ -27,22 +28,26 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   onRemoveUser
 }) => {
   const [newRepo, setNewRepo] = useState({ name: '', owner: '', branch: '', user: '' });
+  const { toast } = useToast();
 
   const handleAddRepository = () => {
     if (newRepo.name && newRepo.owner) {
       onAddRepository(newRepo.name, newRepo.owner);
       setNewRepo({ name: '', owner: '', branch: '', user: '' });
+      toast({ title: "Repository added successfully!" });
     }
   };
 
   const handleAddBranch = (repoId: string) => {
     onAddBranch(repoId, newRepo.branch);
     setNewRepo({ ...newRepo, branch: '' });
+    toast({ title: "Branch pattern added successfully!" });
   };
 
   const handleAddUser = (repoId: string) => {
     onAddUser(repoId, newRepo.user);
     setNewRepo({ ...newRepo, user: '' });
+    toast({ title: "User added successfully!" });
   };
 
   return (
@@ -112,7 +117,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                 </h4>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {repo.allowedBranches.map((branch, index) => (
-                    <Badge key={index} variant="secondary" className="neo-card neo-yellow text-black font-bold">
+                    <Badge key={index} variant="secondary" className="neo-card neo-yellow text-black dark:text-white font-bold">
                       {branch}
                       <button
                         onClick={() => onRemoveBranch(repo.id, index)}
@@ -153,7 +158,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                 </h4>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {repo.allowedUsers.map((user, index) => (
-                    <Badge key={index} variant="secondary" className="neo-card neo-blue text-black font-bold">
+                    <Badge key={index} variant="secondary" className="neo-card neo-blue text-black dark:text-white font-bold">
                       {user}
                       <button
                         onClick={() => onRemoveUser(repo.id, index)}

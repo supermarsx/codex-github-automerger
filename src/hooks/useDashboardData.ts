@@ -80,7 +80,11 @@ export const useDashboardData = () => {
     defaultBranchPatterns: ['codex-*'],
     defaultAllowedUsers: ['github-actions[bot]'],
     alertThreshold: 30,
-    maxRetries: 3
+    maxRetries: 3,
+    autoDeleteBranch: true,
+    allowAllBranches: false,
+    allowAllUsers: false,
+    fetchMode: 'github-api'
   });
 
   const [activities, setActivities] = useState<ActivityItem[]>([

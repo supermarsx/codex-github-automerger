@@ -63,4 +63,8 @@ export interface GlobalConfig {
   defaultAllowedUsers: string[];
   alertThreshold: number;
   maxRetries: number;
+  autoDeleteBranch: boolean;
+  allowAllBranches: boolean;
+  allowAllUsers: boolean;
+  fetchMode: 'no-auth' | 'github-api';
 }
