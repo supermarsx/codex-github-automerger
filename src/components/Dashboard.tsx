@@ -40,6 +40,7 @@ export const Dashboard = () => {
     toggleRepository,
     addRepository,
     deleteRepository,
+    updateRepository,
     addBranch,
     removeBranch,
     addUser,
@@ -94,7 +95,7 @@ export const Dashboard = () => {
             <WatchMode 
               repositories={repositories} 
               apiKeys={apiKeys} 
-              onUpdateRepository={(repoId, updates) => console.log('Update repo:', repoId, updates)}
+              onUpdateRepository={updateRepository}
             />
           </TabsContent>
 
