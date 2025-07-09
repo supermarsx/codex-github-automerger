@@ -46,7 +46,7 @@ export class GitHubService {
 
   async fetchPullRequests(owner: string, repo: string): Promise<any[]> {
     try {
-      const { data } = await this.octokit.rest.pulls.list({
+      const pulls = await this.octokit.paginate(this.octokit.rest.pulls.list, {
         owner,
         repo,
         state: 'open',
@@ -54,7 +54,7 @@ export class GitHubService {
       });
 
       const detailed = await Promise.all(
-        data.map(async pr => {
+        pulls.map(async pr => {
           try {
             const { data: details } = await this.octokit.rest.pulls.get({
               owner,
@@ -114,11 +114,14 @@ export class GitHubService {
 
     for (const repo of repositories) {
       try {
-        const { data: events } = await this.octokit.rest.activity.listRepoEvents({
-          owner: repo.owner,
-          repo: repo.name,
-          per_page: 10,
-        });
+        const events = await this.octokit.paginate(
+          this.octokit.rest.activity.listRepoEvents,
+          {
+            owner: repo.owner,
+            repo: repo.name,
+            per_page: 10,
+          }
+        );
 
         events.forEach(event => {
           if (event.type === 'PullRequestEvent') {
