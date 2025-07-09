@@ -36,6 +36,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   
   const { logInfo, logError, logWarn } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorTimestamps, setErrorTimestamps] = useState<Record<string, number>>({});
 
   const watchEnabledMap = watchModeState.watchEnabled;
   const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
@@ -46,9 +47,22 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   const enabledRepos = repositories.filter(repo => repo.enabled);
 
   const fetchRepoData = async (repo: Repository) => {
-    const apiKey = apiKeys.find(key => key.id === repo.apiKeyId && key.isActive);
+    let apiKey = apiKeys.find(key => key.id === repo.apiKeyId && key.isActive);
     if (!apiKey) {
-      logWarn('watch-mode', `No active API key found for ${repo.owner}/${repo.name}`);
+      // fallback to first active key if repository has none or inactive
+      apiKey = apiKeys.find(key => key.isActive);
+      if (!apiKey) {
+        logWarn('watch-mode', `No active API key found for ${repo.owner}/${repo.name}`);
+        return;
+      }
+      if (apiKey.id !== repo.apiKeyId) {
+        onUpdateRepository(repo.id, { apiKeyId: apiKey.id });
+      }
+    }
+
+    const lastError = errorTimestamps[repo.id];
+    if (lastError && Date.now() - lastError < 2 * 60 * 1000) {
+      logWarn('watch-mode', `Skipping fetch for ${repo.owner}/${repo.name} due to recent errors`);
       return;
     }
 
@@ -70,15 +84,24 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
       const activities = await service.fetchRecentActivity([repo]);
       updateRepoActivities({ ...repoActivities, [repo.id]: activities });
       logInfo('watch-mode', `Fetched ${activities.length} activities for ${repo.owner}/${repo.name}`);
+      setErrorTimestamps(prev => {
+        const copy = { ...prev };
+        delete copy[repo.id];
+        return copy;
+      });
       
     } catch (error) {
       logError('watch-mode', `Error fetching data for ${repo.owner}/${repo.name}`, error);
+      setErrorTimestamps(prev => ({ ...prev, [repo.id]: Date.now() }));
     }
   };
 
   const refreshAllWatched = async () => {
-    setIsLoading(true);
+    if (isLoading) return;
     const watchedReposList = enabledRepos.filter(repo => watchedRepos.includes(repo.id));
+    if (watchedReposList.length === 0) return;
+
+    setIsLoading(true);
     logInfo('watch-mode', `Refreshing ${watchedReposList.length} watched repositories`);
     
     const promises = watchedReposList.map(repo => fetchRepoData(repo));
