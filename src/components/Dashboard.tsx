@@ -28,6 +28,10 @@ import { SelectiveRepositoryLoader } from '@/components/SelectiveRepositoryLoade
 
 export const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('feed');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('theme');
+    return (saved as 'light' | 'dark') || 'light';
+  });
   const {
     repositories,
     apiKeys,
@@ -158,6 +162,8 @@ export const Dashboard = () => {
                 onConfigChange={setGlobalConfig}
                 onExportConfig={exportReport}
                 onImportConfig={() => console.log('Import config')}
+                theme={theme}
+                onThemeChange={setTheme}
               />
             </div>
           </TabsContent>

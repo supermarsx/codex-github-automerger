@@ -60,10 +60,19 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
               className="neo-input"
             />
           </div>
-          <Button onClick={handleAddApiKey} className="neo-button">
-            <Plus className="w-4 h-4 mr-2" />
-            Add API Key
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button onClick={handleAddApiKey} className="neo-button">
+              <Plus className="w-4 h-4 mr-2" />
+              Add API Key
+            </Button>
+            <Button
+              onClick={() => window.open('https://github.com/settings/tokens/new?scopes=repo,read:user&description=Auto-merger+bot', '_blank')}
+              variant="outline"
+              className="neo-button-secondary"
+            >
+              Get 30-day PAT
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

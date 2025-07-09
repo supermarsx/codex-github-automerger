@@ -58,10 +58,15 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
   if (compact) {
     return (
       <div className="flex items-center gap-2 text-sm">
-      <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
-        <Server className="w-3 h-3 mr-1" />
-        Status
-      </Badge>
+        <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
+          {socketConnected ? <Server className="w-3 h-3 mr-1" /> : <WifiOff className="w-3 h-3 mr-1" />}
+          {socketConnected ? 'Connected' : 'Disconnected'}
+        </Badge>
+        {socketConnected && latency > 0 && (
+          <Badge variant="secondary" className="neo-card neo-blue text-white text-xs px-2 py-1">
+            {latency}ms
+          </Badge>
+        )}
       </div>
     );
   }

@@ -26,6 +26,8 @@ interface GlobalConfigurationProps {
   onConfigChange: (config: GlobalConfig) => void;
   onExportConfig: () => void;
   onImportConfig: () => void;
+  theme?: 'light' | 'dark';
+  onThemeChange?: (theme: 'light' | 'dark') => void;
 }
 
 export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
@@ -34,7 +36,9 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   apiKeys,
   onConfigChange,
   onExportConfig,
-  onImportConfig
+  onImportConfig,
+  theme = 'light',
+  onThemeChange
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
@@ -497,6 +501,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.darkMode}
               onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
             />
+            {onThemeChange && (
+              <div className="grid grid-cols-2 items-center gap-4">
+                <Label className="font-bold">Theme</Label>
+                <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
+              </div>
+            )}
             <ConfigToggle
               id="hideHeader"
               label="Hide Header"

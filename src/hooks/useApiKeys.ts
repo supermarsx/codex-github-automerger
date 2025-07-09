@@ -190,7 +190,7 @@ export const useApiKeys = () => {
     if (!key) return null;
     
     try {
-      // Simple deobfuscation - in a real app, use proper decryption
+      // Simple deobfuscation - in a real app, use proper decryption with EncryptionService
       return atob(key.key);
     } catch (error) {
       console.error('Failed to decode API key:', error);
