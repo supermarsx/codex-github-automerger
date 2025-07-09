@@ -159,7 +159,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                 onClick={refreshAllWatched}
                 disabled={isLoading || watchedRepos.length === 0}
                 size="sm"
-                variant="outline"
+                className="neo-button-secondary"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
