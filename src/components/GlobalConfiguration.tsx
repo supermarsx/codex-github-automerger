@@ -15,6 +15,9 @@ import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
 import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { WebhookManagement } from '@/components/WebhookManagement';
+import { ConfigToggle } from '@/components/ConfigToggle';
+import { ConfigSelector } from '@/components/ConfigSelector';
+import { EditableList } from '@/components/EditableList';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -332,180 +335,98 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         {/* Auto-merge Settings */}
         <div className="space-y-4">
           <h4 className="font-black text-lg">Auto-merge Settings</h4>
-          <div className="grid grid-cols-1 gap-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="autoMerge">Enable Auto-merge</Label>
-              <Switch
-                id="autoMerge"
-                checked={config.autoMergeEnabled}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, autoMergeEnabled: checked });
-                  toast({ title: `Auto-merge ${checked ? 'enabled' : 'disabled'} successfully!` });
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="requireApproval">Require Approval</Label>
-              <Switch
-                id="requireApproval"
-                checked={config.requireApproval}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, requireApproval: checked });
-                  toast({ title: `Approval requirement ${checked ? 'enabled' : 'disabled'} successfully!` });
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="alertsEnabled">Enable Alerts</Label>
-              <Switch
-                id="alertsEnabled"
-                checked={config.alertsEnabled}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, alertsEnabled: checked });
-                  toast({ title: `Alerts ${checked ? 'enabled' : 'disabled'} successfully!` });
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="encryptionEnabled">Encrypt API Keys</Label>
-              <Switch
-                id="encryptionEnabled"
-                checked={config.encryptionEnabled}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, encryptionEnabled: checked });
-                  toast({ title: `API key encryption ${checked ? 'enabled' : 'disabled'} successfully!` });
-                }}
-              />
-            </div>
+          <div className="space-y-4">
+            <ConfigToggle
+              id="autoMerge"
+              label="Enable Auto-merge"
+              checked={config.autoMergeEnabled}
+              onCheckedChange={(checked) => onConfigChange({ ...config, autoMergeEnabled: checked })}
+            />
+            <ConfigToggle
+              id="requireApproval"
+              label="Require Approval"
+              checked={config.requireApproval}
+              onCheckedChange={(checked) => onConfigChange({ ...config, requireApproval: checked })}
+            />
+            <ConfigToggle
+              id="alertsEnabled"
+              label="Enable Alerts"
+              checked={config.alertsEnabled}
+              onCheckedChange={(checked) => onConfigChange({ ...config, alertsEnabled: checked })}
+            />
+            <ConfigToggle
+              id="encryptionEnabled"
+              label="Encrypt API Keys"
+              checked={config.encryptionEnabled}
+              onCheckedChange={(checked) => onConfigChange({ ...config, encryptionEnabled: checked })}
+            />
           </div>
         </div>
 
         {/* Default Branch Patterns */}
         <div className="space-y-3">
           <h4 className="font-black text-lg">Default Branch Patterns</h4>
-          <div className="flex flex-wrap gap-2">
-            {config.defaultBranchPatterns.map((pattern, index) => (
-              <Badge key={index} variant="secondary" className="neo-card neo-blue text-black dark:text-white font-bold">
-                {pattern}
-                <button
-                  onClick={() => removeBranchPattern(index)}
-                  className="ml-2 hover:text-red-600"
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="e.g., codex-*"
-              value={newPattern}
-              onChange={(e) => setNewPattern(e.target.value)}
-              className="neo-input"
-              onKeyPress={(e) => e.key === 'Enter' && addBranchPattern()}
-            />
-            <Button onClick={addBranchPattern} className="neo-button" size="sm">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
+          <EditableList
+            items={config.defaultBranchPatterns}
+            onItemsChange={(items) => onConfigChange({ ...config, defaultBranchPatterns: items })}
+            placeholder="e.g., codex-*"
+            itemColor="neo-blue"
+          />
         </div>
 
         {/* Default Allowed Users */}
         <div className="space-y-3">
           <h4 className="font-black text-lg">Default Allowed Users</h4>
-          <div className="flex flex-wrap gap-2">
-            {config.defaultAllowedUsers.map((user, index) => (
-              <Badge key={index} variant="secondary" className="neo-card neo-green text-black dark:text-white font-bold">
-                {user}
-                <button
-                  onClick={() => removeAllowedUser(index)}
-                  className="ml-2 hover:text-red-600"
-                >
-                  ×
-                </button>
-              </Badge>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              placeholder="e.g., github-actions[bot]"
-              value={newUser}
-              onChange={(e) => setNewUser(e.target.value)}
-              className="neo-input"
-              onKeyPress={(e) => e.key === 'Enter' && addAllowedUser()}
-            />
-            <Button onClick={addAllowedUser} className="neo-button" size="sm">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
+          <EditableList
+            items={config.defaultAllowedUsers}
+            onItemsChange={(items) => onConfigChange({ ...config, defaultAllowedUsers: items })}
+            placeholder="e.g., github-actions[bot]"
+            itemColor="neo-green"
+          />
         </div>
 
         {/* Advanced Settings */}
         <div className="space-y-4">
           <h4 className="font-black text-lg">Advanced Settings</h4>
            <div className="grid grid-cols-1 gap-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="autoDeleteBranch">Auto Delete Branch After Merge</Label>
-                <Switch
-                  id="autoDeleteBranch"
-                  checked={config.autoDeleteBranch}
-                  onCheckedChange={(checked) => {
-                    onConfigChange({ ...config, autoDeleteBranch: checked });
-                    toast({ title: `Auto branch deletion ${checked ? 'enabled' : 'disabled'} successfully!` });
-                  }}
-                />
-              </div>
-              <div className="flex items-center justify-between">
+             <ConfigToggle
+                id="autoDeleteBranch"
+                label="Auto Delete Branch After Merge"
+                checked={config.autoDeleteBranch}
+                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
+              />
+             <div className="grid grid-cols-2 items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="allowAllBranches">Allow All Branches</Label>
+                  <Label htmlFor="allowAllBranches" className="font-bold">Allow All Branches</Label>
                   <Shield className="w-4 h-4 text-destructive" />
                 </div>
                 <Switch
                   id="allowAllBranches"
                   checked={config.allowAllBranches}
-                  onCheckedChange={(checked) => {
-                    onConfigChange({ ...config, allowAllBranches: checked });
-                    toast({ 
-                      title: `Allow all branches ${checked ? 'enabled' : 'disabled'} successfully!`,
-                      description: checked ? "Warning: This reduces security" : undefined,
-                      variant: checked ? "destructive" : "default"
-                    });
-                  }}
+                  onCheckedChange={(checked) => onConfigChange({ ...config, allowAllBranches: checked })}
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="grid grid-cols-2 items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="allowAllUsers">Allow All Users</Label>
+                  <Label htmlFor="allowAllUsers" className="font-bold">Allow All Users</Label>
                   <Shield className="w-4 h-4 text-destructive" />
                 </div>
                 <Switch
                   id="allowAllUsers"
                   checked={config.allowAllUsers}
-                  onCheckedChange={(checked) => {
-                    onConfigChange({ ...config, allowAllUsers: checked });
-                    toast({ 
-                      title: `Allow all users ${checked ? 'enabled' : 'disabled'} successfully!`,
-                      description: checked ? "Warning: This reduces security" : undefined,
-                      variant: checked ? "destructive" : "default"
-                    });
-                  }}
+                  onCheckedChange={(checked) => onConfigChange({ ...config, allowAllUsers: checked })}
                 />
               </div>
-             <div className="flex items-center justify-between">
-               <Label htmlFor="fetchMode">Fetch Mode</Label>
-               <select
-                 id="fetchMode"
-                 value={config.fetchMode}
-                 onChange={(e) => {
-                   onConfigChange({ ...config, fetchMode: e.target.value as 'no-auth' | 'github-api' });
-                   toast({ title: "Fetch mode updated successfully!" });
-                 }}
-                 className="neo-input w-48"
-               >
-                 <option value="no-auth">No Authentication</option>
-                 <option value="github-api">GitHub API</option>
-               </select>
-             </div>
+             <ConfigSelector
+                id="fetchMode"
+                label="Fetch Mode"
+                value={config.fetchMode}
+                onChange={(value) => onConfigChange({ ...config, fetchMode: value as 'no-auth' | 'github-api' })}
+                options={[
+                  { value: 'no-auth', label: 'No Authentication' },
+                  { value: 'github-api', label: 'GitHub API' }
+                ]}
+              />
           </div>
           {(config.allowAllBranches || config.allowAllUsers) && (
             <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
@@ -525,107 +446,69 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         {/* Alert Configuration */}
         <div className="space-y-3">
           <h4 className="font-black text-lg">Alert Configuration</h4>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <Label htmlFor="alertThreshold">Alert Threshold (minutes)</Label>
-              <Input
-                id="alertThreshold"
-                type="number"
-                value={config.alertThreshold}
-                onChange={(e) => {
-                  onConfigChange({ ...config, alertThreshold: parseInt(e.target.value) });
-                  toast({ title: "Alert threshold updated successfully!" });
-                }}
-                className="neo-input"
-                min="1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="maxRetries">Max Retries</Label>
-              <Input
-                id="maxRetries"
-                type="number"
-                value={config.maxRetries}
-                onChange={(e) => {
-                  onConfigChange({ ...config, maxRetries: parseInt(e.target.value) });
-                  toast({ title: "Max retries updated successfully!" });
-                }}
-                className="neo-input"
-                min="0"
-              />
-            </div>
+          <div className="space-y-4">
+            <ConfigSelector
+              id="alertThreshold"
+              label="Alert Threshold (minutes)"
+              value={config.alertThreshold}
+              onChange={(value) => onConfigChange({ ...config, alertThreshold: parseInt(value) })}
+              type="number"
+              min={1}
+            />
+            <ConfigSelector
+              id="maxRetries"
+              label="Max Retries"
+              value={config.maxRetries}
+              onChange={(value) => onConfigChange({ ...config, maxRetries: parseInt(value) })}
+              type="number"
+              min={0}
+            />
           </div>
         </div>
 
         {/* System Configuration */}
         <div className="space-y-3">
           <h4 className="font-black text-lg">System Configuration</h4>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <Label htmlFor="serverCheckInterval">Server Check Interval (seconds)</Label>
-              <Input
-                id="serverCheckInterval"
-                type="number"
-                value={config.serverCheckInterval / 1000}
-                onChange={(e) => {
-                  onConfigChange({ ...config, serverCheckInterval: parseInt(e.target.value) * 1000 });
-                  toast({ title: "Server check interval updated successfully!" });
-                }}
-                className="neo-input"
-                min="5"
-                max="300"
-              />
-            </div>
-            <div>
-              <Label htmlFor="logLevel">Log Level</Label>
-              <select
-                id="logLevel"
-                value={config.logLevel}
-                onChange={(e) => {
-                  onConfigChange({ ...config, logLevel: e.target.value as 'info' | 'warn' | 'error' | 'debug' });
-                  toast({ title: "Log level updated successfully!" });
-                }}
-                className="neo-input w-full"
-              >
-                <option value="debug">Debug</option>
-                <option value="info">Info</option>
-                <option value="warn">Warning</option>
-                <option value="error">Error</option>
-              </select>
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="darkMode">Dark Mode</Label>
-              <Switch
-                id="darkMode"
-                checked={config.darkMode}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, darkMode: checked });
-                  toast({ title: `Dark mode ${checked ? 'enabled' : 'disabled'} successfully!` });
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="hideHeader">Hide Header</Label>
-              <Switch
-                id="hideHeader"
-                checked={config.hideHeader}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, hideHeader: checked });
-                  toast({ title: `Header ${checked ? 'hidden' : 'shown'} successfully!` });
-                }}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="logsDisabled">Disable Logs</Label>
-              <Switch
-                id="logsDisabled"
-                checked={config.logsDisabled}
-                onCheckedChange={(checked) => {
-                  onConfigChange({ ...config, logsDisabled: checked });
-                  toast({ title: `Logs ${checked ? 'disabled' : 'enabled'} successfully!` });
-                }}
-              />
-            </div>
+          <div className="space-y-4">
+            <ConfigSelector
+              id="serverCheckInterval"
+              label="Server Check Interval (seconds)"
+              value={config.serverCheckInterval / 1000}
+              onChange={(value) => onConfigChange({ ...config, serverCheckInterval: parseInt(value) * 1000 })}
+              type="number"
+              min={5}
+              max={300}
+            />
+            <ConfigSelector
+              id="logLevel"
+              label="Log Level"
+              value={config.logLevel}
+              onChange={(value) => onConfigChange({ ...config, logLevel: value as 'info' | 'warn' | 'error' | 'debug' })}
+              options={[
+                { value: 'debug', label: 'Debug' },
+                { value: 'info', label: 'Info' },
+                { value: 'warn', label: 'Warning' },
+                { value: 'error', label: 'Error' }
+              ]}
+            />
+            <ConfigToggle
+              id="darkMode"
+              label="Dark Mode"
+              checked={config.darkMode}
+              onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
+            />
+            <ConfigToggle
+              id="hideHeader"
+              label="Hide Header"
+              checked={config.hideHeader}
+              onCheckedChange={(checked) => onConfigChange({ ...config, hideHeader: checked })}
+            />
+            <ConfigToggle
+              id="logsDisabled"
+              label="Disable Logs"
+              checked={config.logsDisabled}
+              onCheckedChange={(checked) => onConfigChange({ ...config, logsDisabled: checked })}
+            />
           </div>
         </div>
 

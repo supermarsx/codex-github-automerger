@@ -48,6 +48,15 @@ export interface ActivityItem {
   details?: any;
 }
 
+export interface Activity {
+  id: string;
+  type: 'merged' | 'pull_request' | 'alert' | 'merge_failed';
+  message: string;
+  repository: string;
+  timestamp: Date;
+  details?: any;
+}
+
 export interface MergeStats {
   session: {
     pending: number;

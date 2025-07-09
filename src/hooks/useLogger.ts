@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export interface LogEntry {
   id: string;
@@ -11,6 +11,12 @@ export interface LogEntry {
 
 export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info') => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  // Initialize with startup logs
+  useEffect(() => {
+    addLog('info', 'system', 'Logger initialized');
+    addLog('info', 'system', `Log level set to: ${logLevel}`);
+  }, []);
 
   const shouldLog = (level: LogEntry['level']): boolean => {
     const levels = ['debug', 'info', 'warn', 'error', 'success'];
@@ -38,6 +44,10 @@ export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
     };
 
     setLogs(prev => [entry, ...prev].slice(0, 1000)); // Keep only last 1000 logs
+    
+    // Also log to console for debugging
+    const consoleMethod = level === 'debug' ? 'log' : level === 'info' ? 'info' : level === 'warn' ? 'warn' : 'error';
+    console[consoleMethod](`[${category}] ${message}`, details ? details : '');
   }, [logLevel]);
 
   const logInfo = useCallback((category: string, message: string, details?: any) => {

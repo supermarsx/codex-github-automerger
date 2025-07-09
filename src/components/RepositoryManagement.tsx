@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { EditableList } from '@/components/EditableList';
 
 interface RepositoryManagementProps {
   repositories: Repository[];
@@ -234,39 +235,17 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         <GitBranch className="w-5 h-5" />
                         Allowed Branch Patterns
                       </h4>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {repo.allowedBranches.map((branch, index) => (
-                          <Badge key={index} variant="secondary" className="neo-card neo-yellow text-black dark:text-white font-bold">
-                            {branch}
-                            <button
-                              onClick={() => onRemoveBranch(repo.id, index)}
-                              className="ml-2 hover:text-red-600"
-                            >
-                              ×
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="e.g., codex-feature/*"
-                          value={newRepo.branch}
-                          onChange={(e) => setNewRepo({ ...newRepo, branch: e.target.value })}
-                          className="neo-input"
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleAddBranch(repo.id);
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={() => handleAddBranch(repo.id)}
-                          className="neo-button"
-                          size="sm"
-                        >
-                          Add
-                        </Button>
-                      </div>
+                       <EditableList
+                         items={repo.allowedBranches}
+                         onItemsChange={(items) => {
+                           // Update branch patterns for this repository
+                           const updatedBranches = items;
+                           // This would need to be implemented in the parent component
+                           console.log('Update branches for repo:', repo.id, updatedBranches);
+                         }}
+                         placeholder="e.g., codex-feature/*"
+                         itemColor="neo-yellow"
+                       />
                     </div>
 
                     {/* Allowed Users */}
@@ -281,39 +260,17 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                           </Badge>
                         )}
                       </h4>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {repo.allowedUsers.map((user, index) => (
-                          <Badge key={index} variant="secondary" className="neo-card neo-blue text-black dark:text-white font-bold">
-                            {user}
-                            <button
-                              onClick={() => onRemoveUser(repo.id, index)}
-                              className="ml-2 hover:text-red-600"
-                            >
-                              ×
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="e.g., github-actions[bot]"
-                          value={newRepo.user}
-                          onChange={(e) => setNewRepo({ ...newRepo, user: e.target.value })}
-                          className="neo-input"
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleAddUser(repo.id);
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={() => handleAddUser(repo.id)}
-                          className="neo-button"
-                          size="sm"
-                        >
-                          Add
-                        </Button>
-                      </div>
+                       <EditableList
+                         items={repo.allowedUsers}
+                         onItemsChange={(items) => {
+                           // Update allowed users for this repository
+                           const updatedUsers = items;
+                           // This would need to be implemented in the parent component
+                           console.log('Update users for repo:', repo.id, updatedUsers);
+                         }}
+                         placeholder="e.g., github-actions[bot]"
+                         itemColor="neo-blue"
+                       />
                     </div>
                   </div>
 

@@ -167,7 +167,20 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-6">
-            <DetailedStatistics repositories={repositories} period={globalConfig.statsPeriod} />
+            <DetailedStatistics 
+              repositories={repositories} 
+              activities={activities.map(activity => ({
+                id: activity.id,
+                type: activity.type === 'merge' ? 'merged' : 
+                      activity.type === 'pull' ? 'pull_request' : 
+                      activity.type === 'failure' ? 'merge_failed' : 'alert',
+                message: activity.message,
+                repository: activity.repo,
+                timestamp: activity.timestamp,
+                details: activity.details
+              }))} 
+              period={globalConfig.statsPeriod} 
+            />
           </TabsContent>
 
           <TabsContent value="logs" className="space-y-6">

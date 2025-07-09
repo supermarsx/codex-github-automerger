@@ -60,15 +60,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       <div className="flex items-center gap-2 text-sm">
       <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
         <Server className="w-3 h-3 mr-1" />
-        {latency > 0 ? `${latency}ms` : 'N/A'}
-      </Badge>
-      <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white text-xs px-2 py-1`}>
-        <Github className="w-3 h-3 mr-1" />
-        GH
-      </Badge>
-      <Badge variant="secondary" className={`neo-card ${activeApiKeys > 0 ? 'neo-yellow' : 'neo-red'} text-white text-xs px-2 py-1`}>
-        <Key className="w-3 h-3 mr-1" />
-        {activeApiKeys}
+        Status
       </Badge>
       </div>
     );
@@ -87,12 +79,12 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       
       <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white font-bold`}>
         {socketConnected ? <Server className="w-4 h-4 mr-2" /> : <WifiOff className="w-4 h-4 mr-2" />}
-        Server {socketConnected ? (latency > 0 ? `(${latency}ms)` : 'Connected') : 'Disconnected'}
+        Server {socketConnected ? `Connected (${latency}ms)` : 'Disconnected'}
       </Badge>
       
       <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white font-bold`}>
         <Github className="w-4 h-4 mr-2" />
-        GitHub API {githubConnected ? 'Connected' : 'Error'}
+        GitHub {githubConnected ? 'Connected' : 'Error'}
       </Badge>
 
       <Badge variant="secondary" className={`neo-card ${publicApiConnected ? 'neo-yellow' : 'neo-red'} text-white font-bold`}>
@@ -102,7 +94,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
 
       <Badge variant="secondary" className={`neo-card ${activeApiKeys > 0 ? 'neo-purple' : 'neo-red'} text-white font-bold`}>
         <Key className="w-4 h-4 mr-2" />
-        {activeApiKeys} Active Keys
+        {activeApiKeys} Keys Active
       </Badge>
     </div>
   );
