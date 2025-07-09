@@ -5,8 +5,9 @@ const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
 export interface WatchModeState {
   watchEnabled: Record<string, boolean>;
   lastUpdateTime: Date;
-  repoActivities: Record<string, any[]>;
-  repoPullRequests: Record<string, any[]>;
+  repoActivities: Record<string, unknown[]>;
+  repoPullRequests: Record<string, unknown[]>;
+  repoLastFetched: Record<string, number>;
 }
 
 export const useWatchModePersistence = () => {
@@ -22,7 +23,8 @@ export const useWatchModePersistence = () => {
               : {}),
           lastUpdateTime: new Date(parsed.lastUpdateTime),
           repoActivities: parsed.repoActivities || {},
-          repoPullRequests: parsed.repoPullRequests || {}
+          repoPullRequests: parsed.repoPullRequests || {},
+          repoLastFetched: parsed.repoLastFetched || {}
         };
       } catch (error) {
         console.error('Error parsing saved watch mode state:', error);
@@ -33,7 +35,8 @@ export const useWatchModePersistence = () => {
       watchEnabled: {},
       lastUpdateTime: new Date(),
       repoActivities: {},
-      repoPullRequests: {}
+      repoPullRequests: {},
+      repoLastFetched: {}
     };
   });
 
@@ -52,6 +55,7 @@ export const useWatchModePersistence = () => {
             lastUpdateTime: new Date(parsed.lastUpdateTime),
             repoActivities: parsed.repoActivities || {},
             repoPullRequests: parsed.repoPullRequests || {},
+            repoLastFetched: parsed.repoLastFetched || {},
           });
         } catch (error) {
           console.error('Error parsing watch mode state from storage event:', error);
@@ -74,12 +78,19 @@ export const useWatchModePersistence = () => {
     }));
   };
 
-  const updateRepoActivities = (repoActivities: Record<string, any[]>) => {
+  const updateRepoActivities = (repoActivities: Record<string, unknown[]>) => {
     setWatchModeState(prev => ({ ...prev, repoActivities }));
   };
 
-  const updateRepoPullRequests = (repoPullRequests: Record<string, any[]>) => {
+  const updateRepoPullRequests = (repoPullRequests: Record<string, unknown[]>) => {
     setWatchModeState(prev => ({ ...prev, repoPullRequests }));
+  };
+
+  const updateRepoLastFetched = (repoId: string) => {
+    setWatchModeState(prev => ({
+      ...prev,
+      repoLastFetched: { ...prev.repoLastFetched, [repoId]: Date.now() }
+    }));
   };
 
   const updateLastUpdateTime = (lastUpdateTime: Date) => {
@@ -90,6 +101,7 @@ export const useWatchModePersistence = () => {
     watchModeState,
     updateWatchEnabled,
     updateRepoActivities,
-    updateRepoPullRequests,
-    updateLastUpdateTime
-  };};
+    updateRepoPullRequests,    updateLastUpdateTime,
+    updateRepoLastFetched
+  };
+};

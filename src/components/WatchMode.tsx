@@ -13,14 +13,16 @@ import {
   CheckCircle,
   ExternalLink
 } from 'lucide-react';
-import { Repository, ActivityItem } from '@/types/dashboard';
+import { Repository, ActivityItem, ApiKey } from '@/types/dashboard';
 import { createGitHubService } from '@/components/GitHubService';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
 
+const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
+
 interface WatchModeProps {
   repositories: Repository[];
-  apiKeys: any[];
+  apiKeys: ApiKey[];
   getDecryptedApiKey: (id: string) => string | null;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
 }
@@ -31,7 +33,8 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     updateWatchEnabled,
     updateRepoActivities,
     updateRepoPullRequests,
-    updateLastUpdateTime
+    updateLastUpdateTime,
+    updateRepoLastFetched
   } = useWatchModePersistence();
   
   const { logInfo, logError, logWarn } = useLogger('info');
@@ -42,11 +45,16 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
   const repoActivities = watchModeState.repoActivities;
   const repoPullRequests = watchModeState.repoPullRequests;
+  const repoLastFetched = watchModeState.repoLastFetched || {};
   const lastUpdateTime = watchModeState.lastUpdateTime;
 
   const enabledRepos = repositories.filter(repo => repo.enabled);
 
   const fetchRepoData = async (repo: Repository) => {
+    const lastFetched = repoLastFetched[repo.id] || 0;
+    if (Date.now() - lastFetched < MIN_FETCH_INTERVAL) {
+      return;
+    }
     let apiKey = apiKeys.find(key => key.id === repo.apiKeyId && key.isActive);
     if (!apiKey) {
       // fallback to first active key if repository has none or inactive
@@ -84,6 +92,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
       const activities = await service.fetchRecentActivity([repo]);
       updateRepoActivities({ ...repoActivities, [repo.id]: activities });
       logInfo('watch-mode', `Fetched ${activities.length} activities for ${repo.owner}/${repo.name}`);
+      updateRepoLastFetched(repo.id);
       setErrorTimestamps(prev => {
         const copy = { ...prev };
         delete copy[repo.id];
