@@ -12,36 +12,26 @@ export interface DecryptionResult {
   success: boolean;
 }
 
-export interface BenchmarkResult {
-  iterations: number;
-  timeMs: number;
-  recommended: boolean;
-}
-
 export class EncryptionService {
   private static readonly DEFAULT_ITERATIONS = 100000;
-  private static readonly MIN_ITERATIONS = 10000;
-  private static readonly TARGET_TIME_MS = 100;
 
-  static async benchmarkIterations(): Promise<BenchmarkResult[]> {
-    const results: BenchmarkResult[] = [];
+  // Benchmark the key derivation
+  static async benchmarkKeyDerivation(durationMs: number = 1000): Promise<{ iterations: number; time: number }> {
+    const startTime = performance.now();
     const testData = 'benchmark test data';
     const testPassword = 'test password';
+    let iterations = 0;
     
-    for (const iterations of [10000, 50000, 100000, 200000, 500000]) {
-      const startTime = performance.now();
-      await this.encrypt(testData, testPassword, iterations);
-      const endTime = performance.now();
-      const timeMs = endTime - startTime;
-      
-      results.push({
-        iterations,
-        timeMs,
-        recommended: timeMs >= this.TARGET_TIME_MS && timeMs <= this.TARGET_TIME_MS * 2
-      });
+    while (performance.now() - startTime < durationMs) {
+      await this.encrypt(testData, testPassword, 10000);
+      iterations += 10000;
     }
     
-    return results;
+    const endTime = performance.now();
+    return {
+      iterations,
+      time: endTime - startTime
+    };
   }
 
   static async encrypt(

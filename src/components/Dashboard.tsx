@@ -9,12 +9,15 @@ import { RepositoryManagement } from '@/components/RepositoryManagement';
 import { ApiKeyManagement } from '@/components/ApiKeyManagement';
 import { SecurityManagement } from '@/components/SecurityManagement';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { ConnectionManager } from '@/components/ConnectionManager';
+import { LogsTab } from '@/components/LogsTab';
 import { 
   Shield, 
   GitBranch, 
   Key, 
   Settings, 
-  Activity
+  Activity,
+  FileText
 } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -43,14 +46,17 @@ export const Dashboard = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <DashboardHeader />
+        <DashboardHeader apiKeys={apiKeys} />
 
         {/* Stats Cards */}
         <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} />
 
+        {/* Connection Status */}
+        <ConnectionManager apiKeys={apiKeys} />
+
         {/* Main Content */}
         <Tabs defaultValue="repositories" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 neo-card bg-secondary h-16 border-0">
+          <TabsList className="grid w-full grid-cols-6 h-16 gap-2 bg-transparent p-0 border-0">
             <TabsTrigger value="repositories" className="neo-button-secondary h-12">
               <GitBranch className="w-4 h-4 mr-2" />
               Repositories
@@ -70,6 +76,10 @@ export const Dashboard = () => {
             <TabsTrigger value="security" className="neo-button-secondary h-12">
               <Shield className="w-4 h-4 mr-2" />
               Security
+            </TabsTrigger>
+            <TabsTrigger value="logs" className="neo-button-secondary h-12">
+              <FileText className="w-4 h-4 mr-2" />
+              Logs
             </TabsTrigger>
           </TabsList>
 
@@ -113,6 +123,10 @@ export const Dashboard = () => {
 
           <TabsContent value="security" className="space-y-6">
             <SecurityManagement />
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-6">
+            <LogsTab />
           </TabsContent>
         </Tabs>
       </div>

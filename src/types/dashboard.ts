@@ -5,7 +5,13 @@ export interface Repository {
   enabled: boolean;
   allowedBranches: string[];
   allowedUsers: string[];
+  allowAllBranches?: boolean;
+  allowAllUsers?: boolean;
   alertsEnabled: boolean;
+  apiKeyId?: string;
+  fetchMode?: 'no-auth' | 'github-api';
+  webhookMethod?: 'global' | 'custom' | 'disabled';
+  webhookUrl?: string;
   lastActivity?: Date;
   recentPull?: {
     number: number;

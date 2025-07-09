@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Shield, Lock, Settings, CheckCircle, AlertCircle, Plus, Trash2, Webhook, Key, Timer } from 'lucide-react';
+import { Shield, Lock, Settings, CheckCircle, AlertCircle, Plus, Trash2, Webhook, Key, Timer, Save, Eye, EyeOff, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PasskeyService, PasskeyCredential } from '@/utils/passkeyAuth';
 import { WebhookService, WebhookConfig, WebhookEvent } from '@/utils/webhooks';
@@ -20,8 +20,12 @@ export const SecurityManagement: React.FC = () => {
   const [showPasskeyDialog, setShowPasskeyDialog] = useState(false);
   const [showWebhookDialog, setShowWebhookDialog] = useState(false);
   const [showEncryptionDialog, setShowEncryptionDialog] = useState(false);
-  const [benchmarkResults, setBenchmarkResults] = useState<BenchmarkResult[]>([]);
-  const [recoveryPhrase, setRecoveryPhrase] = useState<string[]>([]);
+  const [benchmarkResult, setBenchmarkResult] = useState<{ iterations: number; time: number } | null>(null);
+  const [isBenchmarking, setIsBenchmarking] = useState(false);
+  const [benchmarkDuration, setBenchmarkDuration] = useState(1000);
+  const [targetIterations, setTargetIterations] = useState(100000);
+  const [recoveryPhrase, setRecoveryPhrase] = useState<string>('');
+  const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
   const [newWebhook, setNewWebhook] = useState({
     name: '',
     url: '',
@@ -95,17 +99,81 @@ export const SecurityManagement: React.FC = () => {
     toast({ title: "Webhook deleted" });
   };
 
-  const handleBenchmarkEncryption = async () => {
-    toast({ title: "Running encryption benchmark..." });
-    const results = await EncryptionService.benchmarkIterations();
-    setBenchmarkResults(results);
-    toast({ title: "Benchmark completed!" });
+  const runBenchmark = async () => {
+    setIsBenchmarking(true);
+    try {
+      const result = await EncryptionService.benchmarkKeyDerivation(benchmarkDuration);
+      setBenchmarkResult(result);
+      toast({ title: `Benchmark complete: ${result.iterations} iterations in ${result.time}ms` });
+    } catch (error) {
+      toast({ title: "Benchmark failed", variant: "destructive" });
+    } finally {
+      setIsBenchmarking(false);
+    }
   };
 
-  const handleGenerateRecoveryPhrase = () => {
+  const generateRecoveryPhrase = () => {
     const phrase = EncryptionService.generateRecoveryPhrase();
-    setRecoveryPhrase(phrase);
+    setRecoveryPhrase(phrase.join(' '));
     toast({ title: "Recovery phrase generated" });
+  };
+
+  const saveRecoveryPhrase = () => {
+    if (!recoveryPhrase) {
+      generateRecoveryPhrase();
+      return;
+    }
+    
+    const blob = new Blob([recoveryPhrase], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `recovery-phrase-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({ title: "Recovery phrase saved to file!" });
+  };
+
+  const printRecoveryPhrase = () => {
+    if (!recoveryPhrase) {
+      generateRecoveryPhrase();
+      return;
+    }
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>AutoMerger Recovery Phrase</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 40px; }
+              .header { text-align: center; margin-bottom: 40px; }
+              .phrase { background: #f5f5f5; padding: 20px; border-radius: 8px; font-size: 18px; line-height: 1.6; }
+              .warning { color: #dc2626; font-weight: bold; margin-top: 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>AutoMerger Recovery Phrase</h1>
+              <p>Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+            <div class="phrase">${recoveryPhrase}</div>
+            <div class="warning">
+              ⚠️ KEEP THIS PHRASE SECURE AND PRIVATE<br>
+              This phrase can recover your encrypted data
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+    
+    toast({ title: "Recovery phrase ready for printing!" });
   };
 
   const webhookEvents: WebhookEvent[] = [
@@ -312,41 +380,87 @@ export const SecurityManagement: React.FC = () => {
                   <div className="space-y-6">
                     <div>
                       <h4 className="font-bold mb-2">Encryption Benchmark</h4>
-                      <Button onClick={handleBenchmarkEncryption} className="neo-button">
-                        <Timer className="w-4 h-4 mr-2" />
-                        Run Benchmark
-                      </Button>
-                      {benchmarkResults.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                          {benchmarkResults.map((result, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                              <span className="text-sm">{result.iterations.toLocaleString()} iterations</span>
-                              <span className="text-sm">{result.timeMs.toFixed(0)}ms</span>
-                              {result.recommended && (
-                                <Badge variant="secondary">Recommended</Badge>
-                              )}
-                            </div>
-                          ))}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <label className="block text-sm font-bold mb-2">Benchmark Duration (ms)</label>
+                          <Input
+                            type="number"
+                            value={benchmarkDuration}
+                            onChange={(e) => setBenchmarkDuration(parseInt(e.target.value) || 1000)}
+                            className="neo-input"
+                            min="100"
+                            max="10000"
+                          />
                         </div>
-                      )}
+                        <div>
+                          <label className="block text-sm font-bold mb-2">Target Iterations</label>
+                          <Input
+                            type="number"
+                            value={targetIterations}
+                            onChange={(e) => setTargetIterations(parseInt(e.target.value) || 100000)}
+                            className="neo-input"
+                            min="1000"
+                            max="1000000"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-4">
+                        <Button onClick={runBenchmark} disabled={isBenchmarking} className="neo-button">
+                          <Timer className="w-4 h-4 mr-2" />
+                          {isBenchmarking ? 'Running...' : 'Run Benchmark'}
+                        </Button>
+                        
+                        {benchmarkResult && (
+                          <Badge className="neo-card neo-green text-white font-bold">
+                            {benchmarkResult.iterations} iterations / {benchmarkResult.time}ms
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     
                     <div>
                       <h4 className="font-bold mb-2">Recovery Phrase</h4>
-                      <Button onClick={handleGenerateRecoveryPhrase} className="neo-button">
-                        Generate Recovery Phrase
-                      </Button>
-                      {recoveryPhrase.length > 0 && (
+                      <div className="flex flex-wrap gap-4">
+                        <Button onClick={generateRecoveryPhrase} className="neo-button">
+                          <Key className="w-4 h-4 mr-2" />
+                          Generate Recovery Phrase
+                        </Button>
+                        
+                        <Button onClick={saveRecoveryPhrase} className="neo-button" disabled={!recoveryPhrase}>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save to File
+                        </Button>
+                        
+                        <Button onClick={printRecoveryPhrase} className="neo-button" disabled={!recoveryPhrase}>
+                          <Printer className="w-4 h-4 mr-2" />
+                          Print
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => setShowRecoveryPhrase(!showRecoveryPhrase)}
+                          variant="outline"
+                          className="neo-button-secondary"
+                        >
+                          {showRecoveryPhrase ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                      
+                      {recoveryPhrase && (
                         <div className="mt-4">
                           <p className="text-sm font-bold mb-2 text-destructive">
                             Save this recovery phrase securely:
                           </p>
-                          <div className="grid grid-cols-3 gap-2 p-4 bg-muted rounded">
-                            {recoveryPhrase.map((word, index) => (
-                              <div key={index} className="text-sm p-2 bg-background rounded text-center">
-                                {index + 1}. {word}
+                          <div className="p-4 bg-muted rounded">
+                            {showRecoveryPhrase ? (
+                              <div className="font-mono text-sm break-all">
+                                {recoveryPhrase}
                               </div>
-                            ))}
+                            ) : (
+                              <div className="font-mono text-sm">
+                                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

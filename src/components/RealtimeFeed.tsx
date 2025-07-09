@@ -59,25 +59,25 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                   <div className={`neo-card p-2 ${getActivityColor(activity.type)}`}>
                     {getActivityIcon(activity.type)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {activity.repo} • {activity.timestamp.toLocaleString()}
-                    </p>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="font-bold text-foreground">{activity.message}</p>
+                  <p className="text-sm text-muted-foreground">{activity.repo} • {new Date(activity.timestamp).toLocaleString()}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
+                    variant="outline"
+                    size="sm"
+                    className="neo-button-secondary"
+                  >
+                    View
+                  </Button>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{new Date(activity.timestamp).toLocaleTimeString()}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="neo-card neo-yellow text-black dark:text-white font-bold">
-                      {activity.type}
-                    </Badge>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="neo-button-secondary h-6 px-2 text-xs"
-                      onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
-                    >
-                      View
-                    </Button>
-                  </div>
+                </div>
+              </div>
                 </div>
               ))}
             </div>

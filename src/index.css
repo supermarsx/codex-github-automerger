@@ -104,21 +104,21 @@
     @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
   }
   
-  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black; }
-  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black; }
-  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-black; }
-  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-black; }
-  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black; }
-  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-black; }
-  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-black; }
+  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
+  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
+  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-white border-foreground; }
+  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-white border-foreground; }
+  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black border-foreground; }
+  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-white border-foreground; }
+  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-white border-foreground; }
   
-  .dark .neo-card.neo-yellow { @apply text-white; }
-  .dark .neo-card.neo-pink { @apply text-white; }
-  .dark .neo-card.neo-blue { @apply text-white; }
-  .dark .neo-card.neo-purple { @apply text-white; }
-  .dark .neo-card.neo-orange { @apply text-white; }
-  .dark .neo-card.neo-green { @apply text-white; }
-  .dark .neo-card.neo-red { @apply text-white; }
+  .dark .neo-card.neo-yellow { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-pink { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-blue { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-purple { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
   
   .neo-button {
     @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 

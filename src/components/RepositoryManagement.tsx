@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Github, GitBranch, Users } from 'lucide-react';
+import { Plus, Github, GitBranch, Users, Key, Webhook, Shield } from 'lucide-react';
 import { Repository } from '@/types/dashboard';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface RepositoryManagementProps {
   repositories: Repository[];
@@ -155,6 +156,12 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                 <h4 className="font-black text-lg mb-3 flex items-center gap-2">
                   <Users className="w-5 h-5" />
                   Allowed Users
+                  {repo.allowAllUsers && (
+                    <Badge className="neo-card neo-red text-white font-bold ml-2">
+                      <Shield className="w-3 h-3 mr-1" />
+                      ALL USERS
+                    </Badge>
+                  )}
                 </h4>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {repo.allowedUsers.map((user, index) => (
@@ -188,6 +195,58 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                   >
                     Add
                   </Button>
+                </div>
+              </div>
+
+              {/* Repository Configuration */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                    <Key className="w-5 h-5" />
+                    API Key
+                  </h4>
+                  <Select defaultValue="global">
+                    <SelectTrigger className="neo-input">
+                      <SelectValue placeholder="Select API key" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="global">Use Global Config</SelectItem>
+                      <SelectItem value="custom">Custom API Key</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                    <GitBranch className="w-5 h-5" />
+                    Fetch Mode
+                  </h4>
+                  <Select defaultValue="github-api">
+                    <SelectTrigger className="neo-input">
+                      <SelectValue placeholder="Select fetch mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="github-api">GitHub API</SelectItem>
+                      <SelectItem value="no-auth">Public (No Auth)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                    <Webhook className="w-5 h-5" />
+                    Webhook Method
+                  </h4>
+                  <Select defaultValue="global">
+                    <SelectTrigger className="neo-input">
+                      <SelectValue placeholder="Select webhook method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="global">Use Global Config</SelectItem>
+                      <SelectItem value="custom">Custom Webhook</SelectItem>
+                      <SelectItem value="disabled">Disabled</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>

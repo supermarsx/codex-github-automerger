@@ -16,7 +16,8 @@ export type WebhookEvent =
   | 'merge.success'
   | 'merge.failure'
   | 'security.alert'
-  | 'config.updated';
+  | 'config.updated'
+  | 'all_events';
 
 export interface WebhookPayload {
   event: WebhookEvent;
