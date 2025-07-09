@@ -147,10 +147,6 @@ export const Dashboard = () => {
               onRemoveBranch={removeBranch}
               onAddUser={addUser}
               onRemoveUser={removeUser}
-              onAddRepositoryFromApiKey={(apiKeyId, repoName, repoOwner) => {
-                // Mock implementation - in real app would fetch from GitHub API
-                console.log('Adding repository from API key:', { apiKeyId, repoName, repoOwner });
-              }}
             />
           </TabsContent>
 

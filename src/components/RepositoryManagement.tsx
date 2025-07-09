@@ -22,7 +22,6 @@ interface RepositoryManagementProps {
   onRemoveBranch: (repoId: string, branchIndex: number) => void;
   onAddUser: (repoId: string, user: string) => void;
   onRemoveUser: (repoId: string, userIndex: number) => void;
-  onAddRepositoryFromApiKey: (apiKeyId: string, repoName: string, repoOwner: string) => void;
 }
 
 export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
@@ -34,11 +33,9 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   onAddBranch,
   onRemoveBranch,
   onAddUser,
-  onRemoveUser,
-  onAddRepositoryFromApiKey
+  onRemoveUser
 }) => {
   const [newRepo, setNewRepo] = useState({ name: '', owner: '', branch: '', user: '' });
-  const [selectedApiKey, setSelectedApiKey] = useState<string>('');
   const [collapsedRepos, setCollapsedRepos] = useState<Set<string>>(new Set(repositories.map(r => r.id)));
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; repoId: string; repoName: string }>({ 
     open: false, 
@@ -123,53 +120,6 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
               <Plus className="w-4 h-4 mr-2" />
               Add Repository
             </Button>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Or load from API key:</span>
-              <Select value={selectedApiKey} onValueChange={setSelectedApiKey}>
-                <SelectTrigger className="neo-input w-48">
-                  <SelectValue placeholder="Select API key" />
-                </SelectTrigger>
-                <SelectContent>
-                  {apiKeys.filter(k => k.isActive).map(key => (
-                    <SelectItem key={key.id} value={key.id}>{key.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                onClick={() => {
-                  if (selectedApiKey) {
-                    const selectedKey = apiKeys.find(k => k.id === selectedApiKey);
-                    if (selectedKey) {
-                      // Mock loading repositories from API key
-                      toast({ title: "Loading repositories from API key..." });
-                      
-                      // Simulate API call with timeout
-                      setTimeout(() => {
-                        const mockRepos = [
-                          { name: 'example-repo', owner: 'user' },
-                          { name: 'another-repo', owner: 'user' },
-                          { name: 'test-project', owner: 'organization' }
-                        ];
-                        
-                        // Add each repo
-                        mockRepos.forEach(repo => {
-                          onAddRepository(repo.name, repo.owner);
-                        });
-                        
-                        toast({ 
-                          title: "Repositories loaded successfully!",
-                          description: `Added ${mockRepos.length} repositories from ${selectedKey.name}`
-                        });
-                      }, 2000);
-                    }
-                  }
-                }}
-                className="neo-button-secondary"
-                disabled={!selectedApiKey}
-              >
-                Load Repos
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
