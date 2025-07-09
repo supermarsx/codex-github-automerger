@@ -46,11 +46,11 @@ export class GitHubService {
 
   async fetchPullRequests(owner: string, repo: string): Promise<any[]> {
     try {
-      const pulls = await this.octokit.paginate(this.octokit.rest.pulls.list, {
+      const { data: pulls } = await this.octokit.rest.pulls.list({
         owner,
         repo,
         state: 'open',
-        per_page: 100,
+        per_page: 10,
       });
 
       const detailed = await Promise.all(
@@ -114,14 +114,11 @@ export class GitHubService {
 
     for (const repo of repositories) {
       try {
-        const events = await this.octokit.paginate(
-          this.octokit.rest.activity.listRepoEvents,
-          {
-            owner: repo.owner,
-            repo: repo.name,
-            per_page: 10,
-          }
-        );
+        const { data: events } = await this.octokit.rest.activity.listRepoEvents({
+          owner: repo.owner,
+          repo: repo.name,
+          per_page: 10,
+        });
 
         events.forEach(event => {
           if (event.type === 'PullRequestEvent') {

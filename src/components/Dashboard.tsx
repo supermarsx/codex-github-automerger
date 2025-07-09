@@ -61,15 +61,15 @@ export const Dashboard = () => {
     getDecryptedApiKey
   } = useDashboardData();
 
-  // Auto-refresh activities every 30 seconds
+  // Auto-refresh activities every 5 seconds
   useEffect(() => {
     if (repositories.length === 0 || apiKeys.length === 0) return;
-    
+
     logInfo('dashboard', `Setting up auto-refresh for ${repositories.length} repositories`);
     const interval = setInterval(() => {
       logInfo('dashboard', 'Auto-refreshing activities');
       fetchActivities(repositories, apiKeys, getDecryptedApiKey);
-    }, 30000);
+    }, 5000);
 
     return () => {
       logInfo('dashboard', 'Clearing auto-refresh interval');
