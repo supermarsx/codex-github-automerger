@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EditableList } from '@/components/EditableList';
+import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 
 interface RepositoryManagementProps {
   repositories: Repository[];
@@ -45,6 +46,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
     repoName: '' 
   });
   const { toast } = useToast();
+  const { watchModeState, updateWatchEnabled } = useWatchModePersistence();
 
   const handleAddRepository = () => {
     if (newRepo.name && newRepo.owner) {
@@ -157,6 +159,12 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       checked={repo.autoMergeEnabled}
                       onCheckedChange={() => onToggleAutoMerge(repo.id)}
                       className="scale-125"
+                    />
+                    <Switch
+                      checked={watchModeState.watchEnabled[repo.id] ?? false}
+                      onCheckedChange={(checked) => updateWatchEnabled(repo.id, checked)}
+                      className="scale-125"
+                      title="Watch"
                     />
                     <Button
                       variant="ghost"

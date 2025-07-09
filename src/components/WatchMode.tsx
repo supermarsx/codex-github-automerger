@@ -3,13 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { 
   Eye, 
-  EyeOff, 
-  GitBranch, 
-  GitPullRequest, 
+  GitBranch,
+  GitPullRequest,
   RefreshCw, 
   Clock,
   AlertCircle,
@@ -29,33 +26,24 @@ interface WatchModeProps {
 }
 
 export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, onUpdateRepository }) => {
-  const { 
-    watchModeState, 
-    updateWatchedRepos, 
-    updateRepoActivities, 
-    updateRepoPullRequests, 
-    updateLastUpdateTime 
+  const {
+    watchModeState,
+    updateWatchEnabled,
+    updateRepoActivities,
+    updateRepoPullRequests,
+    updateLastUpdateTime
   } = useWatchModePersistence();
   
   const { logInfo, logError, logWarn } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
 
-  const watchedRepos = watchModeState.watchedRepos;
+  const watchEnabledMap = watchModeState.watchEnabled;
+  const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
   const repoActivities = watchModeState.repoActivities;
   const repoPullRequests = watchModeState.repoPullRequests;
   const lastUpdateTime = watchModeState.lastUpdateTime;
 
   const enabledRepos = repositories.filter(repo => repo.enabled);
-
-  const toggleWatch = (repoId: string) => {
-    const repo = repositories.find(r => r.id === repoId);
-    const newWatchedRepos = watchedRepos.includes(repoId) 
-      ? watchedRepos.filter(id => id !== repoId)
-      : [...watchedRepos, repoId];
-    
-    updateWatchedRepos(newWatchedRepos);
-    logInfo('watch-mode', `${watchedRepos.includes(repoId) ? 'Stopped' : 'Started'} watching ${repo?.owner}/${repo?.name}`);
-  };
 
   const fetchRepoData = async (repo: Repository) => {
     const apiKey = apiKeys.find(key => key.id === repo.apiKeyId && key.isActive);
@@ -159,65 +147,8 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
         <CardContent>
           <div className="grid gap-4">
             <div className="text-sm text-muted-foreground">
-              Select repositories to monitor. Watch mode provides real-time updates without any automatic actions.
+              Configure which repositories are watched from the Repositories tab. Watch mode provides real-time updates without automatic actions.
             </div>
-            
-            {enabledRepos.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <GitBranch className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No enabled repositories</p>
-                <p className="text-sm">Enable repositories in the Repositories tab to start watching</p>
-              </div>
-            ) : (
-              <div className="grid gap-2">
-                {enabledRepos.map(repo => (
-                  <div key={repo.id} className="flex items-center justify-between p-3 rounded border">
-                    <div className="flex items-center gap-3">
-                      <Switch
-                        id={`watch-${repo.id}`}
-                        checked={watchedRepos.includes(repo.id)}
-                        onCheckedChange={() => toggleWatch(repo.id)}
-                      />
-                      <Label htmlFor={`watch-${repo.id}`} className="font-medium">
-                        {repo.owner}/{repo.name}
-                      </Label>
-                    </div>
-                    
-                    {watchedRepos.includes(repo.id) && (
-                      <div className="flex items-center gap-2">
-                        {(() => {
-                          const status = getRepoStatus(repo);
-                          return (
-                            <>
-                              <Badge variant="outline" className="text-xs">
-                                {status.totalPRs} PRs
-                              </Badge>
-                              {status.mergeable > 0 && (
-                                <Badge variant="secondary" className="text-xs neo-green">
-                                  {status.mergeable} mergeable
-                                </Badge>
-                              )}
-                              {status.nonMergeable > 0 && (
-                                <Badge variant="secondary" className="text-xs neo-red">
-                                  {status.nonMergeable} blocked
-                                </Badge>
-                              )}
-                            </>
-                          );
-                        })()}
-                        <Button
-                          onClick={() => window.open(`https://github.com/${repo.owner}/${repo.name}`, '_blank')}
-                          size="sm"
-                          variant="ghost"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>

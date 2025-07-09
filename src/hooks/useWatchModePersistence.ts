@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
 
 export interface WatchModeState {
-  watchedRepos: string[];
+  watchEnabled: Record<string, boolean>;
   lastUpdateTime: Date;
   repoActivities: Record<string, any[]>;
   repoPullRequests: Record<string, any[]>;
@@ -16,16 +16,21 @@ export const useWatchModePersistence = () => {
       try {
         const parsed = JSON.parse(saved);
         return {
-          ...parsed,
-          lastUpdateTime: new Date(parsed.lastUpdateTime)
+          watchEnabled: parsed.watchEnabled ??
+            (Array.isArray(parsed.watchedRepos)
+              ? Object.fromEntries(parsed.watchedRepos.map((id: string) => [id, true]))
+              : {}),
+          lastUpdateTime: new Date(parsed.lastUpdateTime),
+          repoActivities: parsed.repoActivities || {},
+          repoPullRequests: parsed.repoPullRequests || {}
         };
       } catch (error) {
         console.error('Error parsing saved watch mode state:', error);
       }
     }
-    
+
     return {
-      watchedRepos: [],
+      watchEnabled: {},
       lastUpdateTime: new Date(),
       repoActivities: {},
       repoPullRequests: {}
@@ -36,8 +41,11 @@ export const useWatchModePersistence = () => {
     localStorage.setItem(WATCH_MODE_STORAGE_KEY, JSON.stringify(watchModeState));
   }, [watchModeState]);
 
-  const updateWatchedRepos = (watchedRepos: string[]) => {
-    setWatchModeState(prev => ({ ...prev, watchedRepos }));
+  const updateWatchEnabled = (repoId: string, enabled: boolean) => {
+    setWatchModeState(prev => ({
+      ...prev,
+      watchEnabled: { ...prev.watchEnabled, [repoId]: enabled }
+    }));
   };
 
   const updateRepoActivities = (repoActivities: Record<string, any[]>) => {
@@ -54,9 +62,8 @@ export const useWatchModePersistence = () => {
 
   return {
     watchModeState,
-    updateWatchedRepos,
+    updateWatchEnabled,
     updateRepoActivities,
     updateRepoPullRequests,
     updateLastUpdateTime
-  };
-};
+  };};

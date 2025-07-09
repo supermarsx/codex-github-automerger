@@ -18,6 +18,7 @@ export const useRepositories = () => {
         return parsed.map((repo: any) => ({
           ...repo,
           autoMergeEnabled: repo.autoMergeEnabled ?? repo.enabled ?? true,
+          watchEnabled: repo.watchEnabled ?? false,
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
           recentPull: repo.recentPull ? {
             ...repo.recentPull,
@@ -92,6 +93,7 @@ export const useRepositories = () => {
       owner,
       enabled: true,
       autoMergeEnabled: true,
+      watchEnabled: false,
       allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
       allowedUsers: ['github-actions[bot]'],
       allowAllBranches: false,
