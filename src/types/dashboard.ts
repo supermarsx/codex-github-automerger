@@ -144,11 +144,11 @@ export interface GlobalConfig {
   serverCheckInterval: number;
   logLevel: 'info' | 'warn' | 'error' | 'debug';
   darkMode: boolean;
+  accentColor: string;
   customCss: string;
   customJs: string;
   feedActions: FeedAction[];
   statsPeriod: StatsPeriod;
   webhooks: Webhook[];
   hideHeader: boolean;
-  logsDisabled: boolean;
-}
+  logsDisabled: boolean;}

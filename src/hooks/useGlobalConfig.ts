@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GlobalConfig } from '@/types/dashboard';
+import { hexToHSL } from '@/lib/utils';
 
 const GLOBAL_CONFIG_STORAGE_KEY = 'automerger-global-config';
 
@@ -19,6 +20,7 @@ const getDefaultConfig = (): GlobalConfig => ({
   serverCheckInterval: 30000, // 30 seconds
   logLevel: 'info',
   darkMode: localStorage.getItem('theme') !== 'light',
+  accentColor: '#313135',
   customCss: '',
   customJs: '',
   feedActions: [],
@@ -61,6 +63,13 @@ export const useGlobalConfig = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [globalConfig.darkMode]);
+
+  // Update accent color
+  useEffect(() => {
+    const hsl = hexToHSL(globalConfig.accentColor);
+    document.documentElement.style.setProperty('--accent', hsl);
+    document.documentElement.style.setProperty('--sidebar-accent', hsl);
+  }, [globalConfig.accentColor]);
 
   const updateConfig = (updates: Partial<GlobalConfig>) => {
     setGlobalConfig(prev => ({ ...prev, ...updates }));
