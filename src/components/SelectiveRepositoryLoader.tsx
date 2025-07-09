@@ -215,7 +215,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
               </SelectTrigger>
               <SelectContent>
                 {activeApiKeys.length === 0 ? (
-                  <SelectItem value="" disabled>
+                  <SelectItem value="no-keys" disabled>
                     No active API keys available
                   </SelectItem>
                 ) : (
