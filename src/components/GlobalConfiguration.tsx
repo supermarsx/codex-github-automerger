@@ -5,12 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Settings, Plus, Trash2, Download, Upload, Shield } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Settings, Plus, Trash2, Download, Upload, Shield, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { GlobalConfig } from '@/types/dashboard';
+import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
+import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
+  repositories: Repository[];
+  apiKeys: ApiKey[];
   onConfigChange: (config: GlobalConfig) => void;
   onExportConfig: () => void;
   onImportConfig: () => void;
@@ -18,12 +24,26 @@ interface GlobalConfigurationProps {
 
 export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   config,
+  repositories,
+  apiKeys,
   onConfigChange,
   onExportConfig,
   onImportConfig
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [exportOptions, setExportOptions] = useState<ExportOptions>({
+    includeGlobalConfig: true,
+    includeRepositories: true,
+    includeApiKeys: false,
+    includeSecurity: false,
+    encrypt: false
+  });
+  const [exportPassword, setExportPassword] = useState('');
+  const [importPassword, setImportPassword] = useState('');
+  const [importFile, setImportFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const addBranchPattern = () => {
@@ -60,6 +80,85 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
     });
   };
 
+  const handleExport = async () => {
+    try {
+      const securityConfig: SecurityConfig = {
+        passkeyEnabled: false,
+        webhookSecurityEnabled: false,
+        encryptionEnabled: config.encryptionEnabled,
+        lastSecurityUpdate: new Date().toISOString()
+      };
+
+      const exportData = await ExportImportService.exportData(
+        config,
+        repositories,
+        apiKeys,
+        securityConfig,
+        exportOptions
+      );
+
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `automerger-config-${timestamp}.json`;
+      
+      ExportImportService.downloadFile(exportData, filename);
+      
+      toast({ 
+        title: "Configuration exported successfully!",
+        description: `Saved as ${filename}`
+      });
+      setShowExportDialog(false);
+    } catch (error) {
+      toast({ 
+        title: "Export failed", 
+        description: "Failed to export configuration",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      toast({ 
+        title: "No file selected", 
+        description: "Please select a file to import",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const exportData = await ExportImportService.readFile(importFile);
+      const result = await ExportImportService.importData(exportData, importPassword);
+
+      if (!result.success) {
+        toast({ 
+          title: "Import failed", 
+          description: result.error,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (result.data?.globalConfig) {
+        onConfigChange(result.data.globalConfig);
+      }
+
+      toast({ 
+        title: "Configuration imported successfully!",
+        description: "Settings have been updated"
+      });
+      setShowImportDialog(false);
+      setImportFile(null);
+      setImportPassword('');
+    } catch (error) {
+      toast({ 
+        title: "Import failed", 
+        description: "Invalid file format",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Card className="neo-card">
       <CardHeader>
@@ -69,28 +168,154 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
             Global Configuration
           </CardTitle>
           <div className="flex gap-2">
-            <Button 
-              onClick={() => {
-                onExportConfig();
-                toast({ title: "Configuration exported successfully!" });
-              }} 
-              className="neo-button-secondary" 
-              size="sm"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
-            <Button 
-              onClick={() => {
-                onImportConfig();
-                toast({ title: "Configuration imported successfully!" });
-              }} 
-              className="neo-button-secondary" 
-              size="sm"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Import
-            </Button>
+            <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+              <DialogTrigger asChild>
+                <Button className="neo-button-secondary" size="sm">
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="neo-card">
+                <DialogHeader>
+                  <DialogTitle>Export Configuration</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <Label>What to export:</Label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="global-config"
+                          checked={exportOptions.includeGlobalConfig}
+                          onCheckedChange={(checked) => 
+                            setExportOptions({...exportOptions, includeGlobalConfig: !!checked})
+                          }
+                        />
+                        <Label htmlFor="global-config">Global Configuration</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="repositories"
+                          checked={exportOptions.includeRepositories}
+                          onCheckedChange={(checked) => 
+                            setExportOptions({...exportOptions, includeRepositories: !!checked})
+                          }
+                        />
+                        <Label htmlFor="repositories">Repositories</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="api-keys"
+                          checked={exportOptions.includeApiKeys}
+                          onCheckedChange={(checked) => 
+                            setExportOptions({...exportOptions, includeApiKeys: !!checked})
+                          }
+                        />
+                        <Label htmlFor="api-keys">API Keys</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="security"
+                          checked={exportOptions.includeSecurity}
+                          onCheckedChange={(checked) => 
+                            setExportOptions({...exportOptions, includeSecurity: !!checked})
+                          }
+                        />
+                        <Label htmlFor="security">Security Settings</Label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="encrypt"
+                        checked={exportOptions.encrypt}
+                        onCheckedChange={(checked) => 
+                          setExportOptions({...exportOptions, encrypt: !!checked})
+                        }
+                      />
+                      <Label htmlFor="encrypt" className="flex items-center gap-2">
+                        <Lock className="w-4 h-4" />
+                        Encrypt export file
+                      </Label>
+                    </div>
+                    
+                    {exportOptions.encrypt && (
+                      <Input
+                        type="password"
+                        placeholder="Encryption password"
+                        value={exportPassword}
+                        onChange={(e) => setExportPassword(e.target.value)}
+                        className="neo-input"
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button onClick={handleExport} className="neo-button">
+                      Export Configuration
+                    </Button>
+                    <Button 
+                      onClick={() => setShowExportDialog(false)} 
+                      variant="outline"
+                      className="neo-button-secondary"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+              <DialogTrigger asChild>
+                <Button className="neo-button-secondary" size="sm">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="neo-card">
+                <DialogHeader>
+                  <DialogTitle>Import Configuration</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Configuration file:</Label>
+                    <Input
+                      type="file"
+                      accept=".json"
+                      onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                      className="neo-input"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label>Password (if encrypted):</Label>
+                    <Input
+                      type="password"
+                      placeholder="Enter password if file is encrypted"
+                      value={importPassword}
+                      onChange={(e) => setImportPassword(e.target.value)}
+                      className="neo-input"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button onClick={handleImport} className="neo-button">
+                      Import Configuration
+                    </Button>
+                    <Button 
+                      onClick={() => setShowImportDialog(false)} 
+                      variant="outline"
+                      className="neo-button-secondary"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </CardHeader>

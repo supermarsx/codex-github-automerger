@@ -103,6 +103,8 @@ export const Dashboard = () => {
           <TabsContent value="config" className="space-y-6">
             <GlobalConfiguration 
               config={globalConfig} 
+              repositories={repositories}
+              apiKeys={apiKeys}
               onConfigChange={setGlobalConfig}
               onExportConfig={exportReport}
               onImportConfig={() => console.log('Import config')}
