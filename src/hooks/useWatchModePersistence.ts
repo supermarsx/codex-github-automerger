@@ -37,6 +37,32 @@ export const useWatchModePersistence = () => {
     };
   });
 
+  // keep state in sync across components using storage events
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === WATCH_MODE_STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setWatchModeState({
+            watchEnabled:
+              parsed.watchEnabled ??
+              (Array.isArray(parsed.watchedRepos)
+                ? Object.fromEntries(parsed.watchedRepos.map((id: string) => [id, true]))
+                : {}),
+            lastUpdateTime: new Date(parsed.lastUpdateTime),
+            repoActivities: parsed.repoActivities || {},
+            repoPullRequests: parsed.repoPullRequests || {},
+          });
+        } catch (error) {
+          console.error('Error parsing watch mode state from storage event:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem(WATCH_MODE_STORAGE_KEY, JSON.stringify(watchModeState));
   }, [watchModeState]);
