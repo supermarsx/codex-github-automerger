@@ -1,59 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Repository } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
+
+const REPOSITORIES_STORAGE_KEY = 'automerger-repositories';
 
 export const useRepositories = () => {
   const { toast } = useToast();
   const { logInfo } = useLogger();
   
-  const [repositories, setRepositories] = useState<Repository[]>([
-    {
-      id: '1',
-      name: 'my-project',
-      owner: 'username',
-      enabled: true,
-      allowedBranches: ['codex-feature/*', 'codex-fix/*', 'codex-update/*'],
-      allowedUsers: ['github-actions[bot]', 'codex-merger'],
-      alertsEnabled: true,
-      lastActivity: new Date('2024-01-20'),
-      recentPull: {
-        number: 123,
-        title: 'Add new feature',
-        status: 'merged',
-        timestamp: new Date('2024-01-20')
-      },
-      stats: {
-        totalMerges: 45,
-        successfulMerges: 42,
-        failedMerges: 3,
-        pendingMerges: 2
-      },
-      activities: [
-        { id: '1', type: 'merge', message: 'PR #123 merged successfully', repo: 'my-project', timestamp: new Date('2024-01-20') },
-        { id: '2', type: 'success', message: 'Codex branch auto-merged', repo: 'my-project', timestamp: new Date('2024-01-19') }
-      ]
-    },
-    {
-      id: '2',
-      name: 'another-repo',
-      owner: 'username',
-      enabled: false,
-      allowedBranches: ['codex-*'],
-      allowedUsers: ['github-actions[bot]'],
-      alertsEnabled: false,
-      lastActivity: new Date('2024-01-15'),
-      stats: {
-        totalMerges: 12,
-        successfulMerges: 10,
-        failedMerges: 2,
-        pendingMerges: 1
-      },
-      activities: [
-        { id: '3', type: 'failure', message: 'PR #45 failed to merge', repo: 'another-repo', timestamp: new Date('2024-01-15') }
-      ]
+  const [repositories, setRepositories] = useState<Repository[]>(() => {
+    const savedRepos = localStorage.getItem(REPOSITORIES_STORAGE_KEY);
+    if (savedRepos) {
+      try {
+        const parsed = JSON.parse(savedRepos);
+        // Convert date strings back to Date objects
+        return parsed.map((repo: any) => ({
+          ...repo,
+          lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
+          recentPull: repo.recentPull ? {
+            ...repo.recentPull,
+            timestamp: new Date(repo.recentPull.timestamp)
+          } : undefined,
+          activities: (repo.activities || []).map((activity: any) => ({
+            ...activity,
+            timestamp: new Date(activity.timestamp)
+          }))
+        }));
+      } catch (error) {
+        console.error('Error parsing saved repositories:', error);
+        return [];
+      }
     }
-  ]);
+    return [];
+  });
+
+  // Persist repositories to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(REPOSITORIES_STORAGE_KEY, JSON.stringify(repositories));
+  }, [repositories]);
 
   const toggleRepository = (id: string) => {
     setRepositories(repos =>
@@ -72,43 +57,96 @@ export const useRepositories = () => {
     );
   };
 
-  const addRepository = (name: string, owner: string) => {
+  const addRepository = (name: string, owner: string, apiKeyId?: string) => {
+    const existingRepo = repositories.find(r => r.name === name && r.owner === owner);
+    if (existingRepo) {
+      toast({ 
+        title: 'Repository already exists',
+        description: `${owner}/${name} is already in your list`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
     const newRepository: Repository = {
       id: Date.now().toString(),
       name,
       owner,
       enabled: true,
-      allowedBranches: ['codex-*'],
+      allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
       allowedUsers: ['github-actions[bot]'],
+      allowAllBranches: false,
+      allowAllUsers: false,
       alertsEnabled: true,
-      stats: { totalMerges: 0, successfulMerges: 0, failedMerges: 0, pendingMerges: 0 },
+      apiKeyId,
+      fetchMode: 'github-api',
+      webhookMethod: 'global',
+      lastActivity: new Date(),
+      stats: { 
+        totalMerges: 0, 
+        successfulMerges: 0, 
+        failedMerges: 0, 
+        pendingMerges: 0 
+      },
       activities: []
     };
+    
     setRepositories(prev => [...prev, newRepository]);
-    logInfo('repository', `Repository ${owner}/${name} added`, { repo: `${owner}/${name}` });
-    toast({ title: `Repository ${owner}/${name} added successfully!` });
+    logInfo('repository', `Repository ${owner}/${name} added`, { repo: `${owner}/${name}`, apiKeyId });
+    toast({ 
+      title: `Repository ${owner}/${name} added successfully!`,
+      description: 'You can now configure its settings and enable monitoring'
+    });
   };
 
   const deleteRepository = (id: string) => {
     const repo = repositories.find(r => r.id === id);
+    if (!repo) return;
+    
     setRepositories(repos => repos.filter(r => r.id !== id));
-    if (repo) {
-      logInfo('repository', `Repository ${repo.owner}/${repo.name} deleted`, { repo: `${repo.owner}/${repo.name}` });
-      toast({ title: `Repository ${repo.owner}/${repo.name} deleted` });
-    }
+    logInfo('repository', `Repository ${repo.owner}/${repo.name} deleted`, { repo: `${repo.owner}/${repo.name}` });
+    toast({ 
+      title: `Repository ${repo.owner}/${repo.name} deleted`,
+      description: 'All associated data has been removed'
+    });
+  };
+
+  const updateRepository = (id: string, updates: Partial<Repository>) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === id ? { ...repo, ...updates } : repo
+      )
+    );
   };
 
   const addBranch = (repoId: string, branch: string) => {
-    if (branch) {
-      setRepositories(repos =>
-        repos.map(repo =>
-          repo.id === repoId
-            ? { ...repo, allowedBranches: [...repo.allowedBranches, branch] }
-            : repo
-        )
-      );
-      toast({ title: `Branch pattern "${branch}" added successfully!` });
+    if (!branch.trim()) {
+      toast({ 
+        title: 'Invalid branch pattern',
+        description: 'Branch pattern cannot be empty',
+        variant: 'destructive'
+      });
+      return;
     }
+
+    const repo = repositories.find(r => r.id === repoId);
+    if (repo?.allowedBranches.includes(branch)) {
+      toast({ 
+        title: 'Branch pattern already exists',
+        description: `"${branch}" is already in the allowed list`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === repoId
+          ? { ...repo, allowedBranches: [...repo.allowedBranches, branch] }
+          : repo
+      )
+    );
+    toast({ title: `Branch pattern "${branch}" added successfully!` });
   };
 
   const removeBranch = (repoId: string, branchIndex: number) => {
@@ -129,16 +167,33 @@ export const useRepositories = () => {
   };
 
   const addUser = (repoId: string, user: string) => {
-    if (user) {
-      setRepositories(repos =>
-        repos.map(repo =>
-          repo.id === repoId
-            ? { ...repo, allowedUsers: [...repo.allowedUsers, user] }
-            : repo
-        )
-      );
-      toast({ title: `User "${user}" added successfully!` });
+    if (!user.trim()) {
+      toast({ 
+        title: 'Invalid username',
+        description: 'Username cannot be empty',
+        variant: 'destructive'
+      });
+      return;
     }
+
+    const repo = repositories.find(r => r.id === repoId);
+    if (repo?.allowedUsers.includes(user)) {
+      toast({ 
+        title: 'User already exists',
+        description: `"${user}" is already in the allowed list`,
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === repoId
+          ? { ...repo, allowedUsers: [...repo.allowedUsers, user] }
+          : repo
+      )
+    );
+    toast({ title: `User "${user}" added successfully!` });
   };
 
   const removeUser = (repoId: string, userIndex: number) => {
@@ -158,14 +213,56 @@ export const useRepositories = () => {
     }
   };
 
+  const updateRepositoryStats = (repoId: string, stats: Partial<Repository['stats']>) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === repoId
+          ? { ...repo, stats: { ...repo.stats, ...stats } }
+          : repo
+      )
+    );
+  };
+
+  const addRepositoryActivity = (repoId: string, activity: Omit<Repository['activities'][0], 'id'>) => {
+    const activityWithId = {
+      ...activity,
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    };
+
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === repoId
+          ? { 
+              ...repo, 
+              activities: [activityWithId, ...repo.activities].slice(0, 100), // Keep last 100 activities
+              lastActivity: new Date()
+            }
+          : repo
+      )
+    );
+  };
+
+  const clearAllRepositories = () => {
+    setRepositories([]);
+    localStorage.removeItem(REPOSITORIES_STORAGE_KEY);
+    toast({ 
+      title: 'All repositories cleared',
+      description: 'Repository data has been reset'
+    });
+  };
+
   return {
     repositories,
     toggleRepository,
     addRepository,
     deleteRepository,
+    updateRepository,
     addBranch,
     removeBranch,
     addUser,
-    removeUser
+    removeUser,
+    updateRepositoryStats,
+    addRepositoryActivity,
+    clearAllRepositories
   };
 };

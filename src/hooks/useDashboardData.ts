@@ -12,10 +12,14 @@ export const useDashboardData = () => {
     toggleRepository,
     addRepository,
     deleteRepository,
+    updateRepository,
     addBranch,
     removeBranch,
     addUser,
-    removeUser
+    removeUser,
+    updateRepositoryStats,
+    addRepositoryActivity,
+    clearAllRepositories
   } = useRepositories();
 
   const {
@@ -26,18 +30,27 @@ export const useDashboardData = () => {
     toggleApiKey,
     deleteApiKey,
     revertApiKeyDeletion,
-    toggleShowApiKey
+    toggleShowApiKey,
+    updateApiKeyConnectionStatus,
+    getDecryptedApiKey,
+    refreshApiKeyStatus,
+    clearAllApiKeys
   } = useApiKeys();
 
   const {
     globalConfig,
-    setGlobalConfig
+    setGlobalConfig,
+    resetConfig,
+    exportConfig,
+    importConfig
   } = useGlobalConfig();
 
   const {
     activities,
     mergeStats,
     isLoading,
+    updateStats,
+    resetSessionStats,
     exportReport,
     fetchActivities
   } = useActivities();
@@ -55,18 +68,31 @@ export const useDashboardData = () => {
     toggleRepository,
     addRepository,
     deleteRepository,
+    updateRepository,
     addBranch,
     removeBranch,
     addUser,
     removeUser,
+    updateRepositoryStats,
+    addRepositoryActivity,
     addApiKey,
     toggleApiKey,
     deleteApiKey,
     revertApiKeyDeletion,
     toggleShowApiKey,
-    exportReport,
+    updateApiKeyConnectionStatus,
+    getDecryptedApiKey,
+    refreshApiKeyStatus,
     setGlobalConfig,
+    resetConfig,
+    exportConfig,
+    importConfig,
+    exportReport,
+    fetchActivities,
+    updateStats,
+    resetSessionStats,
     exportLogs,
-    fetchActivities
+    clearAllRepositories,
+    clearAllApiKeys
   };
 };
