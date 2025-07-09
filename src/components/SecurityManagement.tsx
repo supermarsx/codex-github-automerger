@@ -12,8 +12,15 @@ import { useToast } from '@/hooks/use-toast';
 import { PasskeyService, PasskeyCredential } from '@/utils/passkeyAuth';
 import { WebhookService, WebhookConfig, WebhookEvent } from '@/utils/webhooks';
 import { EncryptionService } from '@/utils/encryption';
+import { ApiKey, Repository, GlobalConfig } from '@/types/dashboard';
 
-export const SecurityManagement: React.FC = () => {
+interface SecurityManagementProps {
+  apiKeys: ApiKey[];
+  repositories: Repository[];
+  config: GlobalConfig;
+}
+
+export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys, repositories, config }) => {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [credentials, setCredentials] = useState<PasskeyCredential[]>([]);
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
@@ -26,6 +33,7 @@ export const SecurityManagement: React.FC = () => {
   const [targetIterations, setTargetIterations] = useState(100000);
   const [recoveryPhrase, setRecoveryPhrase] = useState<string>('');
   const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
+  const [credentialToDelete, setCredentialToDelete] = useState<string | null>(null);
   const [newWebhook, setNewWebhook] = useState({
     name: '',
     url: '',
@@ -67,10 +75,18 @@ export const SecurityManagement: React.FC = () => {
     }
   };
 
-  const handleRemoveCredential = (credentialId: string) => {
-    PasskeyService.removeCredential(credentialId);
+  const handleRemoveCredential = async () => {
+    if (!credentialToDelete) return;
+    const result = await PasskeyService.authenticate();
+    if (!result.success) {
+      toast({ title: 'Authentication failed', variant: 'destructive' });
+      setCredentialToDelete(null);
+      return;
+    }
+    PasskeyService.removeCredential(credentialToDelete);
     setCredentials(PasskeyService.getStoredCredentials());
-    toast({ title: "Passkey removed" });
+    setCredentialToDelete(null);
+    toast({ title: 'Passkey removed' });
   };
 
   const handleSaveWebhook = () => {
@@ -178,13 +194,17 @@ export const SecurityManagement: React.FC = () => {
 
   const webhookEvents: WebhookEvent[] = [
     'pull_request.opened',
-    'pull_request.closed', 
+    'pull_request.closed',
     'pull_request.merged',
     'merge.success',
     'merge.failure',
     'security.alert',
     'config.updated'
   ];
+
+  const apiKeysEncrypted = apiKeys.every(k => k.encrypted);
+  const secureRepoAccess = repositories.every(r => r.fetchMode === 'github-api');
+  const passkeyPending = credentials.length === 0;
   return (
     <Card className="neo-card">
       <CardHeader>
@@ -250,7 +270,7 @@ export const SecurityManagement: React.FC = () => {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleRemoveCredential(cred.id)}
+                      onClick={() => setCredentialToDelete(cred.id)}
                     >
                       <Trash2 className="w-3 h-3" />
                     </Button>
@@ -258,6 +278,20 @@ export const SecurityManagement: React.FC = () => {
                 ))}
               </div>
             )}
+            <Dialog open={!!credentialToDelete} onOpenChange={(o) => !o && setCredentialToDelete(null)}>
+              <DialogContent className="neo-card">
+                <DialogHeader>
+                  <DialogTitle>Delete Passkey?</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <p className="text-sm">Authenticate with your passkey to confirm deletion.</p>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setCredentialToDelete(null)}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleRemoveCredential}>Delete</Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
           
           <div className="neo-card p-4 neo-orange">
@@ -476,20 +510,31 @@ export const SecurityManagement: React.FC = () => {
           <h4 className="font-black text-lg mb-2 text-black">Security Status</h4>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="font-bold text-black">API Keys Encrypted</span>
+              {apiKeysEncrypted ? (
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+              )}
+              <span className="font-bold text-black">API Keys {apiKeysEncrypted ? 'Encrypted' : 'Unencrypted'}</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              {secureRepoAccess ? (
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+              )}
               <span className="font-bold text-black">Secure Repository Access</span>
             </div>
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-yellow-600" />
-              <span className="font-bold text-black">Passkey Authentication Pending</span>
+              {passkeyPending ? (
+                <AlertCircle className="w-5 h-5 text-yellow-600" />
+              ) : (
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              )}
+              <span className="font-bold text-black">{passkeyPending ? 'Passkey Authentication Pending' : 'Passkey Configured'}</span>
             </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  );
-};
+  );};

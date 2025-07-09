@@ -44,6 +44,7 @@ interface GitHubRepository {
 interface SelectiveRepositoryLoaderProps {
   apiKeys: any[];
   existingRepos: string[];
+  getDecryptedApiKey: (id: string) => string | null;
   onAddRepository: (repoData: {
     name: string;
     owner: string;
@@ -56,10 +57,11 @@ interface SelectiveRepositoryLoaderProps {
   }) => void;
 }
 
-export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps> = ({ 
-  apiKeys, 
-  existingRepos, 
-  onAddRepository 
+export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps> = ({
+  apiKeys,
+  existingRepos,
+  getDecryptedApiKey,
+  onAddRepository
 }) => {
   const [selectedApiKey, setSelectedApiKey] = useState<string>('');
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
@@ -79,7 +81,13 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
 
     setIsLoading(true);
     try {
-      const service = createGitHubService(apiKey.key);
+      const token = getDecryptedApiKey(apiKey.id);
+      if (!token) {
+        toast({ title: 'Unlock API keys to load repositories', variant: 'destructive' });
+        setIsLoading(false);
+        return;
+      }
+      const service = createGitHubService(token);
       const repos = await service.fetchRepositories('');
       
       // Convert to our format and filter out already added repos

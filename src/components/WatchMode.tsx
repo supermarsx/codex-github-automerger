@@ -24,10 +24,11 @@ import { useLogger } from '@/hooks/useLogger';
 interface WatchModeProps {
   repositories: Repository[];
   apiKeys: any[];
+  getDecryptedApiKey: (id: string) => string | null;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, onUpdateRepository }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, onUpdateRepository }) => {
   const { 
     watchModeState, 
     updateWatchedRepos, 
@@ -65,7 +66,12 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, onU
 
     try {
       logInfo('watch-mode', `Fetching data for ${repo.owner}/${repo.name}`);
-      const service = createGitHubService(apiKey.key);
+      const token = getDecryptedApiKey(apiKey.id);
+      if (!token) {
+        logWarn('watch-mode', 'API key locked, skipping fetch', { repo: repo.id });
+        return;
+      }
+      const service = createGitHubService(token);
       
       // Fetch pull requests
       const pullRequests = await service.fetchPullRequests(repo.owner, repo.name);

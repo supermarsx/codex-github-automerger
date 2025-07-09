@@ -3,6 +3,7 @@ import { ApiKey } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
 import { EncryptionService } from '@/utils/encryption';
+import { PasskeyService } from '@/utils/passkeyAuth';
 
 const API_KEYS_STORAGE_KEY = 'automerger-api-keys';
 
@@ -31,10 +32,50 @@ export const useApiKeys = () => {
   const [showApiKey, setShowApiKey] = useState<string | null>(null);
   const [deletedApiKeys, setDeletedApiKeys] = useState<Map<string, { key: ApiKey; timeout: NodeJS.Timeout }>>(new Map());
 
+  const [unlocked, setUnlocked] = useState(false);
+  const [decryptedKeys, setDecryptedKeys] = useState<Record<string, string>>({});
+
   // Persist API keys to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(apiKeys));
   }, [apiKeys]);
+
+  useEffect(() => {
+    const unlock = async () => {
+      try {
+        if (PasskeyService.getStoredCredentials().length === 0) {
+          logInfo('api-key', 'No passkey registered, skipping unlock');
+          const map: Record<string, string> = {};
+          apiKeys.forEach(k => {
+            try { map[k.id] = atob(k.key); } catch {}
+          });
+          setDecryptedKeys(map);
+          setUnlocked(true);
+          return;
+        }
+
+        logInfo('api-key', 'Authenticating passkey to unlock API keys');
+        const result = await PasskeyService.authenticate();
+        if (result.success) {
+          const map: Record<string, string> = {};
+          apiKeys.forEach(k => {
+            try { map[k.id] = atob(k.key); } catch {}
+          });
+          setDecryptedKeys(map);
+          setUnlocked(true);
+          logInfo('api-key', 'API keys unlocked');
+        } else {
+          logInfo('api-key', 'Passkey authentication failed', { error: result.error });
+        }
+      } catch (error) {
+        logInfo('api-key', 'Error unlocking API keys', error);
+      }
+    };
+
+    unlock();
+    // intentionally run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
@@ -95,8 +136,11 @@ export const useApiKeys = () => {
       encrypted: true,
       connectionStatus: isValid ? 'connected' : 'disconnected'
     };
-    
+
     setApiKeys(prev => [...prev, newKey]);
+    if (unlocked) {
+      setDecryptedKeys(prev => ({ ...prev, [newKey.id]: key }));
+    }
     logInfo('api-key', `API Key "${name}" added`, { keyName: name, valid: isValid });
     
     toast({ 
@@ -132,8 +176,13 @@ export const useApiKeys = () => {
   const deleteApiKey = (id: string) => {
     const key = apiKeys.find(k => k.id === id);
     if (!key) return;
-    
+
     setApiKeys(keys => keys.filter(key => key.id !== id));
+    setDecryptedKeys(prev => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
     logInfo('api-key', `API Key "${key.name}" deleted`, { keyName: key.name });
     
     // Set up revert functionality
@@ -162,6 +211,9 @@ export const useApiKeys = () => {
     if (deleted) {
       clearTimeout(deleted.timeout);
       setApiKeys(keys => [...keys, deleted.key]);
+      if (unlocked) {
+        setDecryptedKeys(prev => ({ ...prev, [deleted.key.id]: atob(deleted.key.key) }));
+      }
       setDeletedApiKeys(prev => {
         const newMap = new Map(prev);
         newMap.delete(id);
@@ -186,16 +238,7 @@ export const useApiKeys = () => {
   };
 
   const getDecryptedApiKey = (id: string): string | null => {
-    const key = apiKeys.find(k => k.id === id);
-    if (!key) return null;
-    
-    try {
-      // Simple deobfuscation - in a real app, use proper decryption with EncryptionService
-      return atob(key.key);
-    } catch (error) {
-      console.error('Failed to decode API key:', error);
-      return null;
-    }
+    return decryptedKeys[id] || null;
   };
 
   const refreshApiKeyStatus = async (id: string) => {
@@ -218,6 +261,7 @@ export const useApiKeys = () => {
 
   return {
     apiKeys,
+    isUnlocked: unlocked,
     showApiKey,
     deletedApiKeys,
     addApiKey,
@@ -229,5 +273,4 @@ export const useApiKeys = () => {
     getDecryptedApiKey,
     refreshApiKeyStatus,
     clearAllApiKeys
-  };
-};
+  };};
