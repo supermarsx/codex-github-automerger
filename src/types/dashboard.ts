@@ -70,6 +70,40 @@ export interface FeedAction {
   enabled: boolean;
 }
 
+export type StatsPeriod = 'session' | 'day' | 'week' | 'month' | 'year' | 'all-time';
+
+export interface DetailedStats {
+  period: StatsPeriod;
+  repositories: {
+    [repoId: string]: {
+      name: string;
+      merges: number;
+      successes: number;
+      failures: number;
+      pullRequests: number;
+      alerts: number;
+      avgMergeTime: number;
+      dailyStats: {
+        [date: string]: {
+          merges: number;
+          successes: number;
+          failures: number;
+        };
+      };
+    };
+  };
+  overall: {
+    totalMerges: number;
+    totalSuccesses: number;
+    totalFailures: number;
+    totalPullRequests: number;
+    totalAlerts: number;
+    avgSuccessRate: number;
+    topRepository: string;
+    peakDay: string;
+  };
+}
+
 export interface GlobalConfig {
   autoMergeEnabled: boolean;
   requireApproval: boolean;
@@ -86,7 +120,8 @@ export interface GlobalConfig {
   serverCheckInterval: number;
   logLevel: 'info' | 'warn' | 'error' | 'debug';
   darkMode: boolean;
-  customCss?: string;
-  customJs?: string;
+  customCss: string;
+  customJs: string;
   feedActions: FeedAction[];
+  statsPeriod: StatsPeriod;
 }

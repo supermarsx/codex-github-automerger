@@ -97,7 +97,8 @@ export const useDashboardData = () => {
     darkMode: localStorage.getItem('theme') === 'light' ? false : true,
     customCss: '',
     customJs: '',
-    feedActions: []
+    feedActions: [],
+    statsPeriod: 'session'
   });
 
   const [activities, setActivities] = useState<ActivityItem[]>([

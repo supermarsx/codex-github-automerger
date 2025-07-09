@@ -19,8 +19,10 @@ import {
   Settings, 
   Activity,
   FileText,
-  Zap
+  Zap,
+  BarChart3
 } from 'lucide-react';
+import { DetailedStatistics } from '@/components/DetailedStatistics';
 
 export const Dashboard = () => {
   const {
@@ -55,14 +57,14 @@ export const Dashboard = () => {
         <DashboardHeader apiKeys={apiKeys} />
 
         {/* Stats Cards */}
-        <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} />
+        <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} statsPeriod={globalConfig.statsPeriod} />
 
         {/* Connection Status */}
         <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
 
         {/* Main Content */}
         <Tabs defaultValue="feed" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 h-16 gap-2 p-0">
+          <TabsList className="grid w-full grid-cols-8 h-16 gap-2 p-0">
             <TabsTrigger value="feed" className="neo-button-secondary h-12">
               <Activity className="w-4 h-4 mr-2" />
               Feed
@@ -87,17 +89,21 @@ export const Dashboard = () => {
               <Shield className="w-4 h-4 mr-2" />
               Security
             </TabsTrigger>
+            <TabsTrigger value="statistics" className="neo-button-secondary h-12">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Statistics
+            </TabsTrigger>
             <TabsTrigger value="logs" className="neo-button-secondary h-12">
               <FileText className="w-4 h-4 mr-2" />
               Logs
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="feed" className="space-y-6">
+          <TabsContent value="feed" className="space-y-6 max-w-4xl mx-auto">
             <RealtimeFeed activities={activities} onExportReport={exportReport} />
           </TabsContent>
 
-          <TabsContent value="repositories" className="space-y-6">
+          <TabsContent value="repositories" className="space-y-6 max-w-4xl mx-auto">
             <RepositoryManagement
               repositories={repositories}
               apiKeys={apiKeys}
@@ -127,7 +133,7 @@ export const Dashboard = () => {
             />
           </TabsContent>
 
-          <TabsContent value="actions" className="space-y-6">
+          <TabsContent value="actions" className="space-y-6 max-w-4xl mx-auto">
             <FeedActions
               actions={globalConfig.feedActions}
               onActionsChange={(actions) => setGlobalConfig({ ...globalConfig, feedActions: actions })}
@@ -149,6 +155,10 @@ export const Dashboard = () => {
 
           <TabsContent value="security" className="space-y-6">
             <SecurityManagement />
+          </TabsContent>
+
+          <TabsContent value="statistics" className="space-y-6">
+            <DetailedStatistics repositories={repositories} period={globalConfig.statsPeriod} />
           </TabsContent>
 
           <TabsContent value="logs" className="space-y-6">

@@ -1,15 +1,23 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Repository, ApiKey, MergeStats } from '@/types/dashboard';
+import { Repository, ApiKey, MergeStats, StatsPeriod } from '@/types/dashboard';
 
 interface StatsCardsProps {
   repositories: Repository[];
   apiKeys: ApiKey[];
   mergeStats: MergeStats;
+  statsPeriod: StatsPeriod;
 }
 
-export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, mergeStats }) => {
+export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, mergeStats, statsPeriod }) => {
+  const getStatsForPeriod = () => {
+    // For session, use session stats, otherwise use total stats
+    return statsPeriod === 'session' ? mergeStats.session : mergeStats.total;
+  };
+
+  const currentStats = getStatsForPeriod();
+  
   const stats = [
     {
       title: repositories.filter(r => r.enabled).length.toString(),
@@ -24,28 +32,28 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
       subtitle: `${apiKeys.length} total`
     },
     {
-      title: mergeStats.session.pending.toString(),
+      title: currentStats.pending.toString(),
       label: 'Pending',
       color: 'neo-yellow',
-      subtitle: `${mergeStats.total.pending} total`
+      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
     },
     {
-      title: mergeStats.session.merged.toString(),
+      title: currentStats.merged.toString(),
       label: 'Merged',
       color: 'neo-green',
-      subtitle: `${mergeStats.total.merged} total`
+      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
     },
     {
-      title: mergeStats.session.failed.toString(),
+      title: currentStats.failed.toString(),
       label: 'Failed',
       color: 'neo-red',
-      subtitle: `${mergeStats.total.failed} total`
+      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
     },
     {
-      title: `${((mergeStats.total.merged / (mergeStats.total.merged + mergeStats.total.failed)) * 100 || 0).toFixed(1)}%`,
+      title: `${((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toFixed(1)}%`,
       label: 'Success Rate',
       color: 'neo-purple',
-      subtitle: 'All time'
+      subtitle: statsPeriod === 'session' ? 'This session' : 'Total'
     }
   ];
 
