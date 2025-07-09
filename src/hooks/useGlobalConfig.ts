@@ -51,7 +51,9 @@ export const useGlobalConfig = () => {
 
   // Update theme in localStorage when darkMode changes
   useEffect(() => {
-    localStorage.setItem('theme', globalConfig.darkMode ? 'dark' : 'light');
+    const theme = globalConfig.darkMode ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
     // Apply theme to document
     if (globalConfig.darkMode) {
       document.documentElement.classList.add('dark');
