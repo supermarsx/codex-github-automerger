@@ -12,6 +12,35 @@ export interface LogEntry {
 export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info') => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
+  useEffect(() => {
+    const orig = (window as any).__origConsole || {
+      log: console.log,
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+    };
+    (window as any).__origConsole = orig;
+
+    const intercept = (level: LogEntry['level'], method: keyof typeof orig) =>
+      (...args: any[]) => {
+        orig[method](...args);
+        const msg = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+        addLog(level, 'console', msg);
+      };
+
+    console.log = intercept('debug', 'log');
+    console.info = intercept('info', 'info');
+    console.warn = intercept('warn', 'warn');
+    console.error = intercept('error', 'error');
+
+    return () => {
+      console.log = orig.log;
+      console.info = orig.info;
+      console.warn = orig.warn;
+      console.error = orig.error;
+    };
+  }, []);
+
   // Initialize with startup logs
   useEffect(() => {
     addLog('info', 'system', 'Logger initialized');
@@ -47,8 +76,9 @@ export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
     window.dispatchEvent(new CustomEvent<LogEntry>('log-entry', { detail: entry }));
     
     // Also log to console for debugging
+    const orig = (window as any).__origConsole || console;
     const consoleMethod = level === 'debug' ? 'log' : level === 'info' ? 'info' : level === 'warn' ? 'warn' : 'error';
-    console[consoleMethod](`[${category}] ${message}`, details ? details : '');
+    orig[consoleMethod](`[${category}] ${message}`, details ? details : '');
   }, [logLevel]);
 
   const logInfo = useCallback((category: string, message: string, details?: any) => {
