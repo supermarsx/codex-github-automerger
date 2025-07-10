@@ -203,8 +203,8 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
   const apiKeysEncrypted = apiKeys.every(k => k.encrypted);
   const secureRepoAccess = repositories.every(r => r.fetchMode === 'github-api');
   const passkeyPending = credentials.length === 0;
-  return (
-    <Card className="neo-card">
+    return (
+      <Card className="neo-card max-w-4xl mx-auto text-sm">
       <CardHeader>
         <CardTitle className="text-2xl font-black flex items-center gap-2">
           <Shield className="w-6 h-6" />

@@ -50,6 +50,14 @@ export const useActivities = () => {
         .slice(0, 50);
 
       setActivities(sortedActivities);
+
+      const session = {
+        pending: sortedActivities.filter(a => a.type === 'pull').length,
+        merged: sortedActivities.filter(a => a.type === 'merge').length,
+        failed: sortedActivities.filter(a => a.type === 'failure').length
+      };
+
+      updateStats({ session });
     } catch (error) {
       console.error('Error fetching activities:', error);
       setActivities([]);
