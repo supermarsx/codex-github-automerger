@@ -17,6 +17,7 @@ const getDefaultConfig = (): GlobalConfig => ({
   allowAllUsers: false,
   fetchMode: 'github-api',
   serverCheckInterval: 30000, // 30 seconds
+  watchRefreshInterval: 30000,
   logLevel: 'info',
   darkMode: localStorage.getItem('theme') !== 'light',
   accentColor: '#313135',
@@ -68,6 +69,11 @@ export const useGlobalConfig = () => {
     const hsl = hexToHSL(globalConfig.accentColor);
     document.documentElement.style.setProperty('--accent', hsl);
     document.documentElement.style.setProperty('--sidebar-accent', hsl);
+    // simple foreground contrast based on lightness
+    const [h, s, l] = hsl.split(' ').map(v => parseFloat(v));
+    const fg = l > 50 ? '0 0% 0%' : '0 0% 98%';
+    document.documentElement.style.setProperty('--accent-foreground', fg);
+    document.documentElement.style.setProperty('--sidebar-accent-foreground', fg);
   }, [globalConfig.accentColor]);
 
   const updateConfig = (updates: Partial<GlobalConfig>) => {

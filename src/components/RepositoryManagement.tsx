@@ -156,11 +156,13 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
+                      id={`repo-${repo.id}-enabled`}
                       checked={repo.enabled}
                       onCheckedChange={() => onToggleRepository(repo.id)}
                       className="scale-125"
                     />
                     <Switch
+                      id={`repo-${repo.id}-merge`}
                       checked={repo.autoMergeEnabled}
                       onCheckedChange={() => onToggleAutoMerge(repo.id)}
                       className="scale-125"
@@ -296,6 +298,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="font-bold">Watch</span>
                         <Switch
+                          id={`repo-${repo.id}-watch`}
                           checked={repo.watchEnabled}
                           onCheckedChange={() => onToggleWatch(repo.id)}
                         />
@@ -303,6 +306,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="font-bold">Auto Delete Branch</span>
                         <Switch
+                          id={`repo-${repo.id}-delete`}
                           checked={repo.autoDeleteBranch ?? false}
                           onCheckedChange={() => onToggleDeleteBranch(repo.id)}
                         />
@@ -310,6 +314,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       <div className="flex items-center justify-between">
                         <span className="font-bold">Auto Close Branch</span>
                         <Switch
+                          id={`repo-${repo.id}-close`}
                           checked={repo.autoCloseBranch ?? false}
                           onCheckedChange={() => onToggleCloseBranch(repo.id)}
                         />

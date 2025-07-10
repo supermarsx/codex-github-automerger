@@ -489,6 +489,17 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               max={300}
             />
             <ConfigSelector
+              id="watchRefreshInterval"
+              label="Watch Refresh Interval (seconds)"
+              value={config.watchRefreshInterval / 1000}
+              onChange={(value) =>
+                onConfigChange({ ...config, watchRefreshInterval: parseInt(value) * 1000 })
+              }
+              type="number"
+              min={10}
+              max={600}
+            />
+            <ConfigSelector
               id="logLevel"
               label="Log Level"
               value={config.logLevel}

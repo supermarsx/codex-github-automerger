@@ -145,6 +145,7 @@ export interface GlobalConfig {
   allowAllUsers: boolean;
   fetchMode: 'no-auth' | 'github-api';
   serverCheckInterval: number;
+  watchRefreshInterval: number;
   logLevel: 'info' | 'warn' | 'error' | 'debug';
   darkMode: boolean;
   accentColor: string;
@@ -154,4 +155,5 @@ export interface GlobalConfig {
   statsPeriod: StatsPeriod;
   webhooks: Webhook[];
   hideHeader: boolean;
-  logsDisabled: boolean;}
+  logsDisabled: boolean;
+}

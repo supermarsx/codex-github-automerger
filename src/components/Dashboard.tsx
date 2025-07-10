@@ -137,6 +137,7 @@ export const Dashboard = () => {
             isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
             showControlPanel={false}
+            refreshInterval={globalConfig.watchRefreshInterval}
           />
           </TabsContent>
 

@@ -31,9 +31,10 @@ interface WatchModeProps {
   isUnlocked: boolean;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
   showControlPanel?: boolean;
+  refreshInterval: number;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, showControlPanel = true }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, showControlPanel = true, refreshInterval }) => {
   const {
     watchModeState,
     updateRepoActivities,
@@ -135,13 +136,13 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     logDebug('watch-mode', 'Completed refresh of all watched repositories');
   };
 
-  // Auto-refresh every 30 seconds to avoid spamming the GitHub API
+  // Auto-refresh based on configured interval
   useEffect(() => {
     if (watchedRepos.length === 0 || !isUnlocked) return;
 
     const startInterval = () => {
       if (!intervalRef.current) {
-        intervalRef.current = setInterval(refreshAllWatched, 30000);
+        intervalRef.current = setInterval(refreshAllWatched, refreshInterval);
       }
     };
 
@@ -364,7 +365,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <Button
                                       onClick={() => handleClose(repo, pr.number)}
                                       size="sm"
-                                      variant="destructive"
+                                      className="neo-button bg-red-500 hover:bg-red-600"
                                     >
                                       <XCircle className="w-3 h-3 mr-1" />
                                       Close
