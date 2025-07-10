@@ -77,10 +77,12 @@ export const useRepositories = () => {
   };
 
   const toggleAutoMergeOnClean = (id: string) => {
+    let updatedRepo: { owner: string; name: string; status: boolean } | null = null;
     setRepositories(repos =>
       repos.map(repo => {
         if (repo.id === id) {
           const newStatus = !repo.autoMergeOnClean;
+          updatedRepo = { owner: repo.owner, name: repo.name, status: newStatus };
           logInfo('repository', `Auto-merge on clean for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, { repo: repo.name, autoMergeOnClean: newStatus });
           toast({
             title: `Auto-merge on clean ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
@@ -91,16 +93,36 @@ export const useRepositories = () => {
         return repo;
       })
     );
+    if (updatedRepo) {
+      addRepositoryActivity(id, {
+        type: 'alert',
+        message: `merge clean ${updatedRepo.status ? 'on' : 'off'}`,
+        repo: `${updatedRepo.owner}/${updatedRepo.name}`,
+        timestamp: new Date()
+      });
+    }
   };
 
   const toggleAutoMergeOnUnstable = (id: string) => {
+    let updatedRepo: { owner: string; name: string; status: boolean } | null = null;
     setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === id
-          ? { ...repo, autoMergeOnUnstable: !repo.autoMergeOnUnstable }
-          : repo
-      )
+      repos.map(repo => {
+        if (repo.id === id) {
+          const newStatus = !repo.autoMergeOnUnstable;
+          updatedRepo = { owner: repo.owner, name: repo.name, status: newStatus };
+          return { ...repo, autoMergeOnUnstable: newStatus };
+        }
+        return repo;
+      })
     );
+    if (updatedRepo) {
+      addRepositoryActivity(id, {
+        type: 'alert',
+        message: `merge unstable ${updatedRepo.status ? 'on' : 'off'}`,
+        repo: `${updatedRepo.owner}/${updatedRepo.name}`,
+        timestamp: new Date()
+      });
+    }
   };
 
   const toggleWatch = (id: string) => {
@@ -112,11 +134,25 @@ export const useRepositories = () => {
   };
 
   const toggleDeleteOnDirty = (id: string) => {
+    let updatedRepo: { owner: string; name: string; status: boolean } | null = null;
     setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === id ? { ...repo, autoDeleteOnDirty: !repo.autoDeleteOnDirty } : repo
-      )
+      repos.map(repo => {
+        if (repo.id === id) {
+          const newStatus = !repo.autoDeleteOnDirty;
+          updatedRepo = { owner: repo.owner, name: repo.name, status: newStatus };
+          return { ...repo, autoDeleteOnDirty: newStatus };
+        }
+        return repo;
+      })
     );
+    if (updatedRepo) {
+      addRepositoryActivity(id, {
+        type: 'alert',
+        message: `del dirty ${updatedRepo.status ? 'on' : 'off'}`,
+        repo: `${updatedRepo.owner}/${updatedRepo.name}`,
+        timestamp: new Date()
+      });
+    }
   };
 
   const toggleCloseBranch = (id: string) => {

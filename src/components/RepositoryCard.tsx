@@ -107,7 +107,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   {repo.enabled ? 'Active' : 'Inactive'}
                 </Badge>
                 <Badge variant="secondary" className={`neo-card ${repo.autoMergeOnClean ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
-                  {repo.autoMergeOnClean ? 'Automerge Clean' : 'Automerge Clean Off'}
+                  {repo.autoMergeOnClean ? 'Automerge on Clean' : 'Automerge on Clean Off'}
                 </Badge>
                 <Badge variant="secondary" className="neo-card neo-blue text-black font-bold text-xs">
                   {successRate}% Success
@@ -185,8 +185,8 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             {/* Auto-merge Toggle */}
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-black text-sm">Auto-merge</h4>
-                <p className="text-xs text-muted-foreground">Automatically merge PRs when checks pass</p>
+                <h4 className="font-black text-sm">Auto-merge on Clean</h4>
+                <p className="text-xs text-muted-foreground">Automatically merge PRs when the merge state is clean</p>
               </div>
               <Switch
                 checked={repo.autoMergeOnClean}

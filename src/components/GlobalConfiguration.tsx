@@ -441,7 +441,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
              />
             <ConfigToggle
                id="autoDeleteOnDirty"
-               label="Auto Delete Dirty Branches"
+               label="Auto Delete on Dirty Branches"
                checked={config.autoDeleteOnDirty}
                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteOnDirty: checked })}
              />
