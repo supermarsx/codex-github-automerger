@@ -2,24 +2,34 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit2, Check, X } from 'lucide-react';
+import { Plus, Edit2, Check, X, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface EditableListProps {
   items: string[];
   onItemsChange: (items: string[]) => void;
   placeholder: string;
   itemColor?: string;
+  reorderable?: boolean;
 }
 
 export const EditableList: React.FC<EditableListProps> = ({
   items,
   onItemsChange,
   placeholder,
-  itemColor = 'neo-blue'
+  itemColor = 'neo-blue',
+  reorderable = false
 }) => {
   const [newItem, setNewItem] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
+
+  const moveItem = (from: number, to: number) => {
+    if (to < 0 || to >= items.length) return;
+    const updated = [...items];
+    const [moved] = updated.splice(from, 1);
+    updated.splice(to, 0, moved);
+    onItemsChange(updated);
+  };
 
   const addItem = () => {
     if (newItem.trim()) {
@@ -84,8 +94,8 @@ export const EditableList: React.FC<EditableListProps> = ({
             ) : (
               <>
                 <div className="flex-1">
-                  <Badge 
-                    variant="secondary" 
+                  <Badge
+                    variant="secondary"
                     className={`neo-card ${itemColor} text-black dark:text-white font-bold cursor-pointer hover:opacity-80`}
                     onClick={() => startEditing(index)}
                   >
@@ -93,6 +103,26 @@ export const EditableList: React.FC<EditableListProps> = ({
                     {item}
                   </Badge>
                 </div>
+                {reorderable && (
+                  <>
+                    <Button
+                      onClick={() => moveItem(index, index - 1)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-foreground"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      onClick={() => moveItem(index, index + 1)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-foreground"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
                 <Button
                   onClick={() => removeItem(index)}
                   size="sm"

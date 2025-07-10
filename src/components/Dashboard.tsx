@@ -64,6 +64,8 @@ export const Dashboard = () => {
     exportLogs,
     fetchActivities,
     getDecryptedApiKey,
+    unlock,
+    authInProgress,
     showLockedModal,
     setShowLockedModal
   } = useDashboardData();
@@ -102,6 +104,11 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
+      {authInProgress && (
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 neo-card font-black text-xl">
+          Waiting for authentication...
+        </div>
+      )}
       <Dialog open={showLockedModal} onOpenChange={setShowLockedModal}>
         <DialogContent className="neo-card">
           <DialogHeader>
@@ -207,7 +214,12 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
-            <SecurityManagement apiKeys={apiKeys} repositories={repositories} config={globalConfig} />
+            <SecurityManagement
+              apiKeys={apiKeys}
+              repositories={repositories}
+              config={globalConfig}
+              onAuthenticate={unlock}
+            />
           </TabsContent>
 
           <TabsContent value="statistics" className="space-y-6">

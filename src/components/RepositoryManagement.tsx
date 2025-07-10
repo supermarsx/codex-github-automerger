@@ -197,6 +197,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </h4>
                        <EditableList
                          items={repo.allowedBranches}
+                         reorderable
                          onItemsChange={(items) => {
                            // Update branch patterns for this repository
                            const updatedBranches = items;
@@ -212,6 +213,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                        </h4>
                        <EditableList
                          items={repo.protectedBranches || []}
+                         reorderable
                          onItemsChange={(items) => {
                            const updatedBranches = items;
                            console.log('Update protected branches for repo:', repo.id, updatedBranches);
@@ -235,6 +237,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </h4>
                        <EditableList
                          items={repo.allowedUsers}
+                         reorderable
                          onItemsChange={(items) => {
                            // Update allowed users for this repository
                            const updatedUsers = items;

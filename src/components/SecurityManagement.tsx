@@ -18,9 +18,10 @@ interface SecurityManagementProps {
   apiKeys: ApiKey[];
   repositories: Repository[];
   config: GlobalConfig;
+  onAuthenticate: () => void;
 }
 
-export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys, repositories, config }) => {
+export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys, repositories, config, onAuthenticate }) => {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [credentials, setCredentials] = useState<PasskeyCredential[]>([]);
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
@@ -67,12 +68,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
   };
 
   const handleAuthenticatePasskey = async () => {
-    const result = await PasskeyService.authenticate();
-    if (result.success) {
-      toast({ title: "Authentication successful!" });
-    } else {
-      toast({ title: "Authentication failed", description: result.error, variant: "destructive" });
-    }
+    await onAuthenticate();
   };
 
   const handleRemoveCredential = async () => {

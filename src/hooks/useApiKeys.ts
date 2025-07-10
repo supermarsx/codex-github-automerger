@@ -35,6 +35,7 @@ export const useApiKeys = () => {
   const [unlocked, setUnlocked] = useState(false);
   const [decryptedKeys, setDecryptedKeys] = useState<Record<string, string>>({});
   const [showLockedModal, setShowLockedModal] = useState(false);
+  const [authInProgress, setAuthInProgress] = useState(false);
   const lockedShownRef = useRef(false);
 
   // Persist API keys to localStorage whenever they change
@@ -42,46 +43,52 @@ export const useApiKeys = () => {
     localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(apiKeys));
   }, [apiKeys]);
 
-  useEffect(() => {
-    const unlock = async () => {
-      try {
-        if (PasskeyService.getStoredCredentials().length === 0) {
-          logInfo('api-key', 'No passkey registered, skipping unlock');
-          const map: Record<string, string> = {};
-          apiKeys.forEach(k => {
-            try { map[k.id] = atob(k.key); } catch {}
-          });
-          setDecryptedKeys(map);
-          setUnlocked(true);
-          return;
-        }
+  const unlock = async () => {
+    setAuthInProgress(true);
+    try {
+      if (PasskeyService.getStoredCredentials().length === 0) {
+        logInfo('api-key', 'No passkey registered, skipping unlock');
+        const map: Record<string, string> = {};
+        apiKeys.forEach(k => {
+          try { map[k.id] = atob(k.key); } catch {}
+        });
+        setDecryptedKeys(map);
+        setUnlocked(true);
+        setShowLockedModal(false);
+        setAuthInProgress(false);
+        return;
+      }
 
-        logInfo('api-key', 'Authenticating passkey to unlock API keys');
-        const result = await PasskeyService.authenticate();
-        if (result.success) {
-          const map: Record<string, string> = {};
-          apiKeys.forEach(k => {
-            try { map[k.id] = atob(k.key); } catch {}
-          });
-          setDecryptedKeys(map);
-          setUnlocked(true);
-          logInfo('api-key', 'API keys unlocked');
-        } else {
-          logInfo('api-key', 'Passkey authentication failed', { error: result.error });
-          if (!lockedShownRef.current) {
-            setShowLockedModal(true);
-            lockedShownRef.current = true;
-          }
-        }
-      } catch (error) {
-        logInfo('api-key', 'Error unlocking API keys', error);
+      logInfo('api-key', 'Authenticating passkey to unlock API keys');
+      const result = await PasskeyService.authenticate();
+      if (result.success) {
+        const map: Record<string, string> = {};
+        apiKeys.forEach(k => {
+          try { map[k.id] = atob(k.key); } catch {}
+        });
+        setDecryptedKeys(map);
+        setUnlocked(true);
+        setShowLockedModal(false);
+        logInfo('api-key', 'API keys unlocked');
+      } else {
+        logInfo('api-key', 'Passkey authentication failed', { error: result.error });
         if (!lockedShownRef.current) {
           setShowLockedModal(true);
           lockedShownRef.current = true;
         }
       }
-    };
+    } catch (error) {
+      logInfo('api-key', 'Error unlocking API keys', error);
+      if (!lockedShownRef.current) {
+        setShowLockedModal(true);
+        lockedShownRef.current = true;
+      }
+    } finally {
+      setAuthInProgress(false);
+    }
+  };
 
+  useEffect(() => {
     unlock();
     // intentionally run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -284,5 +291,8 @@ export const useApiKeys = () => {
     updateApiKeyConnectionStatus,
     getDecryptedApiKey,
     refreshApiKeyStatus,
-    clearAllApiKeys
-  };};
+    clearAllApiKeys,
+    unlock,
+    authInProgress
+  };
+};

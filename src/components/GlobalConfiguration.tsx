@@ -390,6 +390,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Default Branch Patterns</h4>
           <EditableList
             items={config.defaultBranchPatterns}
+            reorderable
             onItemsChange={(items) => onConfigChange({ ...config, defaultBranchPatterns: items })}
             placeholder="e.g., codex-*"
             itemColor="neo-blue"
@@ -401,6 +402,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Default Allowed Users</h4>
           <EditableList
             items={config.defaultAllowedUsers}
+            reorderable
             onItemsChange={(items) => onConfigChange({ ...config, defaultAllowedUsers: items })}
             placeholder="e.g., github-actions[bot]"
             itemColor="neo-green"
@@ -412,6 +414,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Protected Branches</h4>
           <EditableList
             items={config.protectedBranches}
+            reorderable
             onItemsChange={(items) => onConfigChange({ ...config, protectedBranches: items })}
             placeholder="e.g., main"
             itemColor="neo-red"
