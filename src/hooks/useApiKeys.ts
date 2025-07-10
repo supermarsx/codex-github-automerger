@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ApiKey } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
@@ -34,6 +34,8 @@ export const useApiKeys = () => {
 
   const [unlocked, setUnlocked] = useState(false);
   const [decryptedKeys, setDecryptedKeys] = useState<Record<string, string>>({});
+  const [showLockedModal, setShowLockedModal] = useState(false);
+  const lockedShownRef = useRef(false);
 
   // Persist API keys to localStorage whenever they change
   useEffect(() => {
@@ -66,9 +68,17 @@ export const useApiKeys = () => {
           logInfo('api-key', 'API keys unlocked');
         } else {
           logInfo('api-key', 'Passkey authentication failed', { error: result.error });
+          if (!lockedShownRef.current) {
+            setShowLockedModal(true);
+            lockedShownRef.current = true;
+          }
         }
       } catch (error) {
         logInfo('api-key', 'Error unlocking API keys', error);
+        if (!lockedShownRef.current) {
+          setShowLockedModal(true);
+          lockedShownRef.current = true;
+        }
       }
     };
 
@@ -262,6 +272,8 @@ export const useApiKeys = () => {
   return {
     apiKeys,
     isUnlocked: unlocked,
+    showLockedModal,
+    setShowLockedModal,
     showApiKey,
     deletedApiKeys,
     addApiKey,

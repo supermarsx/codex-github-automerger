@@ -3,6 +3,7 @@ export interface PasskeyCredential {
   publicKey: string;
   counter: number;
   created: Date;
+  label: string;
   lastUsed?: Date;
 }
 
@@ -37,6 +38,11 @@ export class PasskeyService {
     }
 
     try {
+      const storedCredentials = this.getStoredCredentials();
+      if (storedCredentials.length > 0) {
+        return { success: false, error: 'A passkey is already registered' };
+      }
+
       const challenge = new Uint8Array(32);
       crypto.getRandomValues(challenge);
 
@@ -82,10 +88,10 @@ export class PasskeyService {
         publicKey: this.arrayBufferToBase64(response.getPublicKey()!),
         counter: 0,
         created: new Date(),
+        label: username,
       };
 
       // Store credential in localStorage (in production, use secure server storage)
-      const storedCredentials = this.getStoredCredentials();
       storedCredentials.push(passkeyCredential);
       localStorage.setItem('passkey_credentials', JSON.stringify(storedCredentials));
 
