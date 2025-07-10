@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus } from 'lucide-react';
+import { Plus, AlertCircle } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ApiKey } from '@/types/dashboard';
 import { ApiKeyCard } from '@/components/ApiKeyCard';
 
 interface ApiKeyManagementProps {
   apiKeys: ApiKey[];
+  isUnlocked: boolean;
   onAddApiKey: (name: string, key: string) => void;
   onToggleApiKey: (id: string) => void;
   onDeleteApiKey: (id: string) => void;
@@ -18,6 +20,7 @@ interface ApiKeyManagementProps {
 
 export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
   apiKeys,
+  isUnlocked,
   onAddApiKey,
   onToggleApiKey,
   onDeleteApiKey,
@@ -36,6 +39,15 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
 
   return (
     <div className="space-y-6">
+      {!isUnlocked && (
+        <Alert variant="destructive" className="neo-card">
+          <AlertCircle className="w-4 h-4" />
+          <AlertTitle>API Keys Locked</AlertTitle>
+          <AlertDescription>
+            API keys are locked until authentication is complete.
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Add API Key */}
       <Card className="neo-card">
         <CardHeader>

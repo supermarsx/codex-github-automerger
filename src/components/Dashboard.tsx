@@ -155,15 +155,16 @@ export const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="api-keys" className="space-y-6">
-            <ApiKeyManagement
-              apiKeys={apiKeys}
-              onAddApiKey={addApiKey}
-              onToggleApiKey={toggleApiKey}
-              onDeleteApiKey={deleteApiKey}
-              onRevertDelete={revertApiKeyDeletion}
-              showApiKey={showApiKey}
-              onToggleShowApiKey={toggleShowApiKey}
-            />
+          <ApiKeyManagement
+            apiKeys={apiKeys}
+            isUnlocked={isUnlocked}
+            onAddApiKey={addApiKey}
+            onToggleApiKey={toggleApiKey}
+            onDeleteApiKey={deleteApiKey}
+            onRevertDelete={revertApiKeyDeletion}
+            showApiKey={showApiKey}
+            onToggleShowApiKey={toggleShowApiKey}
+          />
           </TabsContent>
 
           <TabsContent value="actions" className="space-y-6 max-w-4xl mx-auto">
