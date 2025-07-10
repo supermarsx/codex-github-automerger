@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { abbreviate } from '@/utils/text';
 import { 
   Github, 
   Plus, 
@@ -220,8 +221,8 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               </h4>
               <div className="flex flex-wrap gap-2 mb-3">
                 {repo.allowedBranches.map((branch, index) => (
-                  <Badge key={index} variant="secondary" className="neo-card neo-blue text-black font-bold">
-                    {branch}
+                  <Badge key={index} variant="secondary" className="neo-card neo-blue text-black font-bold" title={branch}>
+                    {abbreviate(branch)}
                     <button
                       onClick={() => onRemoveBranch(repo.id, index)}
                       className="ml-2 hover:text-red-600"
