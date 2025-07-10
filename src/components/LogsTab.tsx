@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Search, Filter } from 'lucide-react';
+import { Download, FileText, Search, Filter, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -73,7 +73,9 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
                 <Download className="w-4 h-4 mr-2" />
                 Export Logs
               </Button>
-              <Button onClick={handleClearLogs} className="neo-button-secondary">
+              <Button onClick={handleClearLogs} variant="outline" className="neo-button-secondary">
+                <Trash2 className="w-4 h-4 mr-2" />
+
                 Clear Logs
               </Button>
             </div>

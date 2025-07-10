@@ -7,9 +7,11 @@ import { useWatchModePersistence } from './useWatchModePersistence';
 
 export const useDashboardData = () => {
 
+
   const { clearWatchModeState } = useWatchModePersistence();
 
   const { logs, exportLogs, clearLogs } = useLogger();
+
 
   
   const {
