@@ -8,7 +8,12 @@ export const useActivities = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mergeStats, updateStats, resetSessionStats } = useStatsPersistence();
 
-  const fetchActivities = async (repositories: any[], apiKeys: any[], getKey: (id: string) => string | null) => {
+  const fetchActivities = async (
+    repositories: any[],
+    apiKeys: any[],
+    getKey: (id: string) => string | null,
+    addRepoActivity?: (repoId: string, activity: Omit<ActivityItem, 'id'>) => void
+  ) => {
     if (!repositories.length || !apiKeys.length) {
       setActivities([]);
       return;
@@ -17,16 +22,25 @@ export const useActivities = () => {
     setIsLoading(true);
     try {
       const allActivities: ActivityItem[] = [];
-      
+      const repoMap = new Map<string, string>();
+      repositories.forEach(r => repoMap.set(`${r.owner}/${r.name}`, r.id));
+
       for (const apiKey of apiKeys.filter(k => k.isActive)) {
         const token = getKey(apiKey.id);
         if (!token) continue;
         const service = createGitHubService(token);
         const enabledRepos = repositories.filter(r => r.enabled && r.apiKeyId === apiKey.id);
-        
+
         if (enabledRepos.length > 0) {
           const repoActivities = await service.fetchRecentActivity(enabledRepos);
-          allActivities.push(...repoActivities);
+          repoActivities.forEach(act => {
+            allActivities.push(act);
+            const repoId = repoMap.get(act.repo);
+            if (repoId && addRepoActivity) {
+              const { id, ...rest } = act;
+              addRepoActivity(repoId, rest);
+            }
+          });
         }
       }
 
