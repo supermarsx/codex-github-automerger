@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -38,8 +38,9 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     updateRepoLastFetched
   } = useWatchModePersistence();
   
-  const { logInfo, logError, logWarn } = useLogger('info');
+  const { logInfo, logError, logWarn, logDebug } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [errorTimestamps, setErrorTimestamps] = useState<Record<string, number>>({});
 
   const watchEnabledMap = watchModeState.watchEnabled;
@@ -112,22 +113,51 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     if (watchedReposList.length === 0) return;
 
     setIsLoading(true);
-    logInfo('watch-mode', `Refreshing ${watchedReposList.length} watched repositories`);
+    logDebug('watch-mode', `Refreshing ${watchedReposList.length} watched repositories`);
     
     const promises = watchedReposList.map(repo => fetchRepoData(repo));
     
     await Promise.all(promises);
     updateLastUpdateTime(new Date());
     setIsLoading(false);
-    logInfo('watch-mode', 'Completed refresh of all watched repositories');
+    logDebug('watch-mode', 'Completed refresh of all watched repositories');
   };
 
   // Auto-refresh every 30 seconds to avoid spamming the GitHub API
   useEffect(() => {
     if (watchedRepos.length === 0 || !isUnlocked) return;
 
-    const interval = setInterval(refreshAllWatched, 30000);
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(refreshAllWatched, 30000);
+      }
+    };
+
+    const stopInterval = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshAllWatched();
+        startInterval();
+      } else {
+        stopInterval();
+      }
+    };
+
+    if (document.visibilityState === 'visible') {
+      startInterval();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      stopInterval();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [watchedRepos, enabledRepos, isUnlocked]);
 
   // Initial load for watched repos
