@@ -13,7 +13,9 @@ const getDefaultConfig = (): GlobalConfig => ({
   defaultAllowedUsers: ['github-actions[bot]'],
   alertThreshold: 30,
   maxRetries: 3,
-  autoDeleteBranch: false, // Default to false for safety
+  autoMergeOnClean: true,
+  autoMergeOnUnstable: false,
+  autoDeleteOnDirty: false, // Default to false for safety
   allowAllBranches: false,
   allowAllUsers: false,
   fetchMode: 'github-api',

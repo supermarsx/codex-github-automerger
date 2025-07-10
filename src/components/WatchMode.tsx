@@ -282,6 +282,14 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.deleteBranch(repo.owner, repo.name, branch);
     if (success) {
       toast({ title: `Deleted branch ${branch}` });
+      const activity: ActivityItem = {
+        id: Date.now().toString(),
+        type: 'alert',
+        message: `del ${branch}`,
+        repo: `${repo.owner}/${repo.name}`,
+        timestamp: new Date()
+      };
+      updateRepoActivities(repo.id, [activity, ...(repoActivities[repo.id] || [])]);
       updateRepoStrayBranches(repo.id, (repoStrayBranches[repo.id] || []).filter(b => b !== branch));
       fetchRepoData(repo);
     } else {
