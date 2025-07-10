@@ -60,7 +60,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                 </div>
               ) : (
                 activities.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-3 p-3 rounded neo-card">
+                  <div key={activity.id} className="flex items-center gap-3 p-3 neo-card">
                     <div className={`neo-card p-2 ${getActivityColor(activity.type)}`}>
                       {getActivityIcon(activity.type)}
                     </div>
@@ -69,7 +69,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                       <p className="text-sm text-muted-foreground">{activity.repo}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs neo-card rounded-none">
                         {new Date(activity.timestamp).toLocaleString()}
                       </Badge>
                       <Button

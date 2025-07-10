@@ -53,6 +53,19 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   const { toast } = useToast();
   const { logInfo, logError, logWarn } = useLogger('info');
 
+  const accentColorOptions = [
+    { value: '#000000', label: 'Black' },
+    { value: '#1a1a1a', label: 'Dark Grey' },
+    { value: '#d3d3d3', label: 'Light Grey' },
+    { value: '#ffffff', label: 'White' },
+    { value: '#ff0000', label: 'Red' },
+    { value: '#ffa500', label: 'Orange' },
+    { value: '#ffff00', label: 'Yellow' },
+    { value: '#008000', label: 'Green' },
+    { value: '#0000ff', label: 'Blue' },
+    { value: '#800080', label: 'Purple' }
+  ];
+
   const addBranchPattern = () => {
     if (newPattern) {
       onConfigChange({
@@ -532,13 +545,27 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.darkMode}
               onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
             />
-            <ConfigSelector
-              id="accentColor"
-              label="Accent Color"
-              value={config.accentColor}
-              onChange={(value) => onConfigChange({ ...config, accentColor: value })}
-              type="color"
-            />
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="accentColor" className="font-bold">Accent Color</Label>
+              <Select
+                value={config.accentColor}
+                onValueChange={(value) => onConfigChange({ ...config, accentColor: value })}
+              >
+                <SelectTrigger className="neo-input">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {accentColorOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <div className="flex items-center gap-2">
+                        <span className="w-4 h-4 border border-foreground" style={{ backgroundColor: option.value }} />
+                        {option.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <ConfigToggle
               id="hideHeader"
               label="Hide Header"
