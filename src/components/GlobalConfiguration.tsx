@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Settings, Plus, Trash2, Download, Upload, Shield, Lock, Webhook } from 'lucide-react';
+import { Settings, Plus, Trash2, Download, Upload, Shield, Lock, Webhook, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { GlobalConfig, Repository, ApiKey } from '@/types/dashboard';
 import { ExportImportService, ExportOptions, SecurityConfig } from '@/utils/exportImport';
@@ -19,6 +19,7 @@ import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
 import { useLogger } from '@/hooks/useLogger';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
+import { checkUserscriptUpdates } from '@/utils/updateChecker';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -199,6 +200,18 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
     }
   };
 
+  const handleCheckUpdates = async () => {
+    const result = await checkUserscriptUpdates();
+    if (result.hasUpdate) {
+      toast({
+        title: 'Update available',
+        description: `Latest version ${result.latestVersion}`
+      });
+    } else {
+      toast({ title: 'No updates found' });
+    }
+  };
+
   return (
     <Card className="neo-card">
       <CardHeader>
@@ -357,6 +370,10 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 </div>
               </DialogContent>
               </Dialog>
+              <Button onClick={handleCheckUpdates} className="neo-button-secondary" size="sm">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Check Updates
+              </Button>
             </div>
           </div>
         </div>
@@ -445,12 +462,24 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                checked={config.autoDeleteOnDirty}
                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteOnDirty: checked })}
              />
-            <ConfigToggle
-               id="confirmBranchDeletion"
-               label="Confirm Branch Deletion"
-               checked={config.confirmBranchDeletion}
-               onCheckedChange={(checked) => onConfigChange({ ...config, confirmBranchDeletion: checked })}
-             />
+              <ConfigToggle
+                id="confirmBranchDeletion"
+                label="Confirm Branch Deletion"
+                checked={config.confirmBranchDeletion}
+                onCheckedChange={(checked) => onConfigChange({ ...config, confirmBranchDeletion: checked })}
+              />
+              <ConfigToggle
+                id="autoArchiveClose"
+                label="Auto-Archive on Close"
+                checked={config.autoArchiveClose}
+                onCheckedChange={(checked) => onConfigChange({ ...config, autoArchiveClose: checked })}
+              />
+              <ConfigToggle
+                id="autoArchiveClosed"
+                label="Auto-Archive Closed PRs"
+                checked={config.autoArchiveClosed}
+                onCheckedChange={(checked) => onConfigChange({ ...config, autoArchiveClosed: checked })}
+              />
             <div className="grid grid-cols-2 items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="allowAllBranches" className="font-bold">Allow All Branches</Label>
@@ -589,13 +618,19 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.hideHeader}
               onCheckedChange={(checked) => onConfigChange({ ...config, hideHeader: checked })}
             />
-            <ConfigToggle
-              id="logsDisabled"
-              label="Disable Logs"
-              checked={config.logsDisabled}
-              onCheckedChange={(checked) => onConfigChange({ ...config, logsDisabled: checked })}
-            />
-            <div className="flex justify-end">
+              <ConfigToggle
+                id="logsDisabled"
+                label="Disable Logs"
+                checked={config.logsDisabled}
+                onCheckedChange={(checked) => onConfigChange({ ...config, logsDisabled: checked })}
+              />
+              <ConfigToggle
+                id="checkUserscriptUpdates"
+                label="Check Userscript Updates"
+                checked={config.checkUserscriptUpdates}
+                onCheckedChange={(checked) => onConfigChange({ ...config, checkUserscriptUpdates: checked })}
+              />
+              <div className="flex justify-end">
               <Button
                 size="sm"
                 onClick={() => {

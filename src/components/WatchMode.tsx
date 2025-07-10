@@ -232,7 +232,9 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.mergePullRequest(repo.owner, repo.name, prNumber);
     if (success) {
       toast({ title: `Merged PR #${prNumber} successfully` });
-      updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      if (globalConfig.autoArchiveClosed) {
+        updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      }
       const branches = await service.fetchStrayBranches(repo.owner, repo.name);
       updateRepoStrayBranches(repo.id, branches);
       fetchRepoData(repo);
@@ -257,7 +259,9 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.closePullRequest(repo.owner, repo.name, prNumber);
     if (success) {
       toast({ title: `Closed PR #${prNumber}` });
-      updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      if (globalConfig.autoArchiveClose) {
+        updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      }
       const branches = await service.fetchStrayBranches(repo.owner, repo.name);
       updateRepoStrayBranches(repo.id, branches);
       fetchRepoData(repo);

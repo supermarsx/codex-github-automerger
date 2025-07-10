@@ -32,7 +32,10 @@ const getDefaultConfig = (): GlobalConfig => ({
   hideHeader: false,
   logsDisabled: false,
   protectedBranches: ['main'],
-  confirmBranchDeletion: true
+  confirmBranchDeletion: true,
+  checkUserscriptUpdates: true,
+  autoArchiveClose: false,
+  autoArchiveClosed: false
 });
 
 export const useGlobalConfig = () => {
