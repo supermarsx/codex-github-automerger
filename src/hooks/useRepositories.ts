@@ -21,6 +21,7 @@ export const useRepositories = () => {
           watchEnabled: repo.watchEnabled ?? false,
           autoDeleteBranch: repo.autoDeleteBranch ?? false,
           autoCloseBranch: repo.autoCloseBranch ?? false,
+          protectedBranches: repo.protectedBranches ?? ['main'],
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
           recentPull: repo.recentPull ? {
             ...repo.recentPull,
@@ -123,6 +124,7 @@ export const useRepositories = () => {
       autoDeleteBranch: false,
       autoCloseBranch: false,
       allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
+      protectedBranches: ['main'],
       allowedUsers: ['github-actions[bot]'],
       allowAllBranches: false,
       allowAllUsers: false,
