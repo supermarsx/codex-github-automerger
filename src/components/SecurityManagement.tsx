@@ -232,9 +232,9 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
               )}
               <Dialog open={showPasskeyDialog} onOpenChange={setShowPasskeyDialog}>
                 <DialogTrigger asChild>
-                  <Button 
-                    className="neo-button bg-black text-white w-full" 
-                    disabled={!passkeySupported}
+                  <Button
+                    className="neo-button bg-black text-white w-full"
+                    disabled={!passkeySupported || credentials.length >= 1}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {credentials.length > 0 ? 'Add Passkey' : 'Setup Passkey'}
@@ -266,7 +266,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                 <p className="text-xs font-bold">Registered Passkeys:</p>
                 {credentials.map((cred) => (
                   <div key={cred.id} className="flex items-center justify-between bg-white/20 p-2 rounded">
-                    <span className="text-xs font-bold truncate">{cred.id.slice(0, 8)}...</span>
+                    <span className="text-xs font-bold truncate">{cred.label ?? `${cred.id.slice(0, 8)}...`}</span>
                     <Button
                       size="sm"
                       variant="destructive"
