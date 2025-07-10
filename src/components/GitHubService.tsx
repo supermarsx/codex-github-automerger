@@ -95,6 +95,21 @@ export class GitHubService {
     }
   }
 
+  async closePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
+    try {
+      await this.octokit.rest.pulls.update({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        state: 'closed'
+      });
+      return true;
+    } catch (error) {
+      console.error('Error closing pull request:', error);
+      return false;
+    }
+  }
+
   async deleteBranch(owner: string, repo: string, branch: string): Promise<boolean> {
     try {
       await this.octokit.rest.git.deleteRef({

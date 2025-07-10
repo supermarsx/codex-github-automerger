@@ -133,6 +133,7 @@ export const Dashboard = () => {
             getDecryptedApiKey={getDecryptedApiKey}
             isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
+            showControlPanel={false}
           />
           </TabsContent>
 
