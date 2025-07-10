@@ -26,7 +26,9 @@ const getDefaultConfig = (): GlobalConfig => ({
   statsPeriod: 'session',
   webhooks: [],
   hideHeader: false,
-  logsDisabled: false
+  logsDisabled: false,
+  protectedBranches: ['main'],
+  confirmBranchDeletion: true
 });
 
 export const useGlobalConfig = () => {

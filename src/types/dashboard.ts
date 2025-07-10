@@ -11,6 +11,8 @@ export interface Repository {
   /** Close stale branches automatically */
   autoCloseBranch?: boolean;
   allowedBranches: string[];
+  /** Branch patterns that should be hidden from stray branch lists */
+  protectedBranches?: string[];
   allowedUsers: string[];
   allowAllBranches?: boolean;
   allowAllUsers?: boolean;
@@ -154,4 +156,7 @@ export interface GlobalConfig {
   statsPeriod: StatsPeriod;
   webhooks: Webhook[];
   hideHeader: boolean;
-  logsDisabled: boolean;}
+  logsDisabled: boolean;
+  protectedBranches: string[];
+  confirmBranchDeletion: boolean;
+}

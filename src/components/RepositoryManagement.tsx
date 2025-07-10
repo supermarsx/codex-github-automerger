@@ -211,6 +211,19 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                          placeholder="e.g., codex-feature/*"
                          itemColor="neo-yellow"
                        />
+                       <h4 className="font-black text-lg my-3 flex items-center gap-2">
+                         <GitBranch className="w-5 h-5" />
+                         Protected Branches
+                       </h4>
+                       <EditableList
+                         items={repo.protectedBranches || []}
+                         onItemsChange={(items) => {
+                           const updatedBranches = items;
+                           console.log('Update protected branches for repo:', repo.id, updatedBranches);
+                         }}
+                         placeholder="e.g., main"
+                         itemColor="neo-red"
+                       />
                     </div>
 
                     {/* Allowed Users */}

@@ -394,17 +394,34 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           />
         </div>
 
+        {/* Protected Branches */}
+        <div className="space-y-3">
+          <h4 className="font-black text-lg">Protected Branches</h4>
+          <EditableList
+            items={config.protectedBranches}
+            onItemsChange={(items) => onConfigChange({ ...config, protectedBranches: items })}
+            placeholder="e.g., main"
+            itemColor="neo-red"
+          />
+        </div>
+
         {/* Advanced Settings */}
         <div className="space-y-4">
           <h4 className="font-black text-lg">Advanced Settings</h4>
            <div className="grid grid-cols-1 gap-4">
-             <ConfigToggle
-                id="autoDeleteBranch"
-                label="Auto Delete Branch After Merge"
-                checked={config.autoDeleteBranch}
-                onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
-              />
-             <div className="grid grid-cols-2 items-center gap-4">
+            <ConfigToggle
+               id="autoDeleteBranch"
+               label="Auto Delete Branch After Merge"
+               checked={config.autoDeleteBranch}
+               onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
+             />
+            <ConfigToggle
+               id="confirmBranchDeletion"
+               label="Confirm Branch Deletion"
+               checked={config.confirmBranchDeletion}
+               onCheckedChange={(checked) => onConfigChange({ ...config, confirmBranchDeletion: checked })}
+             />
+            <div className="grid grid-cols-2 items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="allowAllBranches" className="font-bold">Allow All Branches</Label>
                   <Shield className="w-4 h-4 text-destructive" />
