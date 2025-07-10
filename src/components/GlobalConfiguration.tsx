@@ -18,6 +18,7 @@ import { ConfigToggle } from '@/components/ConfigToggle';
 import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
 import { useLogger } from '@/hooks/useLogger';
+import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -52,6 +53,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   const [importFile, setImportFile] = useState<File | null>(null);
   const { toast } = useToast();
   const { logInfo, logError, logWarn } = useLogger('info');
+  const { clearWatchModeState } = useWatchModePersistence();
 
   const accentColorOptions = [
     { value: '#000000', label: 'Black' },
@@ -581,6 +583,19 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.logsDisabled}
               onCheckedChange={(checked) => onConfigChange({ ...config, logsDisabled: checked })}
             />
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                onClick={() => {
+                  clearWatchModeState();
+                  toast({ title: 'Watch mode data cleared' });
+                }}
+                className="neo-button bg-red-500 hover:bg-red-600"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear Watch Mode
+              </Button>
+            </div>
           </div>
         </div>
 

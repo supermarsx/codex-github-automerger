@@ -16,11 +16,15 @@ export const useWatchModePersistence = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
+        const cap = (obj: Record<string, unknown[]>) =>
+          Object.fromEntries(
+            Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
+          );
         return {
           lastUpdateTime: new Date(parsed.lastUpdateTime),
-          repoActivities: parsed.repoActivities || {},
-          repoPullRequests: parsed.repoPullRequests || {},
-          repoStrayBranches: parsed.repoStrayBranches || {},
+          repoActivities: cap(parsed.repoActivities),
+          repoPullRequests: cap(parsed.repoPullRequests),
+          repoStrayBranches: cap(parsed.repoStrayBranches),
           repoLastFetched: parsed.repoLastFetched || {}
         };
       } catch (error) {
@@ -43,11 +47,15 @@ export const useWatchModePersistence = () => {
       if (e.key === WATCH_MODE_STORAGE_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
+          const cap = (obj: Record<string, unknown[]>) =>
+            Object.fromEntries(
+              Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
+            );
           setWatchModeState({
             lastUpdateTime: new Date(parsed.lastUpdateTime),
-            repoActivities: parsed.repoActivities || {},
-            repoPullRequests: parsed.repoPullRequests || {},
-            repoStrayBranches: parsed.repoStrayBranches || {},
+            repoActivities: cap(parsed.repoActivities),
+            repoPullRequests: cap(parsed.repoPullRequests),
+            repoStrayBranches: cap(parsed.repoStrayBranches),
             repoLastFetched: parsed.repoLastFetched || {},
           });
         } catch (error) {
@@ -67,7 +75,10 @@ export const useWatchModePersistence = () => {
   const updateRepoActivities = (repoId: string, activities: unknown[]) => {
     setWatchModeState(prev => ({
       ...prev,
-      repoActivities: { ...prev.repoActivities, [repoId]: activities }
+      repoActivities: {
+        ...prev.repoActivities,
+        [repoId]: activities.slice(0, 50)
+      }
     }));
   };
 
@@ -87,14 +98,20 @@ export const useWatchModePersistence = () => {
   const updateRepoPullRequests = (repoId: string, prs: unknown[]) => {
     setWatchModeState(prev => ({
       ...prev,
-      repoPullRequests: { ...prev.repoPullRequests, [repoId]: prs }
+      repoPullRequests: {
+        ...prev.repoPullRequests,
+        [repoId]: prs.slice(0, 50)
+      }
     }));
   };
 
   const updateRepoStrayBranches = (repoId: string, branches: string[]) => {
     setWatchModeState(prev => ({
       ...prev,
-      repoStrayBranches: { ...prev.repoStrayBranches, [repoId]: branches }
+      repoStrayBranches: {
+        ...prev.repoStrayBranches,
+        [repoId]: branches.slice(0, 50)
+      }
     }));
   };
 
@@ -109,6 +126,17 @@ export const useWatchModePersistence = () => {
     setWatchModeState(prev => ({ ...prev, lastUpdateTime }));
   };
 
+  const clearWatchModeState = () => {
+    localStorage.removeItem(WATCH_MODE_STORAGE_KEY);
+    setWatchModeState({
+      lastUpdateTime: new Date(),
+      repoActivities: {},
+      repoPullRequests: {},
+      repoStrayBranches: {},
+      repoLastFetched: {}
+    });
+  };
+
   return {
     watchModeState,
     updateRepoActivities,
@@ -116,6 +144,7 @@ export const useWatchModePersistence = () => {
     updateRepoStrayBranches,
     updateLastUpdateTime,
     updateRepoLastFetched,
-    reorderRepoActivity
+    reorderRepoActivity,
+    clearWatchModeState
   };
 };
