@@ -170,11 +170,14 @@ export class PasskeyService {
   }
 
   private static base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binary = atob(base64);
+    // WebAuthn credential IDs are base64url encoded. Convert to
+    // standard Base64 before decoding to an ArrayBuffer.
+    const b64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = b64.padEnd(Math.ceil(b64.length / 4) * 4, '=');
+    const binary = atob(padded);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
     return bytes.buffer;
-  }
-}
+  }}
