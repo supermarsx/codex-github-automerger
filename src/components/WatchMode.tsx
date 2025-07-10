@@ -283,6 +283,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   };
 
   return (
+    <>
     <div className="space-y-6">
       {showControlPanel && (
       <Card className="neo-card">
@@ -475,7 +476,6 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                   <Button
                                     size="sm"
                                     className="neo-button neo-red"
-                                    onClick={() => handleDeleteBranch(repo, branch)}
                                     variant="destructive"
                                     onClick={() => {
                                       if (globalConfig.confirmBranchDeletion) {
@@ -504,7 +504,12 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     </div>
     <ConfirmationDialog
       open={deleteDialog.open}
-      onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+      onOpenChange={(open) =>
+        setDeleteDialog({
+          ...deleteDialog,
+          open,
+        })
+      }
       title="Delete Branch"
       description={`Are you sure you want to delete ${deleteDialog.branch}?`}
       onConfirm={() => {
@@ -516,5 +521,6 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
       confirmText="Delete"
       variant="destructive"
     />
+    </>
   );
 };
