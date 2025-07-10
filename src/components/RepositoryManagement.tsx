@@ -160,11 +160,6 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       onCheckedChange={() => onToggleRepository(repo.id)}
                       className="scale-125"
                     />
-                    <Switch
-                      checked={repo.autoMergeEnabled}
-                      onCheckedChange={() => onToggleAutoMerge(repo.id)}
-                      className="scale-125"
-                    />
                     <Button
                       variant="ghost"
                       size="sm"
@@ -293,18 +288,25 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </Select>
                     </div>
                     <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold">Watch</span>
-                        <Switch
-                          checked={repo.watchEnabled}
-                          onCheckedChange={() => onToggleWatch(repo.id)}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold">Auto Delete Branch</span>
-                        <Switch
-                          checked={repo.autoDeleteBranch ?? false}
-                          onCheckedChange={() => onToggleDeleteBranch(repo.id)}
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold">Watch</span>
+                      <Switch
+                        checked={repo.watchEnabled}
+                        onCheckedChange={() => onToggleWatch(repo.id)}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold">Auto Merge</span>
+                      <Switch
+                        checked={repo.autoMergeEnabled}
+                        onCheckedChange={() => onToggleAutoMerge(repo.id)}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold">Auto Delete Branch</span>
+                      <Switch
+                        checked={repo.autoDeleteBranch ?? false}
+                        onCheckedChange={() => onToggleDeleteBranch(repo.id)}
                         />
                       </div>
                       <div className="flex items-center justify-between">
