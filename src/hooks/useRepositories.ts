@@ -103,6 +103,23 @@ export const useRepositories = () => {
     );
   };
 
+  const reorderRepository = (fromIndex: number, toIndex: number) => {
+    setRepositories(repos => {
+      const updated = [...repos];
+      if (
+        fromIndex < 0 ||
+        fromIndex >= updated.length ||
+        toIndex < 0 ||
+        toIndex >= updated.length
+      ) {
+        return updated;
+      }
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return updated;
+    });
+  };
+
   const addRepository = (name: string, owner: string, apiKeyId?: string) => {
     const existingRepo = repositories.find(r => r.name === name && r.owner === owner);
     if (existingRepo) {
@@ -318,5 +335,6 @@ export const useRepositories = () => {
     removeUser,
     updateRepositoryStats,
     addRepositoryActivity,
+    reorderRepository,
     clearAllRepositories
   };};

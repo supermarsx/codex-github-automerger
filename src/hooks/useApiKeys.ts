@@ -65,6 +65,8 @@ export const useApiKeys = () => {
           });
           setDecryptedKeys(map);
           setUnlocked(true);
+          setShowLockedModal(false);
+          lockedShownRef.current = false;
           logInfo('api-key', 'API keys unlocked');
         } else {
           logInfo('api-key', 'Passkey authentication failed', { error: result.error });

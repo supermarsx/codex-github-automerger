@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Github, GitBranch, Users, Key, Webhook, Shield, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Github, GitBranch, Users, Key, Webhook, Shield, Trash2, ChevronDown, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react';
 import { Repository } from '@/types/dashboard';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,6 +27,7 @@ interface RepositoryManagementProps {
   onRemoveBranch: (repoId: string, branchIndex: number) => void;
   onAddUser: (repoId: string, user: string) => void;
   onRemoveUser: (repoId: string, userIndex: number) => void;
+  onMoveRepository: (from: number, to: number) => void;
 }
 
 export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
@@ -42,7 +43,8 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   onAddBranch,
   onRemoveBranch,
   onAddUser,
-  onRemoveUser
+  onRemoveUser,
+  onMoveRepository
 }) => {
   const [newRepo, setNewRepo] = useState({ name: '', owner: '', branch: '', user: '' });
   const [collapsedRepos, setCollapsedRepos] = useState<Set<string>>(new Set(repositories.map(r => r.id)));
@@ -135,7 +137,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
 
       {/* Repository List */}
       <div className="grid gap-6">
-        {repositories.map((repo) => (
+        {repositories.map((repo, index) => (
           <Collapsible key={repo.id} open={!collapsedRepos.has(repo.id)}>
             <Card className="neo-card">
               <CardHeader>
@@ -160,6 +162,24 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       onCheckedChange={() => onToggleRepository(repo.id)}
                       className="scale-125"
                     />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onMoveRepository(index, Math.max(0, index - 1))}
+                      className="p-2"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onMoveRepository(index, Math.min(repositories.length - 1, index + 1))}
+                      className="p-2"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-4 h-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
