@@ -152,7 +152,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </CardTitle>
                       <CardDescription className="font-bold">
                         {repo.enabled ? 'Active' : 'Inactive'} |
-                        {repo.autoMergeOnClean ? ' Automerge Clean' : ' Automerge Clean Off'}
+                        {repo.autoMergeOnClean ? ' Auto Merge on Clean' : ' Auto Merge Clean Off'}
                       </CardDescription>
                     </div>
                   </div>
@@ -314,21 +314,21 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">Auto Merge Clean</span>
+                      <span className="font-bold">Auto Merge on Clean</span>
                       <Switch
                         checked={repo.autoMergeOnClean}
                         onCheckedChange={() => onToggleAutoMergeOnClean(repo.id)}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">Auto Merge Unstable</span>
+                      <span className="font-bold">Auto Merge on Unstable</span>
                       <Switch
                         checked={repo.autoMergeOnUnstable ?? false}
                         onCheckedChange={() => onToggleAutoMergeOnUnstable(repo.id)}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">Auto Delete Dirty</span>
+                      <span className="font-bold">Auto Delete on Dirty</span>
                       <Switch
                         checked={repo.autoDeleteOnDirty ?? false}
                         onCheckedChange={() => onToggleDeleteOnDirty(repo.id)}

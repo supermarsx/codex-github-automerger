@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getItem, setItem, removeItem } from '@/utils/storage';
-import { Repository } from '@/types/dashboard';
+import { Repository, ActivityItem } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
 
@@ -59,6 +59,28 @@ export const useRepositories = () => {
     });
   }, [repositories]);
 
+  function addRepositoryActivity(
+    repoId: string,
+    activity: Omit<ActivityItem, 'id'>
+  ) {
+    const activityWithId = {
+      ...activity,
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+    };
+
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === repoId
+          ? {
+              ...repo,
+              activities: [activityWithId, ...repo.activities].slice(0, 100),
+              lastActivity: new Date()
+            }
+          : repo
+      )
+    );
+  }
+
   const toggleRepository = (id: string) => {
     setRepositories(repos =>
       repos.map(repo => {
@@ -77,30 +99,63 @@ export const useRepositories = () => {
   };
 
   const toggleAutoMergeOnClean = (id: string) => {
+    const repo = repositories.find(r => r.id === id);
+    if (!repo) return;
+    const newStatus = !repo.autoMergeOnClean;
+
     setRepositories(repos =>
-      repos.map(repo => {
-        if (repo.id === id) {
-          const newStatus = !repo.autoMergeOnClean;
-          logInfo('repository', `Auto-merge on clean for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, { repo: repo.name, autoMergeOnClean: newStatus });
-          toast({
-            title: `Auto-merge on clean ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
-            description: newStatus ? 'Pull requests will be merged automatically when clean' : 'Automatic merging disabled'
-          });
-          return { ...repo, autoMergeOnClean: newStatus };
-        }
-        return repo;
-      })
+      repos.map(r =>
+        r.id === id ? { ...r, autoMergeOnClean: newStatus } : r
+      )
     );
+
+    logInfo('repository', `Auto-merge on clean for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, {
+      repo: repo.name,
+      autoMergeOnClean: newStatus
+    });
+    toast({
+      title: `Auto-merge on clean ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
+      description: newStatus
+        ? 'Pull requests will be merged automatically when clean'
+        : 'Automatic merging disabled'
+    });
+
+    addRepositoryActivity(id, {
+      type: 'alert',
+      message: `${newStatus ? 'enabled' : 'disabled'} auto merge clean`,
+      repo: `${repo.owner}/${repo.name}`,
+      timestamp: new Date()
+    });
   };
 
   const toggleAutoMergeOnUnstable = (id: string) => {
+    const repo = repositories.find(r => r.id === id);
+    if (!repo) return;
+    const newStatus = !repo.autoMergeOnUnstable;
+
     setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === id
-          ? { ...repo, autoMergeOnUnstable: !repo.autoMergeOnUnstable }
-          : repo
+      repos.map(r =>
+        r.id === id ? { ...r, autoMergeOnUnstable: newStatus } : r
       )
     );
+
+    logInfo('repository', `Auto-merge on unstable for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, {
+      repo: repo.name,
+      autoMergeOnUnstable: newStatus
+    });
+    toast({
+      title: `Auto-merge on unstable ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
+      description: newStatus
+        ? 'Pull requests may merge even when status checks are pending'
+        : 'Unstable auto-merge disabled'
+    });
+
+    addRepositoryActivity(id, {
+      type: 'alert',
+      message: `${newStatus ? 'enabled' : 'disabled'} auto merge unstable`,
+      repo: `${repo.owner}/${repo.name}`,
+      timestamp: new Date()
+    });
   };
 
   const toggleWatch = (id: string) => {
@@ -112,11 +167,33 @@ export const useRepositories = () => {
   };
 
   const toggleDeleteOnDirty = (id: string) => {
+    const repo = repositories.find(r => r.id === id);
+    if (!repo) return;
+    const newStatus = !repo.autoDeleteOnDirty;
+
     setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === id ? { ...repo, autoDeleteOnDirty: !repo.autoDeleteOnDirty } : repo
+      repos.map(r =>
+        r.id === id ? { ...r, autoDeleteOnDirty: newStatus } : r
       )
     );
+
+    logInfo('repository', `Auto delete on dirty for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, {
+      repo: repo.name,
+      autoDeleteOnDirty: newStatus
+    });
+    toast({
+      title: `Auto delete on dirty ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
+      description: newStatus
+        ? 'Dirty stray branches will be removed automatically'
+        : 'Automatic deletion disabled'
+    });
+
+    addRepositoryActivity(id, {
+      type: 'alert',
+      message: `${newStatus ? 'enabled' : 'disabled'} auto delete dirty`,
+      repo: `${repo.owner}/${repo.name}`,
+      timestamp: new Date()
+    });
   };
 
   const toggleCloseBranch = (id: string) => {
@@ -299,24 +376,6 @@ export const useRepositories = () => {
     );
   };
 
-  const addRepositoryActivity = (repoId: string, activity: Omit<Repository['activities'][0], 'id'>) => {
-    const activityWithId = {
-      ...activity,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
-    };
-
-    setRepositories(repos =>
-      repos.map(repo =>
-        repo.id === repoId
-          ? { 
-              ...repo, 
-              activities: [activityWithId, ...repo.activities].slice(0, 100), // Keep last 100 activities
-              lastActivity: new Date()
-            }
-          : repo
-      )
-    );
-  };
 
   const clearAllRepositories = () => {
     setRepositories([]);
