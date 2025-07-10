@@ -25,6 +25,7 @@ export const useDashboardData = () => {
 
   const {
     apiKeys,
+    isUnlocked,
     showApiKey,
     deletedApiKeys,
     addApiKey,
@@ -59,6 +60,7 @@ export const useDashboardData = () => {
   return {
     repositories,
     apiKeys,
+    isUnlocked,
     showApiKey,
     globalConfig,
     activities,

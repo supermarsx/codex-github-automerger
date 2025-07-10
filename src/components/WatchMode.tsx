@@ -24,10 +24,11 @@ interface WatchModeProps {
   repositories: Repository[];
   apiKeys: ApiKey[];
   getDecryptedApiKey: (id: string) => string | null;
+  isUnlocked: boolean;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, onUpdateRepository }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository }) => {
   const {
     watchModeState,
     updateWatchEnabled,
@@ -106,7 +107,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   };
 
   const refreshAllWatched = async () => {
-    if (isLoading) return;
+    if (isLoading || !isUnlocked) return;
     const watchedReposList = enabledRepos.filter(repo => watchedRepos.includes(repo.id));
     if (watchedReposList.length === 0) return;
 
@@ -123,18 +124,18 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
 
   // Auto-refresh every 30 seconds to avoid spamming the GitHub API
   useEffect(() => {
-    if (watchedRepos.length === 0) return;
+    if (watchedRepos.length === 0 || !isUnlocked) return;
 
     const interval = setInterval(refreshAllWatched, 30000);
     return () => clearInterval(interval);
-  }, [watchedRepos, enabledRepos]);
+  }, [watchedRepos, enabledRepos, isUnlocked]);
 
   // Initial load for watched repos
   useEffect(() => {
-    if (watchedRepos.length > 0) {
+    if (watchedRepos.length > 0 && isUnlocked) {
       refreshAllWatched();
     }
-  }, [watchedRepos]);
+  }, [watchedRepos, isUnlocked]);
 
   const getRepoStatus = (repo: Repository) => {
     const pullRequests = repoPullRequests[repo.id] || [];
