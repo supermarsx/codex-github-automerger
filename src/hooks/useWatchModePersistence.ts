@@ -40,6 +40,18 @@ export const useWatchModePersistence = () => {
     };
   });
 
+  const clearWatchModeState = () => {
+    const initialState: WatchModeState = {
+      lastUpdateTime: new Date(),
+      repoActivities: {},
+      repoPullRequests: {},
+      repoStrayBranches: {},
+      repoLastFetched: {}
+    };
+    setWatchModeState(initialState);
+    localStorage.removeItem(WATCH_MODE_STORAGE_KEY);
+  };
+
   // keep state in sync across components using storage events
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -122,6 +134,7 @@ export const useWatchModePersistence = () => {
     updateRepoStrayBranches,
     updateLastUpdateTime,
     updateRepoLastFetched,
-    reorderRepoActivity
+    reorderRepoActivity,
+    clearWatchModeState
   };
 };
