@@ -22,6 +22,9 @@ export interface PasskeyAuthenticationResult {
 export class PasskeyService {
   private static readonly RP_NAME = 'AutoMerger Dashboard';
   private static readonly RP_ID = window.location.hostname;
+  private static isAuthenticating = false;
+  private static isAuthenticated = false;
+  private static lastCredentialId: string | null = null;
 
   static isSupported(): boolean {
     return !!(
@@ -107,7 +110,16 @@ export class PasskeyService {
       return { success: false, error: 'Passkeys not supported in this browser' };
     }
 
+    if (this.isAuthenticated) {
+      return { success: true, credentialId: this.lastCredentialId || undefined };
+    }
+
+    if (this.isAuthenticating) {
+      return { success: false, error: 'Authentication in progress' };
+    }
+
     try {
+      this.isAuthenticating = true;
       const storedCredentials = this.getStoredCredentials();
       
       if (storedCredentials.length === 0) {
@@ -144,10 +156,14 @@ export class PasskeyService {
       );
       localStorage.setItem('passkey_credentials', JSON.stringify(updatedCredentials));
 
+      this.isAuthenticated = true;
+      this.lastCredentialId = credential.id;
       return { success: true, credentialId: credential.id };
     } catch (error) {
       console.error('Passkey authentication error:', error);
       return { success: false, error: 'Authentication failed' };
+    } finally {
+      this.isAuthenticating = false;
     }
   }
 

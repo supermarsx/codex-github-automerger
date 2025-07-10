@@ -17,7 +17,7 @@ const getDefaultConfig = (): GlobalConfig => ({
   allowAllUsers: false,
   fetchMode: 'github-api',
   serverCheckInterval: 30000, // 30 seconds
-  refreshInterval: 5000,
+  refreshInterval: 30000,
   logLevel: 'info',
   darkMode: localStorage.getItem('theme') !== 'light',
   accentColor: '#313135',
