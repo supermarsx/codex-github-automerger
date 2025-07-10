@@ -154,4 +154,6 @@ export interface GlobalConfig {
   statsPeriod: StatsPeriod;
   webhooks: Webhook[];
   hideHeader: boolean;
-  logsDisabled: boolean;}
+  logsDisabled: boolean;
+  refreshInterval: number;
+}
