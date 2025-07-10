@@ -105,8 +105,10 @@ export const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       {authInProgress && (
-        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 neo-card font-black text-xl">
-          Waiting for authentication...
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+          <div className="neo-card p-6 font-black text-xl">
+            Waiting for authentication...
+          </div>
         </div>
       )}
       <Dialog open={showLockedModal} onOpenChange={setShowLockedModal}>
