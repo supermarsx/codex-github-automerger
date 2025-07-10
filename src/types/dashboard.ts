@@ -6,6 +6,10 @@ export interface Repository {
   autoMergeEnabled: boolean;
   /** Whether this repository should be included in watch mode */
   watchEnabled?: boolean;
+  /** Delete merged branches automatically */
+  autoDeleteBranch?: boolean;
+  /** Close stale branches automatically */
+  autoCloseBranch?: boolean;
   allowedBranches: string[];
   allowedUsers: string[];
   allowAllBranches?: boolean;
@@ -129,7 +133,6 @@ export interface Webhook {
 }
 
 export interface GlobalConfig {
-  autoMergeEnabled: boolean;
   requireApproval: boolean;
   alertsEnabled: boolean;
   encryptionEnabled: boolean;

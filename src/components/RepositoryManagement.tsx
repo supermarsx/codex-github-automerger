@@ -11,13 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { EditableList } from '@/components/EditableList';
-import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
+
 
 interface RepositoryManagementProps {
   repositories: Repository[];
   apiKeys: any[];
   onToggleRepository: (id: string) => void;
   onToggleAutoMerge: (id: string) => void;
+  onToggleWatch: (id: string) => void;
+  onToggleDeleteBranch: (id: string) => void;
+  onToggleCloseBranch: (id: string) => void;
   onAddRepository: (name: string, owner: string) => void;
   onDeleteRepository: (id: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
@@ -31,6 +34,9 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   apiKeys,
   onToggleRepository,
   onToggleAutoMerge,
+  onToggleWatch,
+  onToggleDeleteBranch,
+  onToggleCloseBranch,
   onAddRepository,
   onDeleteRepository,
   onAddBranch,
@@ -46,7 +52,6 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
     repoName: '' 
   });
   const { toast } = useToast();
-  const { watchModeState, updateWatchEnabled } = useWatchModePersistence();
 
   const handleAddRepository = () => {
     if (newRepo.name && newRepo.owner) {
@@ -160,12 +165,6 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       onCheckedChange={() => onToggleAutoMerge(repo.id)}
                       className="scale-125"
                     />
-                    <Switch
-                      checked={watchModeState.watchEnabled[repo.id] ?? false}
-                      onCheckedChange={(checked) => updateWatchEnabled(repo.id, checked)}
-                      className="scale-125"
-                      title="Watch"
-                    />
                     <Button
                       variant="ghost"
                       size="sm"
@@ -277,7 +276,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </Select>
                     </div>
 
-                    <div>
+                  <div>
                       <h4 className="font-black text-lg mb-3 flex items-center gap-2">
                         <Webhook className="w-5 h-5" />
                         Webhook Method
@@ -292,6 +291,29 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                           <SelectItem value="disabled">Disabled</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold">Watch</span>
+                        <Switch
+                          checked={repo.watchEnabled}
+                          onCheckedChange={() => onToggleWatch(repo.id)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold">Auto Delete Branch</span>
+                        <Switch
+                          checked={repo.autoDeleteBranch ?? false}
+                          onCheckedChange={() => onToggleDeleteBranch(repo.id)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold">Auto Close Branch</span>
+                        <Switch
+                          checked={repo.autoCloseBranch ?? false}
+                          onCheckedChange={() => onToggleCloseBranch(repo.id)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </CardContent>

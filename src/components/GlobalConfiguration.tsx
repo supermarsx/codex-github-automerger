@@ -347,16 +347,10 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Auto-merge Settings */}
+        {/* Approval Settings */}
         <div className="space-y-4">
-          <h4 className="font-black text-lg">Auto-merge Settings</h4>
+          <h4 className="font-black text-lg">Approval Settings</h4>
           <div className="space-y-4">
-            <ConfigToggle
-              id="autoMerge"
-              label="Enable Auto-merge"
-              checked={config.autoMergeEnabled}
-              onCheckedChange={(checked) => onConfigChange({ ...config, autoMergeEnabled: checked })}
-            />
             <ConfigToggle
               id="requireApproval"
               label="Require Approval"

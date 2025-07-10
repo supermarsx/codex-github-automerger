@@ -19,6 +19,8 @@ export const useRepositories = () => {
           ...repo,
           autoMergeEnabled: repo.autoMergeEnabled ?? repo.enabled ?? true,
           watchEnabled: repo.watchEnabled ?? false,
+          autoDeleteBranch: repo.autoDeleteBranch ?? false,
+          autoCloseBranch: repo.autoCloseBranch ?? false,
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
           recentPull: repo.recentPull ? {
             ...repo.recentPull,
@@ -76,6 +78,30 @@ export const useRepositories = () => {
     );
   };
 
+  const toggleWatch = (id: string) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === id ? { ...repo, watchEnabled: !repo.watchEnabled } : repo
+      )
+    );
+  };
+
+  const toggleDeleteBranch = (id: string) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === id ? { ...repo, autoDeleteBranch: !repo.autoDeleteBranch } : repo
+      )
+    );
+  };
+
+  const toggleCloseBranch = (id: string) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === id ? { ...repo, autoCloseBranch: !repo.autoCloseBranch } : repo
+      )
+    );
+  };
+
   const addRepository = (name: string, owner: string, apiKeyId?: string) => {
     const existingRepo = repositories.find(r => r.name === name && r.owner === owner);
     if (existingRepo) {
@@ -94,6 +120,8 @@ export const useRepositories = () => {
       enabled: true,
       autoMergeEnabled: true,
       watchEnabled: false,
+      autoDeleteBranch: false,
+      autoCloseBranch: false,
       allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
       allowedUsers: ['github-actions[bot]'],
       allowAllBranches: false,
@@ -279,6 +307,9 @@ export const useRepositories = () => {
     deleteRepository,
     updateRepository,
     toggleAutoMerge,
+    toggleWatch,
+    toggleDeleteBranch,
+    toggleCloseBranch,
     addBranch,
     removeBranch,
     addUser,

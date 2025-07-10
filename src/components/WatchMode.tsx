@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
 
 const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
+const MAX_REFRESHES_PER_MINUTE = 10;
 
 interface WatchModeProps {
   repositories: Repository[];
@@ -31,7 +32,6 @@ interface WatchModeProps {
 export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository }) => {
   const {
     watchModeState,
-    updateWatchEnabled,
     updateRepoActivities,
     updateRepoPullRequests,
     updateLastUpdateTime,
@@ -41,8 +41,9 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   const { logInfo, logError, logWarn } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
   const [errorTimestamps, setErrorTimestamps] = useState<Record<string, number>>({});
+  const refreshHistory = useRef<number[]>([]);
 
-  const watchEnabledMap = watchModeState.watchEnabled;
+  const watchEnabledMap = Object.fromEntries(repositories.map(r => [r.id, r.watchEnabled]));
   const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
   const repoActivities = watchModeState.repoActivities;
   const repoPullRequests = watchModeState.repoPullRequests;
@@ -108,6 +109,13 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
 
   const refreshAllWatched = async () => {
     if (isLoading || !isUnlocked) return;
+    const now = Date.now();
+    refreshHistory.current = refreshHistory.current.filter(ts => now - ts < 60000);
+    if (refreshHistory.current.length >= MAX_REFRESHES_PER_MINUTE) {
+      logWarn('watch-mode', 'Refresh skipped to prevent looping');
+      return;
+    }
+    refreshHistory.current.push(now);
     const watchedReposList = enabledRepos.filter(repo => watchedRepos.includes(repo.id));
     if (watchedReposList.length === 0) return;
 

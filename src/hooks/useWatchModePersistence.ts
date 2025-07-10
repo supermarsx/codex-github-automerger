@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
 
 export interface WatchModeState {
-  watchEnabled: Record<string, boolean>;
   lastUpdateTime: Date;
   repoActivities: Record<string, unknown[]>;
   repoPullRequests: Record<string, unknown[]>;
@@ -17,10 +16,6 @@ export const useWatchModePersistence = () => {
       try {
         const parsed = JSON.parse(saved);
         return {
-          watchEnabled: parsed.watchEnabled ??
-            (Array.isArray(parsed.watchedRepos)
-              ? Object.fromEntries(parsed.watchedRepos.map((id: string) => [id, true]))
-              : {}),
           lastUpdateTime: new Date(parsed.lastUpdateTime),
           repoActivities: parsed.repoActivities || {},
           repoPullRequests: parsed.repoPullRequests || {},
@@ -32,7 +27,6 @@ export const useWatchModePersistence = () => {
     }
 
     return {
-      watchEnabled: {},
       lastUpdateTime: new Date(),
       repoActivities: {},
       repoPullRequests: {},
@@ -47,11 +41,6 @@ export const useWatchModePersistence = () => {
         try {
           const parsed = JSON.parse(e.newValue);
           setWatchModeState({
-            watchEnabled:
-              parsed.watchEnabled ??
-              (Array.isArray(parsed.watchedRepos)
-                ? Object.fromEntries(parsed.watchedRepos.map((id: string) => [id, true]))
-                : {}),
             lastUpdateTime: new Date(parsed.lastUpdateTime),
             repoActivities: parsed.repoActivities || {},
             repoPullRequests: parsed.repoPullRequests || {},
@@ -70,13 +59,6 @@ export const useWatchModePersistence = () => {
   useEffect(() => {
     localStorage.setItem(WATCH_MODE_STORAGE_KEY, JSON.stringify(watchModeState));
   }, [watchModeState]);
-
-  const updateWatchEnabled = (repoId: string, enabled: boolean) => {
-    setWatchModeState(prev => ({
-      ...prev,
-      watchEnabled: { ...prev.watchEnabled, [repoId]: enabled }
-    }));
-  };
 
   const updateRepoActivities = (repoActivities: Record<string, unknown[]>) => {
     setWatchModeState(prev => ({ ...prev, repoActivities }));
@@ -99,9 +81,9 @@ export const useWatchModePersistence = () => {
 
   return {
     watchModeState,
-    updateWatchEnabled,
     updateRepoActivities,
-    updateRepoPullRequests,    updateLastUpdateTime,
+    updateRepoPullRequests,
+    updateLastUpdateTime,
     updateRepoLastFetched
   };
 };
