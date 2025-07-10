@@ -5,7 +5,6 @@ import { hexToHSL } from '@/lib/utils';
 const GLOBAL_CONFIG_STORAGE_KEY = 'automerger-global-config';
 
 const getDefaultConfig = (): GlobalConfig => ({
-  autoMergeEnabled: false, // Default to false for safety
   requireApproval: true,   // Default to true for safety
   alertsEnabled: true,
   encryptionEnabled: true,
