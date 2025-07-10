@@ -33,6 +33,15 @@ const buttonVariants = cva(
   }
 )
 
+const variantClasses: Record<NonNullable<VariantProps<typeof buttonVariants>["variant"]>, string> = {
+  default: "neo-button",
+  destructive: "neo-button neo-red",
+  outline: "neo-button-secondary",
+  secondary: "neo-button-secondary",
+  ghost: "neo-button-secondary",
+  link: ""
+}
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -44,7 +53,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(variantClasses[variant ?? 'default'], buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />

@@ -129,11 +129,11 @@ export const Dashboard = () => {
           }} className="space-y-6">
 
           <TabsContent value="feed" className="space-y-6 max-w-4xl mx-auto">
-            <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} />
-          <WatchMode
-            repositories={repositories}
-            apiKeys={apiKeys}
-            getDecryptedApiKey={getDecryptedApiKey}
+            <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} isUnlocked={isUnlocked} />
+            <WatchMode
+              repositories={repositories}
+              apiKeys={apiKeys}
+              getDecryptedApiKey={getDecryptedApiKey}
             isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
             globalConfig={globalConfig}

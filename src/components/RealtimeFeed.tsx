@@ -10,9 +10,10 @@ interface RealtimeFeedProps {
   activities: ActivityItem[];
   onExportReport: () => void;
   isLoading?: boolean;
+  isUnlocked: boolean;
 }
 
-export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExportReport, isLoading }) => {
+export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExportReport, isLoading, isUnlocked }) => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'merge': return <GitMerge className="w-4 h-4" />;
@@ -36,7 +37,12 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
   };
 
   return (
-    <Card className="neo-card">
+    <Card className="neo-card relative">
+      {!isUnlocked && (
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 font-black text-xl neo-card">
+          Need authentication first
+        </div>
+      )}
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-black flex items-center gap-2">

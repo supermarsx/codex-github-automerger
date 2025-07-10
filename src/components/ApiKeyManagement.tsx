@@ -38,7 +38,12 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {!isUnlocked && (
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 neo-card font-black text-xl">
+          Need authentication first
+        </div>
+      )}
       {!isUnlocked && (
         <Alert variant="destructive" className="neo-card">
           <AlertCircle className="w-4 h-4" />

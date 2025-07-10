@@ -266,7 +266,10 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                 <p className="text-xs font-bold">Registered Passkeys:</p>
                 {credentials.map((cred) => (
                   <div key={cred.id} className="flex items-center justify-between bg-white/20 p-2 rounded">
-                    <span className="text-xs font-bold truncate">{cred.label ?? `${cred.id.slice(0, 8)}...`}</span>
+                    <span className="text-xs font-bold truncate">
+                      {cred.label}
+                      <span className="ml-2 text-[10px] text-muted-foreground">({cred.id.slice(0, 8)}...)</span>
+                    </span>
                     <Button
                       size="sm"
                       variant="destructive"

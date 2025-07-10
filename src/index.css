@@ -144,6 +144,14 @@
            focus:translate-x-[2px] focus:translate-y-[2px] 
            transition-all duration-150 font-bold;
   }
+
+  .neo-switch {
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] rounded-full;
+  }
+
+  .neo-switch-thumb {
+    @apply bg-foreground rounded-full;
+  }
   
 }
 

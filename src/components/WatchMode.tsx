@@ -230,6 +230,8 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     if (success) {
       toast({ title: `Merged PR #${prNumber} successfully` });
       updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      const branches = await service.fetchStrayBranches(repo.owner, repo.name);
+      updateRepoStrayBranches(repo.id, branches);
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to merge PR #${prNumber}` });
@@ -253,6 +255,8 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     if (success) {
       toast({ title: `Closed PR #${prNumber}` });
       updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
+      const branches = await service.fetchStrayBranches(repo.owner, repo.name);
+      updateRepoStrayBranches(repo.id, branches);
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to close PR #${prNumber}` });
@@ -284,7 +288,12 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
 
   return (
     <>
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {!isUnlocked && (
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 neo-card font-black text-xl">
+          Need authentication first
+        </div>
+      )}
       {showControlPanel && (
       <Card className="neo-card">
         <CardHeader>
