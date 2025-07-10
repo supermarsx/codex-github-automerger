@@ -3,20 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Eye, 
+import {
+  Eye,
   GitBranch,
   GitPullRequest,
-  RefreshCw, 
+  RefreshCw,
   Clock,
   AlertCircle,
   CheckCircle,
-  ExternalLink
+  ExternalLink,
+  GitMerge,
+  XCircle
 } from 'lucide-react';
 import { Repository, ActivityItem, ApiKey } from '@/types/dashboard';
 import { createGitHubService } from '@/components/GitHubService';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
+import { useToast } from '@/hooks/use-toast';
 
 const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
 const MAX_REFRESHES_PER_MINUTE = 10;
@@ -27,9 +30,10 @@ interface WatchModeProps {
   getDecryptedApiKey: (id: string) => string | null;
   isUnlocked: boolean;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
+  showControlPanel?: boolean;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, showControlPanel = true }) => {
   const {
     watchModeState,
     updateRepoActivities,
@@ -188,9 +192,55 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     return { mergeable, nonMergeable, recentActivity, totalPRs: pullRequests.length };
   };
 
+  const { toast } = useToast();
+
+  const handleMerge = async (repo: Repository, prNumber: number) => {
+    let apiKey = apiKeys.find(k => k.id === repo.apiKeyId && k.isActive);
+    if (!apiKey) {
+      apiKey = apiKeys.find(k => k.isActive);
+      if (!apiKey) return;
+      if (apiKey.id !== repo.apiKeyId) {
+        onUpdateRepository(repo.id, { apiKeyId: apiKey.id });
+      }
+    }
+
+    const token = getDecryptedApiKey(apiKey.id);
+    if (!token) return;
+    const service = createGitHubService(token);
+    const success = await service.mergePullRequest(repo.owner, repo.name, prNumber);
+    if (success) {
+      toast({ title: `Merged PR #${prNumber} successfully` });
+      fetchRepoData(repo);
+    } else {
+      toast({ title: `Failed to merge PR #${prNumber}` });
+    }
+  };
+
+  const handleClose = async (repo: Repository, prNumber: number) => {
+    let apiKey = apiKeys.find(k => k.id === repo.apiKeyId && k.isActive);
+    if (!apiKey) {
+      apiKey = apiKeys.find(k => k.isActive);
+      if (!apiKey) return;
+      if (apiKey.id !== repo.apiKeyId) {
+        onUpdateRepository(repo.id, { apiKeyId: apiKey.id });
+      }
+    }
+
+    const token = getDecryptedApiKey(apiKey.id);
+    if (!token) return;
+    const service = createGitHubService(token);
+    const success = await service.closePullRequest(repo.owner, repo.name, prNumber);
+    if (success) {
+      toast({ title: `Closed PR #${prNumber}` });
+      fetchRepoData(repo);
+    } else {
+      toast({ title: `Failed to close PR #${prNumber}` });
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Control Panel */}
+      {showControlPanel && (
       <Card className="neo-card">
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -223,6 +273,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Watched Repositories Details */}
       {watchedRepos.length > 0 && (
@@ -299,6 +350,25 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                         <span className="capitalize">{pr.mergeable_state}</span>
                                       </>
                                     )}
+                                  </div>
+                                  <div className="flex gap-2 mt-2">
+                                    <Button
+                                      onClick={() => handleMerge(repo, pr.number)}
+                                      size="sm"
+                                      className="neo-button"
+                                      disabled={pr.mergeable !== true}
+                                    >
+                                      <GitMerge className="w-3 h-3 mr-1" />
+                                      Merge
+                                    </Button>
+                                    <Button
+                                      onClick={() => handleClose(repo, pr.number)}
+                                      size="sm"
+                                      variant="destructive"
+                                    >
+                                      <XCircle className="w-3 h-3 mr-1" />
+                                      Close
+                                    </Button>
                                   </div>
                                 </div>
                               ))
