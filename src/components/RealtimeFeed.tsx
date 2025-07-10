@@ -43,7 +43,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
             <Activity className="w-5 h-5" />
             Recent Activity
           </CardTitle>
-          <Button onClick={onExportReport} variant="outline" size="sm">
+          <Button onClick={onExportReport} size="sm" className="neo-button-secondary">
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
