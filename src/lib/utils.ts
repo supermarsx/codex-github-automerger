@@ -39,3 +39,9 @@ export function hexToHSL(hex: string): string {
 
   return `${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`
 }
+
+export function matchesPattern(value: string, pattern: string): boolean {
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
+  return regex.test(value);
+}

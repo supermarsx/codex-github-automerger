@@ -136,6 +136,7 @@ export const Dashboard = () => {
             getDecryptedApiKey={getDecryptedApiKey}
             isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
+            globalConfig={globalConfig}
             showControlPanel={false}
           />
           </TabsContent>

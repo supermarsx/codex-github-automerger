@@ -22,6 +22,8 @@ import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
 import { useToast } from '@/hooks/use-toast';
 import { abbreviate } from '@/utils/text';
+import { matchesPattern } from '@/lib/utils';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
 const MAX_REFRESHES_PER_MINUTE = 10;
@@ -32,10 +34,11 @@ interface WatchModeProps {
   getDecryptedApiKey: (id: string) => string | null;
   isUnlocked: boolean;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
+  globalConfig: import('@/types/dashboard').GlobalConfig;
   showControlPanel?: boolean;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, showControlPanel = true }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, globalConfig, showControlPanel = true }) => {
   const {
     watchModeState,
     updateRepoActivities,
@@ -50,6 +53,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [errorTimestamps, setErrorTimestamps] = useState<Record<string, number>>({});
   const refreshHistory = useRef<number[]>([]);
+  const [deleteDialog, setDeleteDialog] = useState<{open: boolean; repo: Repository | null; branch: string}>({open: false, repo: null, branch: ''});
 
   const watchEnabledMap = Object.fromEntries(repositories.map(r => [r.id, r.watchEnabled]));
   const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
@@ -105,7 +109,11 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
       logInfo('watch-mode', `Fetched ${activities.length} activities for ${repo.owner}/${repo.name}`);
 
       // Fetch stray branches
-      const branches = await service.fetchStrayBranches(repo.owner, repo.name);
+      let branches = await service.fetchStrayBranches(repo.owner, repo.name);
+      const patterns = [...(globalConfig.protectedBranches || []), ...(repo.protectedBranches || [])];
+      if (patterns.length > 0) {
+        branches = branches.filter(b => !patterns.some(p => matchesPattern(b, p)));
+      }
       updateRepoStrayBranches(repo.id, branches);
       logInfo('watch-mode', `Fetched ${branches.length} stray branches for ${repo.owner}/${repo.name}`);
       updateRepoLastFetched(repo.id);
@@ -221,6 +229,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.mergePullRequest(repo.owner, repo.name, prNumber);
     if (success) {
       toast({ title: `Merged PR #${prNumber} successfully` });
+      updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to merge PR #${prNumber}` });
@@ -243,6 +252,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.closePullRequest(repo.owner, repo.name, prNumber);
     if (success) {
       toast({ title: `Closed PR #${prNumber}` });
+      updateRepoPullRequests(repo.id, (repoPullRequests[repo.id] || []).filter(pr => pr.number !== prNumber));
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to close PR #${prNumber}` });
@@ -265,6 +275,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const success = await service.deleteBranch(repo.owner, repo.name, branch);
     if (success) {
       toast({ title: `Deleted branch ${branch}` });
+      updateRepoStrayBranches(repo.id, (repoStrayBranches[repo.id] || []).filter(b => b !== branch));
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to delete branch ${branch}` });
@@ -465,6 +476,14 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     size="sm"
                                     className="neo-button neo-red"
                                     onClick={() => handleDeleteBranch(repo, branch)}
+                                    variant="destructive"
+                                    onClick={() => {
+                                      if (globalConfig.confirmBranchDeletion) {
+                                        setDeleteDialog({ open: true, repo, branch });
+                                      } else {
+                                        handleDeleteBranch(repo, branch);
+                                      }
+                                    }}
                                   >
                                     <Trash2 className="w-3 h-3 mr-1" />
                                     Delete
@@ -483,5 +502,19 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
         </div>
       )}
     </div>
+    <ConfirmationDialog
+      open={deleteDialog.open}
+      onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+      title="Delete Branch"
+      description={`Are you sure you want to delete ${deleteDialog.branch}?`}
+      onConfirm={() => {
+        if (deleteDialog.repo) {
+          handleDeleteBranch(deleteDialog.repo, deleteDialog.branch);
+        }
+        setDeleteDialog({ open: false, repo: null, branch: '' });
+      }}
+      confirmText="Delete"
+      variant="destructive"
+    />
   );
 };
