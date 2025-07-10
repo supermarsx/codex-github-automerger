@@ -43,9 +43,10 @@ export const Dashboard = () => {
     logs,
     isLoading,
     toggleRepository,
-    toggleAutoMerge,
+    toggleAutoMergeOnClean,
+    toggleAutoMergeOnUnstable,
     toggleWatch,
-    toggleDeleteBranch,
+    toggleDeleteOnDirty,
     toggleCloseBranch,
     addRepository,
     deleteRepository,
@@ -146,6 +147,7 @@ export const Dashboard = () => {
               getDecryptedApiKey={getDecryptedApiKey}
             isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
+            onAddActivity={addRepositoryActivity}
             globalConfig={globalConfig}
             showControlPanel={false}
           />
@@ -170,9 +172,10 @@ export const Dashboard = () => {
               repositories={repositories}
               apiKeys={apiKeys}
               onToggleRepository={toggleRepository}
-              onToggleAutoMerge={toggleAutoMerge}
+              onToggleAutoMerge={toggleAutoMergeOnClean}
+              onToggleAutoMergeUnstable={toggleAutoMergeOnUnstable}
               onToggleWatch={toggleWatch}
-              onToggleDeleteBranch={toggleDeleteBranch}
+              onToggleDeleteOnDirty={toggleDeleteOnDirty}
               onToggleCloseBranch={toggleCloseBranch}
               onAddRepository={addRepository}
               onDeleteRepository={deleteRepository}

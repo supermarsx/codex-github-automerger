@@ -17,9 +17,10 @@ export const useRepositories = () => {
         // Convert date strings back to Date objects
         return parsed.map((repo: any) => ({
           ...repo,
-          autoMergeEnabled: repo.autoMergeEnabled ?? repo.enabled ?? true,
+          autoMergeOnClean: repo.autoMergeOnClean ?? repo.autoMergeEnabled ?? repo.enabled ?? true,
+          autoMergeOnUnstable: repo.autoMergeOnUnstable ?? false,
           watchEnabled: repo.watchEnabled ?? false,
-          autoDeleteBranch: repo.autoDeleteBranch ?? false,
+          autoDeleteOnDirty: repo.autoDeleteOnDirty ?? repo.autoDeleteBranch ?? false,
           autoCloseBranch: repo.autoCloseBranch ?? false,
           protectedBranches: repo.protectedBranches ?? ['main'],
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
@@ -62,20 +63,28 @@ export const useRepositories = () => {
     );
   };
 
-  const toggleAutoMerge = (id: string) => {
+  const toggleAutoMergeOnClean = (id: string) => {
     setRepositories(repos =>
       repos.map(repo => {
         if (repo.id === id) {
-          const newStatus = !repo.autoMergeEnabled;
-          logInfo('repository', `Auto-merge for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, { repo: repo.name, autoMergeEnabled: newStatus });
+          const newStatus = !repo.autoMergeOnClean;
+          logInfo('repository', `Auto merge on clean for ${repo.name} ${newStatus ? 'enabled' : 'disabled'}`, { repo: repo.name, autoMergeOnClean: newStatus });
           toast({
-            title: `Auto-merge ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
-            description: newStatus ? 'Pull requests will be merged automatically' : 'Automatic merging disabled'
+            title: `Auto merge on clean ${newStatus ? 'enabled' : 'disabled'} for ${repo.name}`,
+            description: newStatus ? 'Pull requests will be merged when clean' : 'Automatic merging disabled'
           });
-          return { ...repo, autoMergeEnabled: newStatus };
+          return { ...repo, autoMergeOnClean: newStatus };
         }
         return repo;
       })
+    );
+  };
+
+  const toggleAutoMergeOnUnstable = (id: string) => {
+    setRepositories(repos =>
+      repos.map(repo =>
+        repo.id === id ? { ...repo, autoMergeOnUnstable: !repo.autoMergeOnUnstable } : repo
+      )
     );
   };
 
@@ -87,10 +96,10 @@ export const useRepositories = () => {
     );
   };
 
-  const toggleDeleteBranch = (id: string) => {
+  const toggleDeleteOnDirty = (id: string) => {
     setRepositories(repos =>
       repos.map(repo =>
-        repo.id === id ? { ...repo, autoDeleteBranch: !repo.autoDeleteBranch } : repo
+        repo.id === id ? { ...repo, autoDeleteOnDirty: !repo.autoDeleteOnDirty } : repo
       )
     );
   };
@@ -119,9 +128,10 @@ export const useRepositories = () => {
       name,
       owner,
       enabled: true,
-      autoMergeEnabled: true,
+      autoMergeOnClean: true,
+      autoMergeOnUnstable: false,
       watchEnabled: false,
-      autoDeleteBranch: false,
+      autoDeleteOnDirty: false,
       autoCloseBranch: false,
       allowedBranches: ['codex-*', 'feature/*', 'fix/*'],
       protectedBranches: ['main'],
@@ -308,9 +318,10 @@ export const useRepositories = () => {
     addRepository,
     deleteRepository,
     updateRepository,
-    toggleAutoMerge,
+    toggleAutoMergeOnClean,
+    toggleAutoMergeOnUnstable,
     toggleWatch,
-    toggleDeleteBranch,
+    toggleDeleteOnDirty,
     toggleCloseBranch,
     addBranch,
     removeBranch,
@@ -319,4 +330,5 @@ export const useRepositories = () => {
     updateRepositoryStats,
     addRepositoryActivity,
     clearAllRepositories
-  };};
+  };
+};

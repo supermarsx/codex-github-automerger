@@ -27,6 +27,7 @@ interface RepositoryCardProps {
   repo: Repository;
   onToggle: (id: string) => void;
   onToggleAutoMerge: (id: string) => void;
+  onToggleAutoMergeUnstable: (id: string) => void;
   onAddBranch: (repoId: string, branch: string) => void;
   onRemoveBranch: (repoId: string, index: number) => void;
   onAddUser: (repoId: string, user: string) => void;
@@ -40,6 +41,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
   repo,
   onToggle,
   onToggleAutoMerge,
+  onToggleAutoMergeUnstable,
   onAddBranch,
   onRemoveBranch,
   onAddUser,
@@ -104,8 +106,8 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                 <Badge variant="secondary" className={`neo-card ${repo.enabled ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
                   {repo.enabled ? 'Active' : 'Inactive'}
                 </Badge>
-                <Badge variant="secondary" className={`neo-card ${repo.autoMergeEnabled ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
-                  {repo.autoMergeEnabled ? 'Automerge On' : 'Automerge Off'}
+                <Badge variant="secondary" className={`neo-card ${repo.autoMergeOnClean ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
+                  {repo.autoMergeOnClean ? 'Merge Clean' : 'No Clean Merge'}
                 </Badge>
                 <Badge variant="secondary" className="neo-card neo-blue text-black font-bold text-xs">
                   {successRate}% Success
@@ -183,12 +185,24 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             {/* Auto-merge Toggle */}
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-black text-sm">Auto-merge</h4>
-                <p className="text-xs text-muted-foreground">Automatically merge PRs when checks pass</p>
+                <h4 className="font-black text-sm">Auto Merge Clean</h4>
+                <p className="text-xs text-muted-foreground">Merge when status is clean</p>
               </div>
               <Switch
-                checked={repo.autoMergeEnabled}
+                checked={repo.autoMergeOnClean}
                 onCheckedChange={() => onToggleAutoMerge(repo.id)}
+                className="scale-125"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-black text-sm">Auto Merge Unstable</h4>
+                <p className="text-xs text-muted-foreground">Merge even if checks unstable</p>
+              </div>
+              <Switch
+                checked={repo.autoMergeOnUnstable ?? false}
+                onCheckedChange={() => onToggleAutoMergeUnstable(repo.id)}
                 className="scale-125"
               />
             </div>

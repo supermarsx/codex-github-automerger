@@ -36,11 +36,12 @@ interface WatchModeProps {
   getDecryptedApiKey: (id: string) => string | null;
   isUnlocked: boolean;
   onUpdateRepository: (repoId: string, updates: Partial<Repository>) => void;
+  onAddActivity?: (repoId: string, activity: Omit<ActivityItem, 'id'>) => void;
   globalConfig: import('@/types/dashboard').GlobalConfig;
   showControlPanel?: boolean;
 }
 
-export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, globalConfig, showControlPanel = true }) => {
+export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, getDecryptedApiKey, isUnlocked, onUpdateRepository, onAddActivity, globalConfig, showControlPanel = true }) => {
   const {
     watchModeState,
     updateRepoActivities,
@@ -283,6 +284,14 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     if (success) {
       toast({ title: `Deleted branch ${branch}` });
       updateRepoStrayBranches(repo.id, (repoStrayBranches[repo.id] || []).filter(b => b !== branch));
+      if (onAddActivity) {
+        onAddActivity(repo.id, {
+          type: 'alert',
+          message: `del ${branch}`,
+          repo: `${repo.owner}/${repo.name}`,
+          timestamp: new Date()
+        });
+      }
       fetchRepoData(repo);
     } else {
       toast({ title: `Failed to delete branch ${branch}` });

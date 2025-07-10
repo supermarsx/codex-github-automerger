@@ -426,10 +426,22 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
           <h4 className="font-black text-lg">Advanced Settings</h4>
            <div className="grid grid-cols-1 gap-4">
             <ConfigToggle
-               id="autoDeleteBranch"
-               label="Auto Delete Branch After Merge"
-               checked={config.autoDeleteBranch}
-               onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteBranch: checked })}
+               id="autoDeleteOnDirty"
+               label="Auto Delete Dirty Branch"
+               checked={config.autoDeleteOnDirty}
+               onCheckedChange={(checked) => onConfigChange({ ...config, autoDeleteOnDirty: checked })}
+             />
+            <ConfigToggle
+               id="autoMergeOnClean"
+               label="Auto Merge on Clean"
+               checked={config.autoMergeOnClean}
+               onCheckedChange={(checked) => onConfigChange({ ...config, autoMergeOnClean: checked })}
+             />
+            <ConfigToggle
+               id="autoMergeOnUnstable"
+               label="Auto Merge on Unstable"
+               checked={config.autoMergeOnUnstable}
+               onCheckedChange={(checked) => onConfigChange({ ...config, autoMergeOnUnstable: checked })}
              />
             <ConfigToggle
                id="confirmBranchDeletion"

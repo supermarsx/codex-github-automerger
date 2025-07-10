@@ -12,7 +12,9 @@ const getDefaultConfig = (): GlobalConfig => ({
   defaultAllowedUsers: ['github-actions[bot]'],
   alertThreshold: 30,
   maxRetries: 3,
-  autoDeleteBranch: false, // Default to false for safety
+  autoDeleteOnDirty: false, // Default to false for safety
+  autoMergeOnClean: true,
+  autoMergeOnUnstable: false,
   allowAllBranches: false,
   allowAllUsers: false,
   fetchMode: 'github-api',
@@ -38,6 +40,15 @@ export const useGlobalConfig = () => {
     if (savedConfig) {
       try {
         const parsed = JSON.parse(savedConfig);
+        // Migrate old keys
+        if (parsed.autoDeleteBranch !== undefined && parsed.autoDeleteOnDirty === undefined) {
+          parsed.autoDeleteOnDirty = parsed.autoDeleteBranch;
+          delete parsed.autoDeleteBranch;
+        }
+        if (parsed.autoMergeEnabled !== undefined && parsed.autoMergeOnClean === undefined) {
+          parsed.autoMergeOnClean = parsed.autoMergeEnabled;
+          delete parsed.autoMergeEnabled;
+        }
         // Merge with defaults to ensure all properties exist
         return { ...getDefaultConfig(), ...parsed };
       } catch (error) {

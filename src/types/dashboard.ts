@@ -3,11 +3,12 @@ export interface Repository {
   name: string;
   owner: string;
   enabled: boolean;
-  autoMergeEnabled: boolean;
+  autoMergeOnClean: boolean;
+  autoMergeOnUnstable?: boolean;
   /** Whether this repository should be included in watch mode */
   watchEnabled?: boolean;
-  /** Delete merged branches automatically */
-  autoDeleteBranch?: boolean;
+  /** Delete stray branches when dirty */
+  autoDeleteOnDirty?: boolean;
   /** Close stale branches automatically */
   autoCloseBranch?: boolean;
   allowedBranches: string[];
@@ -142,7 +143,9 @@ export interface GlobalConfig {
   defaultAllowedUsers: string[];
   alertThreshold: number;
   maxRetries: number;
-  autoDeleteBranch: boolean;
+  autoDeleteOnDirty: boolean;
+  autoMergeOnClean: boolean;
+  autoMergeOnUnstable?: boolean;
   allowAllBranches: boolean;
   allowAllUsers: boolean;
   fetchMode: 'no-auth' | 'github-api';

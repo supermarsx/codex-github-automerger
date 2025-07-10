@@ -18,8 +18,9 @@ interface RepositoryManagementProps {
   apiKeys: any[];
   onToggleRepository: (id: string) => void;
   onToggleAutoMerge: (id: string) => void;
+  onToggleAutoMergeUnstable: (id: string) => void;
   onToggleWatch: (id: string) => void;
-  onToggleDeleteBranch: (id: string) => void;
+  onToggleDeleteOnDirty: (id: string) => void;
   onToggleCloseBranch: (id: string) => void;
   onAddRepository: (name: string, owner: string) => void;
   onDeleteRepository: (id: string) => void;
@@ -34,8 +35,9 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   apiKeys,
   onToggleRepository,
   onToggleAutoMerge,
+  onToggleAutoMergeUnstable,
   onToggleWatch,
-  onToggleDeleteBranch,
+  onToggleDeleteOnDirty,
   onToggleCloseBranch,
   onAddRepository,
   onDeleteRepository,
@@ -150,7 +152,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </CardTitle>
                       <CardDescription className="font-bold">
                         {repo.enabled ? 'Active' : 'Inactive'} |
-                        {repo.autoMergeEnabled ? ' Automerge On' : ' Automerge Off'}
+                        {repo.autoMergeOnClean ? ' Clean Merge' : ' No Clean Merge'}
                       </CardDescription>
                     </div>
                   </div>
@@ -312,17 +314,24 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">Auto Merge</span>
+                      <span className="font-bold">Merge Clean</span>
                       <Switch
-                        checked={repo.autoMergeEnabled}
+                        checked={repo.autoMergeOnClean}
                         onCheckedChange={() => onToggleAutoMerge(repo.id)}
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold">Auto Delete Branch</span>
+                      <span className="font-bold">Merge Unstable</span>
                       <Switch
-                        checked={repo.autoDeleteBranch ?? false}
-                        onCheckedChange={() => onToggleDeleteBranch(repo.id)}
+                        checked={repo.autoMergeOnUnstable ?? false}
+                        onCheckedChange={() => onToggleAutoMergeUnstable(repo.id)}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold">Del Dirty Branch</span>
+                      <Switch
+                        checked={repo.autoDeleteOnDirty ?? false}
+                        onCheckedChange={() => onToggleDeleteOnDirty(repo.id)}
                         />
                       </div>
                       <div className="flex items-center justify-between">
