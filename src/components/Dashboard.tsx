@@ -54,6 +54,7 @@ export const Dashboard = () => {
     removeBranch,
     addUser,
     removeUser,
+    addRepositoryActivity,
     addApiKey,
     toggleApiKey,
     deleteApiKey,
