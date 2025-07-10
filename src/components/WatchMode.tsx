@@ -21,6 +21,7 @@ import { createGitHubService } from '@/components/GitHubService';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
 import { useToast } from '@/hooks/use-toast';
+import { abbreviate } from '@/utils/text';
 
 const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
 const MAX_REFRESHES_PER_MINUTE = 10;
@@ -331,7 +332,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                         <Button
                           onClick={() => window.open(`https://github.com/${repo.owner}/${repo.name}`, '_blank')}
                           size="sm"
-                          variant="outline"
+                          className="neo-button-secondary"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
                           View on GitHub
@@ -457,10 +458,12 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                             ) : (
                               (repoStrayBranches[repo.id] || []).map(branch => (
                                 <div key={branch} className="p-3 border rounded flex items-center justify-between">
-                                  <span className="text-sm font-mono">{branch}</span>
+                                  <span className="text-sm font-mono" title={branch}>
+                                    {abbreviate(branch)}
+                                  </span>
                                   <Button
                                     size="sm"
-                                    variant="destructive"
+                                    className="neo-button neo-red"
                                     onClick={() => handleDeleteBranch(repo, branch)}
                                   >
                                     <Trash2 className="w-3 h-3 mr-1" />

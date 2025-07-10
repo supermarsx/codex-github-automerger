@@ -242,7 +242,7 @@ export const Dashboard = () => {
         
         {/* Floating Action Bar */}
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-card/95 backdrop-blur-sm border rounded-full p-2 shadow-lg">
+          <div className="neo-card rounded-full p-2">
             <div className="flex items-center gap-2">
               <button
                 title="Feed"
@@ -251,8 +251,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to feed tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'feed' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'feed' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <Activity className="w-4 h-4" />
@@ -264,8 +264,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to repositories tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'repositories' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'repositories' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <GitBranch className="w-4 h-4" />
@@ -277,8 +277,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to api-keys tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'api-keys' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'api-keys' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <Key className="w-4 h-4" />
@@ -290,8 +290,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to actions tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'actions' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'actions' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <Zap className="w-4 h-4" />
@@ -303,8 +303,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to config tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'config' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'config' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <Settings className="w-4 h-4" />
@@ -316,8 +316,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to security tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'security' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'security' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <Shield className="w-4 h-4" />
@@ -329,8 +329,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to statistics tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'statistics' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'statistics' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -342,8 +342,8 @@ export const Dashboard = () => {
                   markActivity();
                   logInfo('dashboard', 'Switched to logs tab via floating action bar');
                 }}
-                className={`p-3 rounded-full transition-all ${
-                  appState.activeTab === 'logs' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                className={`rounded-full p-3 ${
+                  appState.activeTab === 'logs' ? 'neo-button' : 'neo-button-secondary'
                 }`}
               >
                 <FileText className="w-4 h-4" />
