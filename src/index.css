@@ -128,10 +128,14 @@
   }
   
   .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
-           hover:translate-x-[2px] hover:translate-y-[2px] 
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
+           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+           hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
+  }
+
+  .neo-button.neo-red {
+    @apply bg-[hsl(var(--neo-red))] text-white;
   }
   
   .neo-input {
