@@ -1,3 +1,5 @@
+import { getItem, setItem } from '@/utils/storage';
+
 export interface PasskeyCredential {
   id: string;
   publicKey: string;

@@ -55,7 +55,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto text-sm">
       <Card className="neo-card">
         <CardHeader>
           <div className="flex items-center justify-between">

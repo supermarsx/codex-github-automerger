@@ -6,8 +6,8 @@ const STATS_STORAGE_KEY = 'automerger-stats';
 
 export const useStatsPersistence = () => {
   const [mergeStats, setMergeStats] = useState<MergeStats>({
-    session: { pending: 3, merged: 12, failed: 2 },
-    total: { pending: 23, merged: 156, failed: 18 }
+    session: { pending: 0, merged: 0, failed: 0 },
+    total: { pending: 0, merged: 0, failed: 0 }
   });
 
   useEffect(() => {
