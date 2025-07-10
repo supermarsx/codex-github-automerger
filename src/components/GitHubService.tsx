@@ -124,6 +124,31 @@ export class GitHubService {
     }
   }
 
+  async fetchStrayBranches(owner: string, repo: string): Promise<string[]> {
+    try {
+      const { data: branches } = await this.octokit.rest.repos.listBranches({
+        owner,
+        repo,
+        per_page: 100,
+      });
+
+      const { data: pulls } = await this.octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: 'open',
+        per_page: 100,
+      });
+
+      const activeBranches = new Set(pulls.map(pr => pr.head.ref));
+      return branches
+        .filter(b => !b.protected && !activeBranches.has(b.name))
+        .map(b => b.name);
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+      return [];
+    }
+  }
+
   async fetchRecentActivity(repositories: Repository[]): Promise<ActivityItem[]> {
     const activities: ActivityItem[] = [];
 

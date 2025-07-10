@@ -13,7 +13,8 @@ import {
   CheckCircle,
   ExternalLink,
   GitMerge,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react';
 import { Repository, ActivityItem, ApiKey } from '@/types/dashboard';
 import { createGitHubService } from '@/components/GitHubService';
@@ -38,6 +39,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     watchModeState,
     updateRepoActivities,
     updateRepoPullRequests,
+    updateRepoStrayBranches,
     updateLastUpdateTime,
     updateRepoLastFetched
   } = useWatchModePersistence();
@@ -52,6 +54,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   const watchedRepos = Object.keys(watchEnabledMap).filter(id => watchEnabledMap[id]);
   const repoActivities = watchModeState.repoActivities;
   const repoPullRequests = watchModeState.repoPullRequests;
+  const repoStrayBranches = watchModeState.repoStrayBranches || {};
   const repoLastFetched = watchModeState.repoLastFetched || {};
   const lastUpdateTime = watchModeState.lastUpdateTime;
 
@@ -92,13 +95,18 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
       
       // Fetch pull requests
       const pullRequests = await service.fetchPullRequests(repo.owner, repo.name);
-      updateRepoPullRequests({ ...repoPullRequests, [repo.id]: pullRequests });
+      updateRepoPullRequests(repo.id, pullRequests);
       logInfo('watch-mode', `Fetched ${pullRequests.length} pull requests for ${repo.owner}/${repo.name}`);
 
       // Fetch recent activity
       const activities = await service.fetchRecentActivity([repo]);
-      updateRepoActivities({ ...repoActivities, [repo.id]: activities });
+      updateRepoActivities(repo.id, activities);
       logInfo('watch-mode', `Fetched ${activities.length} activities for ${repo.owner}/${repo.name}`);
+
+      // Fetch stray branches
+      const branches = await service.fetchStrayBranches(repo.owner, repo.name);
+      updateRepoStrayBranches(repo.id, branches);
+      logInfo('watch-mode', `Fetched ${branches.length} stray branches for ${repo.owner}/${repo.name}`);
       updateRepoLastFetched(repo.id);
       setErrorTimestamps(prev => {
         const copy = { ...prev };
@@ -240,6 +248,28 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     }
   };
 
+  const handleDeleteBranch = async (repo: Repository, branch: string) => {
+    let apiKey = apiKeys.find(k => k.id === repo.apiKeyId && k.isActive);
+    if (!apiKey) {
+      apiKey = apiKeys.find(k => k.isActive);
+      if (!apiKey) return;
+      if (apiKey.id !== repo.apiKeyId) {
+        onUpdateRepository(repo.id, { apiKeyId: apiKey.id });
+      }
+    }
+
+    const token = getDecryptedApiKey(apiKey.id);
+    if (!token) return;
+    const service = createGitHubService(token);
+    const success = await service.deleteBranch(repo.owner, repo.name, branch);
+    if (success) {
+      toast({ title: `Deleted branch ${branch}` });
+      fetchRepoData(repo);
+    } else {
+      toast({ title: `Failed to delete branch ${branch}` });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {showControlPanel && (
@@ -294,18 +324,23 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                         <GitBranch className="w-5 h-5" />
                         {repo.owner}/{repo.name}
                       </div>
-                      <Button
-                        onClick={() => window.open(`https://github.com/${repo.owner}/${repo.name}`, '_blank')}
-                        size="sm"
-                        variant="outline"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View on GitHub
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {repoLastFetched[repo.id] ? new Date(repoLastFetched[repo.id]).toLocaleString() : 'Never'}
+                        </Badge>
+                        <Button
+                          onClick={() => window.open(`https://github.com/${repo.owner}/${repo.name}`, '_blank')}
+                          size="sm"
+                          variant="outline"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View on GitHub
+                        </Button>
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-3 gap-6">
                       {/* Pull Requests */}
                       <div>
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
@@ -399,6 +434,38 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                   <p className="text-xs text-muted-foreground">
                                     {new Date(activity.timestamp).toLocaleString()}
                                   </p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
+
+                      {/* Stray Branches */}
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <GitBranch className="w-4 h-4" />
+                          Stray Branches ({(repoStrayBranches[repo.id] || []).length})
+                        </h4>
+                        <ScrollArea className="h-64">
+                          <div className="space-y-2">
+                            {(repoStrayBranches[repo.id] || []).length === 0 ? (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <GitBranch className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No stray branches</p>
+                              </div>
+                            ) : (
+                              (repoStrayBranches[repo.id] || []).map(branch => (
+                                <div key={branch} className="p-3 border rounded flex items-center justify-between">
+                                  <span className="text-sm font-mono">{branch}</span>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleDeleteBranch(repo, branch)}
+                                  >
+                                    <Trash2 className="w-3 h-3 mr-1" />
+                                    Delete
+                                  </Button>
                                 </div>
                               ))
                             )}

@@ -6,6 +6,7 @@ export interface WatchModeState {
   lastUpdateTime: Date;
   repoActivities: Record<string, unknown[]>;
   repoPullRequests: Record<string, unknown[]>;
+  repoStrayBranches: Record<string, string[]>;
   repoLastFetched: Record<string, number>;
 }
 
@@ -19,6 +20,7 @@ export const useWatchModePersistence = () => {
           lastUpdateTime: new Date(parsed.lastUpdateTime),
           repoActivities: parsed.repoActivities || {},
           repoPullRequests: parsed.repoPullRequests || {},
+          repoStrayBranches: parsed.repoStrayBranches || {},
           repoLastFetched: parsed.repoLastFetched || {}
         };
       } catch (error) {
@@ -30,6 +32,7 @@ export const useWatchModePersistence = () => {
       lastUpdateTime: new Date(),
       repoActivities: {},
       repoPullRequests: {},
+      repoStrayBranches: {},
       repoLastFetched: {}
     };
   });
@@ -44,6 +47,7 @@ export const useWatchModePersistence = () => {
             lastUpdateTime: new Date(parsed.lastUpdateTime),
             repoActivities: parsed.repoActivities || {},
             repoPullRequests: parsed.repoPullRequests || {},
+            repoStrayBranches: parsed.repoStrayBranches || {},
             repoLastFetched: parsed.repoLastFetched || {},
           });
         } catch (error) {
@@ -60,12 +64,25 @@ export const useWatchModePersistence = () => {
     localStorage.setItem(WATCH_MODE_STORAGE_KEY, JSON.stringify(watchModeState));
   }, [watchModeState]);
 
-  const updateRepoActivities = (repoActivities: Record<string, unknown[]>) => {
-    setWatchModeState(prev => ({ ...prev, repoActivities }));
+  const updateRepoActivities = (repoId: string, activities: unknown[]) => {
+    setWatchModeState(prev => ({
+      ...prev,
+      repoActivities: { ...prev.repoActivities, [repoId]: activities }
+    }));
   };
 
-  const updateRepoPullRequests = (repoPullRequests: Record<string, unknown[]>) => {
-    setWatchModeState(prev => ({ ...prev, repoPullRequests }));
+  const updateRepoPullRequests = (repoId: string, prs: unknown[]) => {
+    setWatchModeState(prev => ({
+      ...prev,
+      repoPullRequests: { ...prev.repoPullRequests, [repoId]: prs }
+    }));
+  };
+
+  const updateRepoStrayBranches = (repoId: string, branches: string[]) => {
+    setWatchModeState(prev => ({
+      ...prev,
+      repoStrayBranches: { ...prev.repoStrayBranches, [repoId]: branches }
+    }));
   };
 
   const updateRepoLastFetched = (repoId: string) => {
@@ -83,6 +100,7 @@ export const useWatchModePersistence = () => {
     watchModeState,
     updateRepoActivities,
     updateRepoPullRequests,
+    updateRepoStrayBranches,
     updateLastUpdateTime,
     updateRepoLastFetched
   };
