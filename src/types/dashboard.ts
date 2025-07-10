@@ -159,4 +159,5 @@ export interface GlobalConfig {
   logsDisabled: boolean;
   protectedBranches: string[];
   confirmBranchDeletion: boolean;
+  refreshInterval: number;
 }

@@ -412,7 +412,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <Button
                                       onClick={() => handleClose(repo, pr.number)}
                                       size="sm"
-                                      variant="destructive"
+                                      className="neo-button neo-red"
                                     >
                                       <XCircle className="w-3 h-3 mr-1" />
                                       Close

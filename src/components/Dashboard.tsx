@@ -68,7 +68,7 @@ export const Dashboard = () => {
     setShowLockedModal
   } = useDashboardData();
 
-  // Auto-refresh activities every 5 seconds
+  // Auto-refresh activities based on configured interval
   useEffect(() => {
     if (repositories.length === 0 || apiKeys.length === 0 || !isUnlocked) return;
 
@@ -76,13 +76,13 @@ export const Dashboard = () => {
     const interval = setInterval(() => {
       logInfo('dashboard', 'Auto-refreshing activities');
       fetchActivities(repositories, apiKeys, getDecryptedApiKey);
-    }, 5000);
+    }, globalConfig.refreshInterval);
 
     return () => {
       logInfo('dashboard', 'Clearing auto-refresh interval');
       clearInterval(interval);
     };
-  }, [repositories.length, apiKeys.length, isUnlocked]);
+  }, [repositories.length, apiKeys.length, isUnlocked, globalConfig.refreshInterval]);
 
   // Initial fetch when repos or keys change
   useEffect(() => {
