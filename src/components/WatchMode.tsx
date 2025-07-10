@@ -44,7 +44,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   
   const { logInfo, logError, logWarn, logDebug } = useLogger('info');
   const [isLoading, setIsLoading] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [errorTimestamps, setErrorTimestamps] = useState<Record<string, number>>({});
   const refreshHistory = useRef<number[]>([]);
 
@@ -117,7 +117,6 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const now = Date.now();
     refreshHistory.current = refreshHistory.current.filter(ts => now - ts < 60000);
     if (refreshHistory.current.length >= MAX_REFRESHES_PER_MINUTE) {
-      logWarn('watch-mode', 'Refresh skipped to prevent looping');
       return;
     }
     refreshHistory.current.push(now);
@@ -135,39 +134,42 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     logDebug('watch-mode', 'Completed refresh of all watched repositories');
   };
 
-  // Auto-refresh every 30 seconds to avoid spamming the GitHub API
+  // Periodically refresh using a self-scheduling timeout
   useEffect(() => {
     if (watchedRepos.length === 0 || !isUnlocked) return;
 
-    const startInterval = () => {
-      if (!intervalRef.current) {
-        intervalRef.current = setInterval(refreshAllWatched, 30000);
+    let cancelled = false;
+
+    const scheduleRefresh = async () => {
+      await refreshAllWatched();
+      if (!cancelled) {
+        timeoutRef.current = setTimeout(scheduleRefresh, 30000);
       }
     };
 
-    const stopInterval = () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+    const stopTimeout = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
 
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        refreshAllWatched();
-        startInterval();
-      } else {
-        stopInterval();
+      if (document.visibilityState === 'visible' && !timeoutRef.current) {
+        scheduleRefresh();
+      } else if (document.visibilityState !== 'visible') {
+        stopTimeout();
       }
     };
 
     if (document.visibilityState === 'visible') {
-      startInterval();
+      scheduleRefresh();
     }
 
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
-      stopInterval();
+      cancelled = true;
+      stopTimeout();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [watchedRepos, enabledRepos, isUnlocked]);
