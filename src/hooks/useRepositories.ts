@@ -42,7 +42,23 @@ export const useRepositories = () => {
 
   // Persist repositories to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem(REPOSITORIES_STORAGE_KEY, JSON.stringify(repositories));
+    try {
+      localStorage.setItem(
+        REPOSITORIES_STORAGE_KEY,
+        JSON.stringify(repositories)
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.error('Storage quota exceeded while saving repositories');
+        toast({
+          title: 'Storage limit reached',
+          description: 'Unable to save repository data to localStorage.',
+          variant: 'destructive'
+        });
+      } else {
+        console.error('Error saving repositories:', error);
+      }
+    }
   }, [repositories]);
 
   const toggleRepository = (id: string) => {
