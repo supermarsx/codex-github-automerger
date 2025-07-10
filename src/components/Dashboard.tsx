@@ -12,6 +12,7 @@ import { FeedActions } from '@/components/FeedActions';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { ConnectionManager } from '@/components/ConnectionManager';
 import { LogsTab } from '@/components/LogsTab';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Shield, 
   GitBranch, 
@@ -59,7 +60,9 @@ export const Dashboard = () => {
     setGlobalConfig,
     exportLogs,
     fetchActivities,
-    getDecryptedApiKey
+    getDecryptedApiKey,
+    showLockedModal,
+    setShowLockedModal
   } = useDashboardData();
 
   // Auto-refresh activities every 5 seconds
@@ -96,6 +99,14 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
+      <Dialog open={showLockedModal} onOpenChange={setShowLockedModal}>
+        <DialogContent className="neo-card">
+          <DialogHeader>
+            <DialogTitle>API Keys Locked</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">Authenticate with your passkey to unlock API keys.</p>
+        </DialogContent>
+      </Dialog>
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         {!globalConfig.hideHeader && <DashboardHeader apiKeys={apiKeys} />}
