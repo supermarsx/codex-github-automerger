@@ -14,7 +14,9 @@ import {
   ExternalLink,
   GitMerge,
   XCircle,
-  Trash2
+  Trash2,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { Repository, ActivityItem, ApiKey } from '@/types/dashboard';
 import { createGitHubService } from '@/components/GitHubService';
@@ -45,7 +47,8 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     updateRepoPullRequests,
     updateRepoStrayBranches,
     updateLastUpdateTime,
-    updateRepoLastFetched
+    updateRepoLastFetched,
+    reorderRepoActivity
   } = useWatchModePersistence();
   
   const { logInfo, logError, logWarn, logDebug } = useLogger('info');
@@ -450,12 +453,34 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                 <p className="text-sm">No recent activity</p>
                               </div>
                             ) : (
-                              activities.slice(0, 20).map(activity => (
-                                <div key={activity.id} className="p-3 border rounded">
-                                  <p className="text-sm font-medium mb-1">{activity.message}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {new Date(activity.timestamp).toLocaleString()}
-                                  </p>
+                              activities.slice(0, 20).map((activity, idx) => (
+                                <div key={activity.id} className="p-3 border rounded flex items-start justify-between gap-2">
+                                  <div>
+                                    <p className="text-sm font-medium mb-1">{activity.message}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {new Date(activity.timestamp).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="p-1"
+                                      onClick={() => reorderRepoActivity(repo.id, idx, Math.max(0, idx - 1))}
+                                      title="Move Up"
+                                    >
+                                      <ArrowUp className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="p-1"
+                                      onClick={() => reorderRepoActivity(repo.id, idx, Math.min(activities.length - 1, idx + 1))}
+                                      title="Move Down"
+                                    >
+                                      <ArrowDown className="w-3 h-3" />
+                                    </Button>
+                                  </div>
                                 </div>
                               ))
                             )}

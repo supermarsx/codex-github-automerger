@@ -71,6 +71,27 @@ export const useWatchModePersistence = () => {
     }));
   };
 
+  const reorderRepoActivity = (repoId: string, from: number, to: number) => {
+    setWatchModeState(prev => {
+      const list = prev.repoActivities[repoId] || [];
+      const updated = [...list];
+      if (
+        from < 0 ||
+        from >= updated.length ||
+        to < 0 ||
+        to >= updated.length
+      ) {
+        return prev;
+      }
+      const [m] = updated.splice(from, 1);
+      updated.splice(to, 0, m);
+      return {
+        ...prev,
+        repoActivities: { ...prev.repoActivities, [repoId]: updated }
+      };
+    });
+  };
+
   const updateRepoPullRequests = (repoId: string, prs: unknown[]) => {
     setWatchModeState(prev => ({
       ...prev,
@@ -102,6 +123,7 @@ export const useWatchModePersistence = () => {
     updateRepoPullRequests,
     updateRepoStrayBranches,
     updateLastUpdateTime,
-    updateRepoLastFetched
+    updateRepoLastFetched,
+    reorderRepoActivity
   };
 };

@@ -120,6 +120,7 @@ export class PasskeyService {
 
     try {
       this.isAuthenticating = true;
+      window.dispatchEvent(new Event('passkey-auth-start'));
       const storedCredentials = this.getStoredCredentials();
       
       if (storedCredentials.length === 0) {
@@ -164,6 +165,7 @@ export class PasskeyService {
       return { success: false, error: 'Authentication failed' };
     } finally {
       this.isAuthenticating = false;
+      window.dispatchEvent(new Event('passkey-auth-end'));
     }
   }
 
