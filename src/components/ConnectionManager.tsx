@@ -17,7 +17,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
   const [latency, setLatency] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { logInfo } = useLogger();
+  const { logInfo, logWarn } = useLogger();
 
   const activeApiKeys = apiKeys.filter(k => k.isActive).length;
 
@@ -36,11 +36,22 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
 
       const rateLimit = githubResponse.headers.get('X-RateLimit-Limit');
       const rateRemaining = githubResponse.headers.get('X-RateLimit-Remaining');
+      const remaining = rateRemaining ? parseInt(rateRemaining, 10) : NaN;
       if (activeApiKeys === 0 && rateLimit && rateRemaining) {
         logInfo(
           'connection',
           `GitHub unauthenticated rate limit: ${rateRemaining}/${rateLimit}`,
           { limit: rateLimit, remaining: rateRemaining }
+        );
+      }
+      if (
+        activeApiKeys === 0 &&
+        (githubResponse.status === 403 || githubResponse.status === 429 || remaining === 0)
+      ) {
+        logWarn(
+          'github',
+          'GitHub API rate limit reached without authentication',
+          { remaining }
         );
       }
 
