@@ -75,6 +75,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
               </Button>
               <Button onClick={handleClearLogs} variant="outline" className="neo-button-secondary">
                 <Trash2 className="w-4 h-4 mr-2" />
+
                 Clear Logs
               </Button>
             </div>

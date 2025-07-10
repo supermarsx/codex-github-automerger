@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 
 const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
+// Maximum number of items persisted per repository history list.
+// Older entries are trimmed before being saved to localStorage.
+const MAX_ITEMS = 50;
 
 export interface WatchModeState {
   lastUpdateTime: Date;
@@ -37,6 +40,18 @@ export const useWatchModePersistence = () => {
     };
   });
 
+  const clearWatchModeState = () => {
+    const initialState: WatchModeState = {
+      lastUpdateTime: new Date(),
+      repoActivities: {},
+      repoPullRequests: {},
+      repoStrayBranches: {},
+      repoLastFetched: {}
+    };
+    setWatchModeState(initialState);
+    localStorage.removeItem(WATCH_MODE_STORAGE_KEY);
+  };
+
   // keep state in sync across components using storage events
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -65,9 +80,10 @@ export const useWatchModePersistence = () => {
   }, [watchModeState]);
 
   const updateRepoActivities = (repoId: string, activities: unknown[]) => {
+    const trimmed = activities.slice(-MAX_ITEMS);
     setWatchModeState(prev => ({
       ...prev,
-      repoActivities: { ...prev.repoActivities, [repoId]: activities }
+      repoActivities: { ...prev.repoActivities, [repoId]: trimmed }
     }));
   };
 
@@ -85,16 +101,18 @@ export const useWatchModePersistence = () => {
   };
 
   const updateRepoPullRequests = (repoId: string, prs: unknown[]) => {
+    const trimmed = prs.slice(-MAX_ITEMS);
     setWatchModeState(prev => ({
       ...prev,
-      repoPullRequests: { ...prev.repoPullRequests, [repoId]: prs }
+      repoPullRequests: { ...prev.repoPullRequests, [repoId]: trimmed }
     }));
   };
 
   const updateRepoStrayBranches = (repoId: string, branches: string[]) => {
+    const trimmed = branches.slice(-MAX_ITEMS);
     setWatchModeState(prev => ({
       ...prev,
-      repoStrayBranches: { ...prev.repoStrayBranches, [repoId]: branches }
+      repoStrayBranches: { ...prev.repoStrayBranches, [repoId]: trimmed }
     }));
   };
 
@@ -116,6 +134,7 @@ export const useWatchModePersistence = () => {
     updateRepoStrayBranches,
     updateLastUpdateTime,
     updateRepoLastFetched,
-    reorderRepoActivity
+    reorderRepoActivity,
+    clearWatchModeState
   };
 };
