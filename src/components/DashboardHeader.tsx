@@ -21,9 +21,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [] }
               <p className="text-muted-foreground font-bold">Automated pull request management system</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <ConnectionManager apiKeys={apiKeys} compact={true} />
-          </div>
+          <ConnectionManager apiKeys={apiKeys} compact={true} />
         </div>
       </CardHeader>
     </Card>
