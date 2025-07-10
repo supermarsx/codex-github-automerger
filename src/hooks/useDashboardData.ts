@@ -30,6 +30,7 @@ export const useDashboardData = () => {
     apiKeys,
     isUnlocked,
     showApiKey,
+    authInProgress,
     deletedApiKeys,
     addApiKey,
     toggleApiKey,
@@ -40,6 +41,7 @@ export const useDashboardData = () => {
     getDecryptedApiKey,
     refreshApiKeyStatus,
     clearAllApiKeys,
+    unlock,
     showLockedModal,
     setShowLockedModal
   } = useApiKeys();
@@ -106,6 +108,8 @@ export const useDashboardData = () => {
     exportLogs,
     clearAllRepositories,
     clearAllApiKeys,
+    unlock,
+    authInProgress,
     showLockedModal,
     setShowLockedModal
   };
