@@ -5,7 +5,7 @@ import { useActivities } from './useActivities';
 import { useLogger } from './useLogger';
 
 export const useDashboardData = () => {
-  const { logs, exportLogs } = useLogger();
+  const { logs, exportLogs, clearLogs } = useLogger();
   
   const {
     repositories,
@@ -106,6 +106,7 @@ export const useDashboardData = () => {
     updateStats,
     resetSessionStats,
     exportLogs,
+    clearLogs,
     clearAllRepositories,
     clearAllApiKeys,
     unlock,

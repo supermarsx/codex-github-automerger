@@ -71,3 +71,7 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Activity Logs
+
+The dashboard keeps a running history of actions in the **Logs** tab. You can download this history using **Export Logs** or remove it entirely using the new **Clear Logs** button next to the export option.

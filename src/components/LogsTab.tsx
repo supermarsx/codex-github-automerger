@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Search, Filter } from 'lucide-react';
+import { Download, FileText, Search, Filter, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,9 +18,10 @@ interface LogEntry {
 interface LogsTabProps {
   logs: LogEntry[];
   onExportLogs: () => void;
+  onClearLogs: () => void;
 }
 
-export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs }) => {
+export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLogs }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const { toast } = useToast();
@@ -35,6 +36,11 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs }) => {
   const handleExportLogs = () => {
     onExportLogs();
     toast({ title: "Logs exported successfully!" });
+  };
+
+  const handleClearLogs = () => {
+    onClearLogs();
+    toast({ title: "Logs cleared" });
   };
 
   const getLevelColor = (level: string) => {
@@ -62,10 +68,16 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs }) => {
                 Track all system actions and events
               </CardDescription>
             </div>
-            <Button onClick={handleExportLogs} className="neo-button">
-              <Download className="w-4 h-4 mr-2" />
-              Export Logs
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleExportLogs} className="neo-button">
+                <Download className="w-4 h-4 mr-2" />
+                Export Logs
+              </Button>
+              <Button onClick={handleClearLogs} variant="outline" className="neo-button-secondary">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Clear Logs
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

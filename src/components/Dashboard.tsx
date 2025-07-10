@@ -63,6 +63,7 @@ export const Dashboard = () => {
     exportReport,
     setGlobalConfig,
     exportLogs,
+    clearLogs,
     fetchActivities,
     getDecryptedApiKey,
     unlock,
@@ -244,7 +245,7 @@ export const Dashboard = () => {
 
           <TabsContent value="logs" className="space-y-6">
             {!globalConfig.logsDisabled ? (
-              <LogsTab logs={logs} onExportLogs={exportLogs} />
+              <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} />
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
