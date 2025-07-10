@@ -10,6 +10,9 @@ class OctokitMock {
     activity: {
       listRepoEvents: vi.fn(),
     },
+    repos: {
+      listBranches: vi.fn(),
+    },
   };
 }
 
@@ -53,5 +56,21 @@ describe('fetchRecentActivity', () => {
 
     expect(octokitInstance.rest.activity.listRepoEvents).toHaveBeenCalledWith({ owner: 'o', repo: 'r', per_page: 10 });
     expect(activities[0]).toMatchObject({ message: 'PR #2 opened', repo: 'o/r' });
+  });
+});
+
+describe('fetchStrayBranches', () => {
+  it('lists branches without open PRs', async () => {
+    octokitInstance.rest.repos.listBranches.mockResolvedValue({ data: [
+      { name: 'feature-1', protected: false },
+      { name: 'main', protected: true }
+    ]});
+    octokitInstance.rest.pulls.list.mockResolvedValue({ data: [ { head: { ref: 'feature-2' } } ]});
+
+    const branches = await service.fetchStrayBranches('o', 'r');
+
+    expect(octokitInstance.rest.repos.listBranches).toHaveBeenCalledWith({ owner: 'o', repo: 'r', per_page: 100 });
+    expect(octokitInstance.rest.pulls.list).toHaveBeenCalledWith({ owner: 'o', repo: 'r', state: 'open', per_page: 100 });
+    expect(branches).toEqual(['feature-1']);
   });
 });
