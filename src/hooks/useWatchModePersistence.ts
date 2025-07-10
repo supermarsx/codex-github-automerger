@@ -127,17 +127,6 @@ export const useWatchModePersistence = () => {
     setWatchModeState(prev => ({ ...prev, lastUpdateTime }));
   };
 
-  const clearWatchModeState = () => {
-    removeItem(WATCH_MODE_STORAGE_KEY);
-    setWatchModeState({
-      lastUpdateTime: new Date(),
-      repoActivities: {},
-      repoPullRequests: {},
-      repoStrayBranches: {},
-      repoLastFetched: {}
-    });
-  };
-
   return {
     watchModeState,
     updateRepoActivities,
