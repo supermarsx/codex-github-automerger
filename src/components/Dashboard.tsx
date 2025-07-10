@@ -12,7 +12,6 @@ import { FeedActions } from '@/components/FeedActions';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { ConnectionManager } from '@/components/ConnectionManager';
 import { LogsTab } from '@/components/LogsTab';
-import { AuthOverlay } from '@/components/AuthOverlay';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Shield, 
@@ -103,7 +102,6 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <AuthOverlay />
       <Dialog open={showLockedModal} onOpenChange={setShowLockedModal}>
         <DialogContent className="neo-card">
           <DialogHeader>
@@ -172,7 +170,6 @@ export const Dashboard = () => {
               onRemoveBranch={removeBranch}
               onAddUser={addUser}
               onRemoveUser={removeUser}
-              onMoveRepository={reorderRepository}
             />
           </TabsContent>
 

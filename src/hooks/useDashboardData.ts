@@ -23,7 +23,6 @@ export const useDashboardData = () => {
     removeUser,
     updateRepositoryStats,
     addRepositoryActivity,
-    reorderRepository,
     clearAllRepositories
   } = useRepositories();
 
@@ -106,7 +105,6 @@ export const useDashboardData = () => {
     resetSessionStats,
     exportLogs,
     clearAllRepositories,
-    reorderRepository,
     clearAllApiKeys,
     showLockedModal,
     setShowLockedModal
