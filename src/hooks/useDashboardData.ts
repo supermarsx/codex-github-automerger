@@ -6,9 +6,11 @@ import { useLogger } from './useLogger';
 import { useWatchModePersistence } from './useWatchModePersistence';
 
 export const useDashboardData = () => {
-  const { logs, exportLogs } = useLogger();
 
   const { clearWatchModeState } = useWatchModePersistence();
+
+  const { logs, exportLogs, clearLogs } = useLogger();
+
   
   const {
     repositories,
@@ -109,6 +111,7 @@ export const useDashboardData = () => {
     updateStats,
     resetSessionStats,
     exportLogs,
+    clearLogs,
     clearAllRepositories,
     clearAllApiKeys,
     clearWatchModeState,
