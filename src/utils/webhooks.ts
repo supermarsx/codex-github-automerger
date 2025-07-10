@@ -26,20 +26,28 @@ export interface WebhookPayload {
   data: any;
 }
 
+import { getItem, setItem } from '@/utils/storage';
+
 export class WebhookService {
   private static readonly WEBHOOK_CONFIGS_KEY = 'webhook_configs';
 
-  static getWebhooks(): WebhookConfig[] {
+  static async getWebhooks(): Promise<WebhookConfig[]> {
     try {
-      const stored = localStorage.getItem(this.WEBHOOK_CONFIGS_KEY);
-      return stored ? JSON.parse(stored) : [];
+      const stored = await getItem<any>(this.WEBHOOK_CONFIGS_KEY);
+      if (!stored) return [];
+      const parsed = typeof stored === 'string' ? JSON.parse(stored) : stored;
+      return parsed.map((w: any) => ({
+        ...w,
+        created: new Date(w.created),
+        lastTriggered: w.lastTriggered ? new Date(w.lastTriggered) : undefined,
+      }));
     } catch {
       return [];
     }
   }
 
-  static saveWebhook(webhook: WebhookConfig): void {
-    const webhooks = this.getWebhooks();
+  static async saveWebhook(webhook: WebhookConfig): Promise<void> {
+    const webhooks = await this.getWebhooks();
     const existingIndex = webhooks.findIndex(w => w.id === webhook.id);
     
     if (existingIndex >= 0) {
@@ -48,12 +56,12 @@ export class WebhookService {
       webhooks.push(webhook);
     }
     
-    localStorage.setItem(this.WEBHOOK_CONFIGS_KEY, JSON.stringify(webhooks));
+    await setItem(this.WEBHOOK_CONFIGS_KEY, webhooks);
   }
 
-  static deleteWebhook(id: string): void {
-    const webhooks = this.getWebhooks().filter(w => w.id !== id);
-    localStorage.setItem(this.WEBHOOK_CONFIGS_KEY, JSON.stringify(webhooks));
+  static async deleteWebhook(id: string): Promise<void> {
+    const webhooks = (await this.getWebhooks()).filter(w => w.id !== id);
+    await setItem(this.WEBHOOK_CONFIGS_KEY, webhooks);
   }
 
   static async triggerWebhook(
@@ -78,13 +86,13 @@ export class WebhookService {
       }
 
       // Update last triggered timestamp
-      const webhooks = this.getWebhooks();
-      const updatedWebhooks = webhooks.map(w => 
-        w.id === webhook.id 
+      const webhooks = await this.getWebhooks();
+      const updatedWebhooks = webhooks.map(w =>
+        w.id === webhook.id
           ? { ...w, lastTriggered: new Date() }
           : w
       );
-      localStorage.setItem(this.WEBHOOK_CONFIGS_KEY, JSON.stringify(updatedWebhooks));
+      await setItem(this.WEBHOOK_CONFIGS_KEY, updatedWebhooks);
 
       return { success: true };
     } catch (error) {
@@ -97,7 +105,7 @@ export class WebhookService {
   }
 
   static async triggerWebhooks(event: WebhookEvent, repository: string, data: any): Promise<void> {
-    const webhooks = this.getWebhooks().filter(w => 
+    const webhooks = (await this.getWebhooks()).filter(w =>
       w.active && w.events.includes(event)
     );
 

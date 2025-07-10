@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { setItem } from '@/utils/storage';
 import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,7 +11,7 @@ interface ThemeToggleProps {
 export const ThemeToggle = ({ theme, onThemeChange }: ThemeToggleProps) => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

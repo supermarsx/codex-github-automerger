@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getItem, setItem } from '@/utils/storage';
 import { GlobalConfig } from '@/types/dashboard';
 import { hexToHSL } from '@/lib/utils';
 
@@ -19,7 +20,7 @@ const getDefaultConfig = (): GlobalConfig => ({
   serverCheckInterval: 30000, // 30 seconds
   refreshInterval: 30000,
   logLevel: 'info',
-  darkMode: localStorage.getItem('theme') !== 'light',
+  darkMode: true,
   accentColor: '#313135',
   customCss: '',
   customJs: '',
@@ -33,30 +34,33 @@ const getDefaultConfig = (): GlobalConfig => ({
 });
 
 export const useGlobalConfig = () => {
-  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(() => {
-    const savedConfig = localStorage.getItem(GLOBAL_CONFIG_STORAGE_KEY);
-    if (savedConfig) {
-      try {
-        const parsed = JSON.parse(savedConfig);
-        // Merge with defaults to ensure all properties exist
-        return { ...getDefaultConfig(), ...parsed };
-      } catch (error) {
-        console.error('Error parsing saved config:', error);
-        return getDefaultConfig();
-      }
-    }
-    return getDefaultConfig();
-  });
+  const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(getDefaultConfig());
 
-  // Persist config to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem(GLOBAL_CONFIG_STORAGE_KEY, JSON.stringify(globalConfig));
+    (async () => {
+      const savedConfig = await getItem<any>(GLOBAL_CONFIG_STORAGE_KEY);
+      if (savedConfig) {
+        try {
+          const parsed = typeof savedConfig === 'string' ? JSON.parse(savedConfig) : savedConfig;
+          setGlobalConfig(prev => ({ ...prev, ...parsed }));
+        } catch (error) {
+          console.error('Error parsing saved config:', error);
+        }
+      }
+    })();
+  }, []);
+
+  // Persist config to IndexedDB whenever it changes
+  useEffect(() => {
+    setItem(GLOBAL_CONFIG_STORAGE_KEY, globalConfig).catch(err => {
+      console.error('Error saving global config:', err);
+    });
   }, [globalConfig]);
 
-  // Update theme in localStorage when darkMode changes
+  // Update theme in IndexedDB when darkMode changes
   useEffect(() => {
     const theme = globalConfig.darkMode ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
+    setItem('theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
     // Apply theme to document
     if (globalConfig.darkMode) {
@@ -81,7 +85,9 @@ export const useGlobalConfig = () => {
   const resetConfig = () => {
     const defaultConfig = getDefaultConfig();
     setGlobalConfig(defaultConfig);
-    localStorage.setItem(GLOBAL_CONFIG_STORAGE_KEY, JSON.stringify(defaultConfig));
+    setItem(GLOBAL_CONFIG_STORAGE_KEY, defaultConfig).catch(err => {
+      console.error('Error resetting config:', err);
+    });
   };
 
   const exportConfig = () => {

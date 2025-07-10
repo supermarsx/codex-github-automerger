@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getItem, setItem, removeItem } from '@/utils/storage';
 import { ApiKey } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
@@ -11,23 +12,26 @@ export const useApiKeys = () => {
   const { toast } = useToast();
   const { logInfo } = useLogger();
   
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(() => {
-    const savedKeys = localStorage.getItem(API_KEYS_STORAGE_KEY);
-    if (savedKeys) {
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const savedKeys = await getItem<any>(API_KEYS_STORAGE_KEY);
+      if (!savedKeys) return;
       try {
-        const parsed = JSON.parse(savedKeys);
-        return parsed.map((key: any) => ({
-          ...key,
-          created: new Date(key.created),
-          lastUsed: key.lastUsed ? new Date(key.lastUsed) : undefined
-        }));
+        const parsed = typeof savedKeys === 'string' ? JSON.parse(savedKeys) : savedKeys;
+        setApiKeys(
+          parsed.map((key: any) => ({
+            ...key,
+            created: new Date(key.created),
+            lastUsed: key.lastUsed ? new Date(key.lastUsed) : undefined,
+          }))
+        );
       } catch (error) {
         console.error('Error parsing saved API keys:', error);
-        return [];
       }
-    }
-    return [];
-  });
+    })();
+  }, []);
 
   const [showApiKey, setShowApiKey] = useState<string | null>(null);
   const [deletedApiKeys, setDeletedApiKeys] = useState<Map<string, { key: ApiKey; timeout: NodeJS.Timeout }>>(new Map());
@@ -38,15 +42,18 @@ export const useApiKeys = () => {
   const [authInProgress, setAuthInProgress] = useState(false);
   const lockedShownRef = useRef(false);
 
-  // Persist API keys to localStorage whenever they change
+  // Persist API keys to IndexedDB whenever they change
   useEffect(() => {
-    localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(apiKeys));
+    setItem(API_KEYS_STORAGE_KEY, apiKeys).catch(err => {
+      console.error('Error saving API keys:', err);
+    });
   }, [apiKeys]);
 
   const unlock = async () => {
     setAuthInProgress(true);
     try {
-      if (PasskeyService.getStoredCredentials().length === 0) {
+      const creds = await PasskeyService.getStoredCredentials();
+      if (creds.length === 0) {
         logInfo('api-key', 'No passkey registered, skipping unlock');
         const map: Record<string, string> = {};
         apiKeys.forEach(k => {
@@ -269,8 +276,8 @@ export const useApiKeys = () => {
   const clearAllApiKeys = () => {
     setApiKeys([]);
     setDeletedApiKeys(new Map());
-    localStorage.removeItem(API_KEYS_STORAGE_KEY);
-    toast({ 
+    removeItem(API_KEYS_STORAGE_KEY);
+    toast({
       title: 'All API keys cleared',
       description: 'API key data has been reset'
     });

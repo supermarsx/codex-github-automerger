@@ -1,35 +1,34 @@
 import { useState, useEffect } from 'react';
+import { getItem, setItem } from '@/utils/storage';
 import { MergeStats } from '@/types/dashboard';
 
 const STATS_STORAGE_KEY = 'automerger-stats';
 
 export const useStatsPersistence = () => {
-  const [mergeStats, setMergeStats] = useState<MergeStats>(() => {
-    const savedStats = localStorage.getItem(STATS_STORAGE_KEY);
-    if (savedStats) {
-      try {
-        return JSON.parse(savedStats);
-      } catch (error) {
-        console.error('Error parsing saved stats:', error);
-      }
-    }
-    
-    return {
-      session: {
-        pending: 3,
-        merged: 12,
-        failed: 2
-      },
-      total: {
-        pending: 23,
-        merged: 156,
-        failed: 18
-      }
-    };
+  const [mergeStats, setMergeStats] = useState<MergeStats>({
+    session: { pending: 3, merged: 12, failed: 2 },
+    total: { pending: 23, merged: 156, failed: 18 }
   });
 
   useEffect(() => {
-    localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(mergeStats));
+    (async () => {
+      const savedStats = await getItem<any>(STATS_STORAGE_KEY);
+      if (savedStats) {
+        try {
+          const parsed = typeof savedStats === 'string' ? JSON.parse(savedStats) : savedStats;
+          setMergeStats(parsed);
+        } catch (error) {
+          console.error('Error parsing saved stats:', error);
+        }
+      }
+    })();
+  }, []);
+
+
+  useEffect(() => {
+    setItem(STATS_STORAGE_KEY, mergeStats).catch(err => {
+      console.error('Error saving stats:', err);
+    });
   }, [mergeStats]);
 
   const updateStats = (newStats: Partial<MergeStats>) => {
