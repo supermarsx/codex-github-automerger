@@ -34,6 +34,7 @@ export const Dashboard = () => {
   const {
     repositories,
     apiKeys,
+    isUnlocked,
     showApiKey,
     globalConfig,
     activities,
@@ -63,7 +64,7 @@ export const Dashboard = () => {
 
   // Auto-refresh activities every 5 seconds
   useEffect(() => {
-    if (repositories.length === 0 || apiKeys.length === 0) return;
+    if (repositories.length === 0 || apiKeys.length === 0 || !isUnlocked) return;
 
     logInfo('dashboard', `Setting up auto-refresh for ${repositories.length} repositories`);
     const interval = setInterval(() => {
@@ -75,15 +76,15 @@ export const Dashboard = () => {
       logInfo('dashboard', 'Clearing auto-refresh interval');
       clearInterval(interval);
     };
-  }, [repositories.length, apiKeys.length]);
+  }, [repositories.length, apiKeys.length, isUnlocked]);
 
   // Initial fetch when repos or keys change
   useEffect(() => {
-    if (repositories.length > 0 && apiKeys.length > 0) {
+    if (repositories.length > 0 && apiKeys.length > 0 && isUnlocked) {
       logInfo('dashboard', `Initial fetch for ${repositories.length} repositories with ${apiKeys.length} API keys`);
       fetchActivities(repositories, apiKeys, getDecryptedApiKey);
     }
-  }, [repositories.length, apiKeys.length]);
+  }, [repositories.length, apiKeys.length, isUnlocked]);
 
   // Log app initialization
   useEffect(() => {
@@ -119,6 +120,7 @@ export const Dashboard = () => {
             repositories={repositories}
             apiKeys={apiKeys}
             getDecryptedApiKey={getDecryptedApiKey}
+            isUnlocked={isUnlocked}
             onUpdateRepository={updateRepository}
           />
           </TabsContent>
