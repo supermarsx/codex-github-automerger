@@ -3,9 +3,12 @@ import { useApiKeys } from './useApiKeys';
 import { useGlobalConfig } from './useGlobalConfig';
 import { useActivities } from './useActivities';
 import { useLogger } from './useLogger';
+import { useWatchModePersistence } from './useWatchModePersistence';
 
 export const useDashboardData = () => {
   const { logs, exportLogs } = useLogger();
+
+  const { clearWatchModeState } = useWatchModePersistence();
   
   const {
     repositories,
@@ -108,6 +111,7 @@ export const useDashboardData = () => {
     exportLogs,
     clearAllRepositories,
     clearAllApiKeys,
+    clearWatchModeState,
     unlock,
     authInProgress,
     showLockedModal,
