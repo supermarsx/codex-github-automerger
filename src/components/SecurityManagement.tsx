@@ -46,8 +46,8 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
 
   useEffect(() => {
     setPasskeySupported(PasskeyService.isSupported());
-    setCredentials(PasskeyService.getStoredCredentials());
-    setWebhooks(WebhookService.getWebhooks());
+    PasskeyService.getStoredCredentials().then(setCredentials);
+    WebhookService.getWebhooks().then(setWebhooks);
   }, []);
 
   const handleRegisterPasskey = async () => {
@@ -58,7 +58,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
 
     const result = await PasskeyService.register(username);
     if (result.success) {
-      setCredentials(PasskeyService.getStoredCredentials());
+      PasskeyService.getStoredCredentials().then(setCredentials);
       toast({ title: "Passkey registered successfully!" });
       setShowPasskeyDialog(false);
       setUsername('');
@@ -79,8 +79,8 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
       setCredentialToDelete(null);
       return;
     }
-    PasskeyService.removeCredential(credentialToDelete);
-    setCredentials(PasskeyService.getStoredCredentials());
+    await PasskeyService.removeCredential(credentialToDelete);
+    PasskeyService.getStoredCredentials().then(setCredentials);
     setCredentialToDelete(null);
     toast({ title: 'Passkey removed' });
   };
@@ -98,16 +98,18 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
       created: new Date()
     };
 
-    WebhookService.saveWebhook(webhook);
-    setWebhooks(WebhookService.getWebhooks());
+    WebhookService.saveWebhook(webhook).then(() =>
+      WebhookService.getWebhooks().then(setWebhooks)
+    );
     setNewWebhook({ name: '', url: '', secret: '', events: [] });
     setShowWebhookDialog(false);
     toast({ title: "Webhook configured successfully!" });
   };
 
   const handleDeleteWebhook = (id: string) => {
-    WebhookService.deleteWebhook(id);
-    setWebhooks(WebhookService.getWebhooks());
+    WebhookService.deleteWebhook(id).then(() =>
+      WebhookService.getWebhooks().then(setWebhooks)
+    );
     toast({ title: "Webhook deleted" });
   };
 

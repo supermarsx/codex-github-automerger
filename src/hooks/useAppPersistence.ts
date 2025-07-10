@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getItem, setItem } from '@/utils/storage';
 
 const APP_STATE_STORAGE_KEY = 'automerger-app-state';
 
@@ -14,35 +15,39 @@ export interface AppState {
 }
 
 export const useAppPersistence = () => {
-  const [appState, setAppState] = useState<AppState>(() => {
-    const saved = localStorage.getItem(APP_STATE_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          ...parsed,
-          lastActivity: new Date(parsed.lastActivity),
-          sessionStartTime: new Date(parsed.sessionStartTime)
-        };
-      } catch (error) {
-        console.error('Error parsing saved app state:', error);
-      }
-    }
-    
-    return {
-      activeTab: 'feed',
-      lastActivity: new Date(),
-      sessionStartTime: new Date(),
-      userPreferences: {
-        compactMode: false,
-        autoRefresh: true,
-        notificationsEnabled: true
-      }
-    };
+  const [appState, setAppState] = useState<AppState>({
+    activeTab: 'feed',
+    lastActivity: new Date(),
+    sessionStartTime: new Date(),
+    userPreferences: {
+      compactMode: false,
+      autoRefresh: true,
+      notificationsEnabled: true,
+    },
   });
 
   useEffect(() => {
-    localStorage.setItem(APP_STATE_STORAGE_KEY, JSON.stringify(appState));
+    (async () => {
+      const saved = await getItem<any>(APP_STATE_STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
+          setAppState({
+            ...parsed,
+            lastActivity: new Date(parsed.lastActivity),
+            sessionStartTime: new Date(parsed.sessionStartTime),
+          });
+        } catch (error) {
+          console.error('Error parsing saved app state:', error);
+        }
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    setItem(APP_STATE_STORAGE_KEY, appState).catch(err => {
+      console.error('Error saving app state:', err);
+    });
   }, [appState]);
 
   const updateActiveTab = (tab: string) => {

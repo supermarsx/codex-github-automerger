@@ -41,7 +41,7 @@ export class PasskeyService {
     }
 
     try {
-      const storedCredentials = this.getStoredCredentials();
+      const storedCredentials = await this.getStoredCredentials();
       if (storedCredentials.length > 0) {
         return { success: false, error: 'A passkey is already registered' };
       }
@@ -94,9 +94,9 @@ export class PasskeyService {
         label: username,
       };
 
-      // Store credential in localStorage (in production, use secure server storage)
+      // Store credential in IndexedDB (in production, use secure server storage)
       storedCredentials.push(passkeyCredential);
-      localStorage.setItem('passkey_credentials', JSON.stringify(storedCredentials));
+      await setItem('passkey_credentials', storedCredentials);
 
       return { success: true, credential: passkeyCredential };
     } catch (error) {
@@ -120,7 +120,7 @@ export class PasskeyService {
 
     try {
       this.isAuthenticating = true;
-      const storedCredentials = this.getStoredCredentials();
+      const storedCredentials = await this.getStoredCredentials();
       
       if (storedCredentials.length === 0) {
         return { success: false, error: 'No passkeys registered' };
@@ -149,12 +149,12 @@ export class PasskeyService {
       }
 
       // Update last used timestamp
-      const updatedCredentials = storedCredentials.map(cred => 
-        cred.id === credential.id 
+      const updatedCredentials = storedCredentials.map(cred =>
+        cred.id === credential.id
           ? { ...cred, lastUsed: new Date() }
           : cred
       );
-      localStorage.setItem('passkey_credentials', JSON.stringify(updatedCredentials));
+      await setItem('passkey_credentials', updatedCredentials);
 
       this.isAuthenticated = true;
       this.lastCredentialId = credential.id;
@@ -167,19 +167,25 @@ export class PasskeyService {
     }
   }
 
-  static getStoredCredentials(): PasskeyCredential[] {
+  static async getStoredCredentials(): Promise<PasskeyCredential[]> {
     try {
-      const stored = localStorage.getItem('passkey_credentials');
-      return stored ? JSON.parse(stored) : [];
+      const stored = await getItem<any>('passkey_credentials');
+      if (!stored) return [];
+      const parsed = typeof stored === 'string' ? JSON.parse(stored) : stored;
+      return parsed.map((cred: any) => ({
+        ...cred,
+        created: new Date(cred.created),
+        lastUsed: cred.lastUsed ? new Date(cred.lastUsed) : undefined,
+      }));
     } catch {
       return [];
     }
   }
 
-  static removeCredential(credentialId: string): void {
-    const credentials = this.getStoredCredentials();
+  static async removeCredential(credentialId: string): Promise<void> {
+    const credentials = await this.getStoredCredentials();
     const filtered = credentials.filter(cred => cred.id !== credentialId);
-    localStorage.setItem('passkey_credentials', JSON.stringify(filtered));
+    await setItem('passkey_credentials', filtered);
   }
 
   private static arrayBufferToBase64(buffer: ArrayBuffer): string {

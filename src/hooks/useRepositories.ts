@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getItem, setItem, removeItem } from '@/utils/storage';
 import { Repository } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
@@ -9,13 +10,16 @@ export const useRepositories = () => {
   const { toast } = useToast();
   const { logInfo } = useLogger();
   
-  const [repositories, setRepositories] = useState<Repository[]>(() => {
-    const savedRepos = localStorage.getItem(REPOSITORIES_STORAGE_KEY);
-    if (savedRepos) {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const savedRepos = await getItem<any>(REPOSITORIES_STORAGE_KEY);
+      if (!mounted || !savedRepos) return;
       try {
-        const parsed = JSON.parse(savedRepos);
-        // Convert date strings back to Date objects
-        return parsed.map((repo: any) => ({
+        const parsed = typeof savedRepos === 'string' ? JSON.parse(savedRepos) : savedRepos;
+        const repos = parsed.map((repo: any) => ({
           ...repo,
           autoMergeEnabled: repo.autoMergeEnabled ?? repo.enabled ?? true,
           watchEnabled: repo.watchEnabled ?? false,
@@ -32,33 +36,26 @@ export const useRepositories = () => {
             timestamp: new Date(activity.timestamp)
           }))
         }));
+        setRepositories(repos);
       } catch (error) {
         console.error('Error parsing saved repositories:', error);
-        return [];
       }
-    }
-    return [];
-  });
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  // Persist repositories to localStorage whenever they change
+  // Persist repositories to IndexedDB whenever they change
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        REPOSITORIES_STORAGE_KEY,
-        JSON.stringify(repositories)
-      );
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        console.error('Storage quota exceeded while saving repositories');
-        toast({
-          title: 'Storage limit reached',
-          description: 'Unable to save repository data to localStorage.',
-          variant: 'destructive'
-        });
-      } else {
-        console.error('Error saving repositories:', error);
-      }
-    }
+    setItem(REPOSITORIES_STORAGE_KEY, repositories).catch(error => {
+      console.error('Error saving repositories:', error);
+      toast({
+        title: 'Storage error',
+        description: 'Unable to save repository data to IndexedDB.',
+        variant: 'destructive'
+      });
+    });
   }, [repositories]);
 
   const toggleRepository = (id: string) => {
@@ -311,8 +308,8 @@ export const useRepositories = () => {
 
   const clearAllRepositories = () => {
     setRepositories([]);
-    localStorage.removeItem(REPOSITORIES_STORAGE_KEY);
-    toast({ 
+    removeItem(REPOSITORIES_STORAGE_KEY);
+    toast({
       title: 'All repositories cleared',
       description: 'Repository data has been reset'
     });

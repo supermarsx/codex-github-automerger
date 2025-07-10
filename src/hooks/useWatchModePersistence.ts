@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { getItem, setItem, removeItem } from '@/utils/storage';
 
 const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
 // Maximum number of items persisted per repository history list.
-// Older entries are trimmed before being saved to localStorage.
+// Older entries are trimmed before being saved to IndexedDB.
 const MAX_ITEMS = 50;
 
 export interface WatchModeState {
@@ -14,35 +15,37 @@ export interface WatchModeState {
 }
 
 export const useWatchModePersistence = () => {
-  const [watchModeState, setWatchModeState] = useState<WatchModeState>(() => {
-    const saved = localStorage.getItem(WATCH_MODE_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const cap = (obj: Record<string, unknown[]>) =>
-          Object.fromEntries(
-            Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
-          );
-        return {
-          lastUpdateTime: new Date(parsed.lastUpdateTime),
-          repoActivities: cap(parsed.repoActivities),
-          repoPullRequests: cap(parsed.repoPullRequests),
-          repoStrayBranches: cap(parsed.repoStrayBranches),
-          repoLastFetched: parsed.repoLastFetched || {}
-        };
-      } catch (error) {
-        console.error('Error parsing saved watch mode state:', error);
-      }
-    }
-
-    return {
-      lastUpdateTime: new Date(),
-      repoActivities: {},
-      repoPullRequests: {},
-      repoStrayBranches: {},
-      repoLastFetched: {}
-    };
+  const [watchModeState, setWatchModeState] = useState<WatchModeState>({
+    lastUpdateTime: new Date(),
+    repoActivities: {},
+    repoPullRequests: {},
+    repoStrayBranches: {},
+    repoLastFetched: {}
   });
+
+  useEffect(() => {
+    (async () => {
+      const saved = await getItem<any>(WATCH_MODE_STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
+          const cap = (obj: Record<string, unknown[]>) =>
+            Object.fromEntries(
+              Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
+            );
+          setWatchModeState({
+            lastUpdateTime: new Date(parsed.lastUpdateTime),
+            repoActivities: cap(parsed.repoActivities),
+            repoPullRequests: cap(parsed.repoPullRequests),
+            repoStrayBranches: cap(parsed.repoStrayBranches),
+            repoLastFetched: parsed.repoLastFetched || {}
+          });
+        } catch (error) {
+          console.error('Error parsing saved watch mode state:', error);
+        }
+      }
+    })();
+  }, []);
 
   const clearWatchModeState = () => {
     const initialState: WatchModeState = {
@@ -53,38 +56,15 @@ export const useWatchModePersistence = () => {
       repoLastFetched: {}
     };
     setWatchModeState(initialState);
-    localStorage.removeItem(WATCH_MODE_STORAGE_KEY);
+    removeItem(WATCH_MODE_STORAGE_KEY);
   };
 
-  // keep state in sync across components using storage events
-  useEffect(() => {
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === WATCH_MODE_STORAGE_KEY && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          const cap = (obj: Record<string, unknown[]>) =>
-            Object.fromEntries(
-              Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
-            );
-          setWatchModeState({
-            lastUpdateTime: new Date(parsed.lastUpdateTime),
-            repoActivities: cap(parsed.repoActivities),
-            repoPullRequests: cap(parsed.repoPullRequests),
-            repoStrayBranches: cap(parsed.repoStrayBranches),
-            repoLastFetched: parsed.repoLastFetched || {},
-          });
-        } catch (error) {
-          console.error('Error parsing watch mode state from storage event:', error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
+  // No storage events for IndexedDB; state is local to the tab
 
   useEffect(() => {
-    localStorage.setItem(WATCH_MODE_STORAGE_KEY, JSON.stringify(watchModeState));
+    setItem(WATCH_MODE_STORAGE_KEY, watchModeState).catch(err => {
+      console.error('Error saving watch mode state:', err);
+    });
   }, [watchModeState]);
 
   const updateRepoActivities = (repoId: string, activities: unknown[]) => {
@@ -148,7 +128,7 @@ export const useWatchModePersistence = () => {
   };
 
   const clearWatchModeState = () => {
-    localStorage.removeItem(WATCH_MODE_STORAGE_KEY);
+    removeItem(WATCH_MODE_STORAGE_KEY);
     setWatchModeState({
       lastUpdateTime: new Date(),
       repoActivities: {},
