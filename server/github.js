@@ -1,5 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
+const strayBranchCache = new Map();
+
 export function createGitHubService(token) {
   const octokit = new Octokit({ auth: token });
 
@@ -59,7 +61,19 @@ export function createGitHubService(token) {
     },
 
     async deleteBranch(owner, repo, branch) {
+      const key = `${owner}/${repo}`;
+      const cached = strayBranchCache.get(key) || [];
+      if (!cached.includes(branch)) {
+        throw new Error('branch not in stray list');
+      }
+      try {
+        await octokit.rest.repos.getBranchProtection({ owner, repo, branch });
+        throw new Error('branch protected');
+      } catch (err) {
+        if (err.status && err.status !== 404) throw err;
+      }
       await octokit.rest.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
+      strayBranchCache.set(key, cached.filter(b => b !== branch));
       return true;
     },
 
@@ -67,7 +81,11 @@ export function createGitHubService(token) {
       const { data: branches } = await octokit.rest.repos.listBranches({ owner, repo, per_page: 100 });
       const { data: pulls } = await octokit.rest.pulls.list({ owner, repo, state: 'open', per_page: 100 });
       const activeBranches = new Set(pulls.map(pr => pr.head.ref));
-      return branches.filter(b => !b.protected && !activeBranches.has(b.name)).map(b => b.name);
+      const stray = branches
+        .filter(b => !b.protected && !activeBranches.has(b.name))
+        .map(b => b.name);
+      strayBranchCache.set(`${owner}/${repo}`, stray);
+      return stray;
     },
 
     async fetchRecentActivity(repositories) {
