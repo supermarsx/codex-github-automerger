@@ -2,6 +2,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@reference border-border;
 
 /* Neobrutalism Design System with Dark Mode */
 @layer base {
