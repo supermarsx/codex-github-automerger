@@ -85,4 +85,6 @@ Webhook configurations are stored in `server/webhooks.json`. Set the
 
 When a pull request is opened, closed, merged or a security alert appears,
 socket clients subscribed via the `subscribeRepo` message receive a `repoUpdate`
-payload and any active webhooks are triggered.
+payload and any active webhooks are triggered. The subscribe call may include
+configuration such as protected branch patterns, allowed users or minimum alert
+severity. These settings influence polling and security filtering on the server.

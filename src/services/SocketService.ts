@@ -257,6 +257,20 @@ export class SocketService {
     return this.request('checkPRMergeable', { token, owner, repo, pullNumber });
   }
 
+  async subscribeRepo(
+    token: string,
+    owner: string,
+    repo: string,
+    interval?: number,
+    config: Record<string, any> = {}
+  ): Promise<any> {
+    return this.request('subscribeRepo', { token, owner, repo, interval, config });
+  }
+
+  async unsubscribeRepo(owner: string, repo: string): Promise<any> {
+    return this.request('unsubscribeRepo', { owner, repo });
+  }
+
   // Connection Management
   get isConnected(): boolean {
     return this.socket?.isConnected || false;

@@ -44,6 +44,14 @@ export class GitHubService {
   checkPullRequestMergeable(owner: string, repo: string, pullNumber: number): Promise<boolean> {
     return this.emit('checkPRMergeable', { owner, repo, pullNumber });
   }
+
+  subscribeRepo(owner: string, repo: string, interval?: number, config: Record<string, any> = {}): Promise<void> {
+    return this.emit('subscribeRepo', { owner, repo, interval, config });
+  }
+
+  unsubscribeRepo(owner: string, repo: string): Promise<void> {
+    return this.emit('unsubscribeRepo', { owner, repo });
+  }
 }
 
 export const createGitHubService = (apiKey: string) => new GitHubService(apiKey);

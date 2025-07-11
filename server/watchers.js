@@ -7,6 +7,12 @@ const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
 const watchers = new Map();
 const repoCache = new Map();
 
+function matchesPattern(value, pattern) {
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
+  return regex.test(value);
+}
+
 function cleanCache() {
   const now = Date.now();
   for (const [key, entry] of repoCache) {
@@ -14,7 +20,7 @@ function cleanCache() {
   }
 }
 
-export function subscribeRepo(socket, { token, owner, repo, interval }) {
+export function subscribeRepo(socket, { token, owner, repo, interval, config = {} }) {
   const key = `${owner}/${repo}`;
   let watcher = watchers.get(key);
   if (!watcher) {
@@ -26,10 +32,18 @@ export function subscribeRepo(socket, { token, owner, repo, interval }) {
       lastEvent: null,
       alerts: new Set(),
       interval: interval || DEFAULT_INTERVAL,
-      timer: null
+      timer: null,
+      config: { ...config }
     };
     watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
     watchers.set(key, watcher);
+  } else {
+    watcher.config = { ...watcher.config, ...config };
+    if (interval && interval !== watcher.interval) {
+      clearInterval(watcher.timer);
+      watcher.interval = interval;
+      watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
+    }
   }
   watcher.sockets.add(socket);
 }
@@ -63,7 +77,15 @@ async function pollRepo(watcher) {
       handleEvent(watcher, event);
     }
     const { data: alerts } = await svc.octokit.rest.dependabot.listAlertsForRepo({ owner, repo, state: 'open', per_page: 10 });
+    const { minAlertSeverity } = watcher.config || {};
+    const order = { low: 1, medium: 2, high: 3, critical: 4 };
     for (const alert of alerts) {
+      if (
+        minAlertSeverity &&
+        order[alert.security_vulnerability.severity || 'low'] < order[minAlertSeverity]
+      ) {
+        continue;
+      }
       if (!watcher.alerts.has(alert.number)) {
         watcher.alerts.add(alert.number);
         broadcast(watcher, 'security.alert', alert);
@@ -76,13 +98,29 @@ async function pollRepo(watcher) {
   }
 }
 
+function branchProtected(branch, patterns = []) {
+  return patterns.some(p => matchesPattern(branch, p));
+}
+
 function handleEvent(watcher, event) {
   const payload = event.payload;
   if (event.type === 'PullRequestEvent') {
-    if (payload.action === 'opened') broadcast(watcher, 'pull_request.opened', payload.pull_request);
+    const { protectedBranches = [], allowedUsers = [] } = watcher.config || {};
+    const pr = payload.pull_request;
+    if (pr && pr.base && pr.head) {
+      if (
+        branchProtected(pr.base.ref, protectedBranches) ||
+        branchProtected(pr.head.ref, protectedBranches)
+      ) {
+        return;
+      }
+    }
+    if (allowedUsers.length && pr && !allowedUsers.includes(pr.user.login)) return;
+
+    if (payload.action === 'opened') broadcast(watcher, 'pull_request.opened', pr);
     else if (payload.action === 'closed') {
-      if (payload.pull_request.merged) broadcast(watcher, 'pull_request.merged', payload.pull_request);
-      else broadcast(watcher, 'pull_request.closed', payload.pull_request);
+      if (pr.merged) broadcast(watcher, 'pull_request.merged', pr);
+      else broadcast(watcher, 'pull_request.closed', pr);
     }
   }
 }
