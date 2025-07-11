@@ -235,8 +235,14 @@ export class SocketService {
     return this.request('closePR', { token, owner, repo, pullNumber });
   }
 
-  async deleteBranch(token: string, owner: string, repo: string, branch: string): Promise<any> {
-    return this.request('deleteBranch', { token, owner, repo, branch });
+  async deleteBranch(
+    token: string,
+    owner: string,
+    repo: string,
+    branch: string,
+    protectedPatterns: string[] = []
+  ): Promise<any> {
+    return this.request('deleteBranch', { token, owner, repo, branch, protectedPatterns });
   }
 
   async fetchStrayBranches(token: string, owner: string, repo: string): Promise<any> {
