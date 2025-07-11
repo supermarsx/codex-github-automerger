@@ -3,6 +3,13 @@
 @tailwind components;
 @tailwind utilities;
 @reference border-border;
+@reference bg-background;
+@reference text-foreground;
+@reference bg-card;
+@reference border-foreground;
+@reference bg-primary;
+@reference bg-secondary;
+@reference bg-foreground;
 
 /* Neobrutalism Design System with Dark Mode */
 @layer base {
@@ -91,67 +98,90 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
   .neo-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground))];
+    background-color: hsl(var(--card));
+    @apply border-4;
+    border-color: hsl(var(--foreground));
+    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
   }
   
-  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
-  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
-  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-white border-foreground; }
-  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-white border-foreground; }
-  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black border-foreground; }
-  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-white border-foreground; }
-  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-white border-foreground; }
+  .neo-card.neo-yellow { background-color: hsl(var(--neo-yellow)); color: black; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-pink { background-color: hsl(var(--neo-pink)); color: black; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-blue { background-color: hsl(var(--neo-blue)); color: white; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-purple { background-color: hsl(var(--neo-purple)); color: white; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-orange { background-color: hsl(var(--neo-orange)); color: black; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-green { background-color: hsl(var(--neo-green)); color: white; border-color: hsl(var(--foreground)); }
+  .neo-card.neo-red { background-color: hsl(var(--neo-red)); color: white; border-color: hsl(var(--foreground)); }
   
-  .dark .neo-card.neo-yellow { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-pink { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-blue { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-purple { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-yellow { color: black; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-pink { color: black; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-blue { color: white; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-purple { color: white; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-orange { color: black; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-green { color: white; border-width: 2px; border-color: #4b5563; }
+  .dark .neo-card.neo-red { color: white; border-width: 2px; border-color: #4b5563; }
   
   .neo-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
-           hover:translate-x-[2px] hover:translate-y-[2px] 
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--primary));
+    @apply border-4;
+    border-color: hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition-property: all;
+    transition-duration: 150ms;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   
   .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
-           hover:translate-x-[2px] hover:translate-y-[2px]
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--secondary));
+    @apply border-4;
+    border-color: hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition-property: all;
+    transition-duration: 150ms;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .neo-button.neo-red {
-    @apply bg-[hsl(var(--neo-red))] text-white;
+    background-color: hsl(var(--neo-red));
+    color: white;
   }
   
   .neo-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           focus:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
-           focus:translate-x-[2px] focus:translate-y-[2px] 
-           transition-all duration-150 font-bold;
+    background-color: hsl(var(--background));
+    @apply border-4;
+    border-color: hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition-property: all;
+    transition-duration: 150ms;
+    font-weight: bold;
   }
 
   .neo-switch {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))] rounded-full;
+    background-color: hsl(var(--background));
+    @apply border-4;
+    border-color: hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    border-radius: 9999px;
   }
 
   .neo-switch-thumb {
-    @apply bg-foreground rounded-full;
+    background-color: hsl(var(--foreground));
+    border-radius: 9999px;
   }
   
 }
