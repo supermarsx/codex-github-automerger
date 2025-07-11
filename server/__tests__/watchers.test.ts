@@ -29,7 +29,8 @@ describe('watchers cache', () => {
       repo: 'r',
       sockets: new Set([{ emit }]),
       lastEvent: null,
-      alerts: new Set()
+      alerts: new Set(),
+      config: {}
     };
     __test.repoCache.clear();
   });
