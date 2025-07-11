@@ -75,3 +75,14 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 ## Activity Logs
 
 The dashboard keeps a running history of actions in the **Logs** tab. You can download this history using **Export Logs** or remove it entirely using the new **Clear Logs** button next to the export option.
+
+## Server configuration
+
+The Node.js server polls GitHub for repository updates. The polling interval can
+be tuned with the `POLL_INTERVAL_MS` environment variable (default: `60000` ms).
+Webhook configurations are stored in `server/webhooks.json`. Set the
+`WEBHOOK_STORAGE_PATH` variable to change this location.
+
+When a pull request is opened, closed, merged or a security alert appears,
+socket clients subscribed via the `subscribeRepo` message receive a `repoUpdate`
+payload and any active webhooks are triggered.
