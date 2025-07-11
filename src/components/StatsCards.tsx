@@ -64,7 +64,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className={`neo-card ${stat.color} p-2 shadow-[4px_4px_0_theme('colors.foreground')]`}
+          className={`neo-card ${stat.color} p-2 shadow-[4px_4px_0_hsl(var(--foreground))]`}
         >
           <CardHeader className="pb-1">
             <CardTitle className="text-black dark:text-white font-black text-lg text-center">
