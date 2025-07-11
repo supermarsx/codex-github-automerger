@@ -103,13 +103,9 @@ export const useApiKeys = () => {
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
-      const response = await fetch('https://api.github.com/user', {
-        headers: {
-          'Authorization': `token ${key}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      return response.ok;
+      const svc = createGitHubService(key);
+      await svc.fetchRepositories('');
+      return true;
     } catch (error) {
       console.error('API key validation failed:', error);
       return false;
