@@ -2,45 +2,42 @@ import { Repository, ActivityItem } from '@/types/dashboard';
 import { socketService } from '@/services/SocketService';
 
 export class GitHubService {
-  private token: string;
+  constructor(private token: string) {}
 
-  constructor(apiKey: string) {
-    this.token = apiKey;
+  private emit<T>(event: string, payload: Record<string, any>): Promise<T> {
+    return socketService.request<T>(event, { ...payload, token: this.token });
   }
 
-  async fetchRepositories(owner: string): Promise<Repository[]> {
-    return socketService.fetchRepositories(this.token, owner);
+  fetchRepositories(owner: string): Promise<Repository[]> {
+    return this.emit('fetchRepos', { owner });
   }
 
-  async fetchPullRequests(owner: string, repo: string): Promise<any[]> {
-    return socketService.fetchPullRequests(this.token, owner, repo);
+  fetchPullRequests(owner: string, repo: string): Promise<any[]> {
+    return this.emit('fetchPullRequests', { owner, repo });
   }
 
-  async mergePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    await socketService.mergePR(this.token, owner, repo, pullNumber);
-    return true;
+  mergePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
+    return this.emit('mergePR', { owner, repo, pullNumber });
   }
 
-  async closePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    await socketService.closePR(this.token, owner, repo, pullNumber);
-    return true;
+  closePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
+    return this.emit('closePR', { owner, repo, pullNumber });
   }
 
-  async deleteBranch(owner: string, repo: string, branch: string): Promise<boolean> {
-    await socketService.deleteBranch(this.token, owner, repo, branch);
-    return true;
+  deleteBranch(owner: string, repo: string, branch: string): Promise<boolean> {
+    return this.emit('deleteBranch', { owner, repo, branch });
   }
 
-  async fetchStrayBranches(owner: string, repo: string): Promise<string[]> {
-    return socketService.fetchStrayBranches(this.token, owner, repo);
+  fetchStrayBranches(owner: string, repo: string): Promise<string[]> {
+    return this.emit('fetchStrayBranches', { owner, repo });
   }
 
-  async fetchRecentActivity(repos: Repository[]): Promise<ActivityItem[]> {
-    return socketService.fetchRecentActivity(this.token, repos);
+  fetchRecentActivity(repos: Repository[]): Promise<ActivityItem[]> {
+    return this.emit('fetchRecentActivity', { repositories: repos });
   }
 
-  async checkPullRequestMergeable(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    return socketService.checkPRMergeable(this.token, owner, repo, pullNumber);
+  checkPullRequestMergeable(owner: string, repo: string, pullNumber: number): Promise<boolean> {
+    return this.emit('checkPRMergeable', { owner, repo, pullNumber });
   }
 }
 

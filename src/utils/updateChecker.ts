@@ -6,17 +6,7 @@ export interface UpdateResult {
 const UPDATE_API = 'https://api.github.com/repos/openai/codex-automerger-userscript/releases/latest';
 
 export async function checkUserscriptUpdates(): Promise<UpdateResult> {
-  try {
-    const res = await fetch(UPDATE_API, { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) {
-      throw new Error('Network error');
-    }
-    const data = await res.json();
-    const latest = data.tag_name || data.name;
-    const current = (window as any).__USERSCRIPT_VERSION__;
-    return { hasUpdate: current ? latest !== current : false, latestVersion: latest };
-  } catch (err) {
-    console.error('Failed to check userscript updates', err);
-    return { hasUpdate: false };
-  }
+  // In the client-only environment we skip update checks to avoid direct
+  // requests to the GitHub API
+  return { hasUpdate: false };
 }

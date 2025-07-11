@@ -2,11 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../services/SocketService', () => ({
   socketService: {
-    fetchPullRequests: vi.fn(),
-    fetchRepositories: vi.fn(),
-    fetchRecentActivity: vi.fn(),
-    fetchStrayBranches: vi.fn(),
-    checkPRMergeable: vi.fn()
+    request: vi.fn()
   }
 }));
 
@@ -21,17 +17,24 @@ beforeEach(() => {
 });
 
 describe('GitHubService', () => {
-  it('delegates fetchPullRequests', async () => {
-    (socketService.fetchPullRequests as any).mockResolvedValue(['pr']);
+  it('emits fetchPullRequests event', async () => {
+    (socketService.request as any).mockResolvedValue(['pr']);
     const res = await service.fetchPullRequests('o', 'r');
-    expect(socketService.fetchPullRequests).toHaveBeenCalledWith('token', 'o', 'r');
+    expect(socketService.request).toHaveBeenCalledWith('fetchPullRequests', {
+      token: 'token',
+      owner: 'o',
+      repo: 'r'
+    });
     expect(res).toEqual(['pr']);
   });
 
-  it('delegates fetchRepositories', async () => {
-    (socketService.fetchRepositories as any).mockResolvedValue(['repo']);
+  it('emits fetchRepos event', async () => {
+    (socketService.request as any).mockResolvedValue(['repo']);
     const res = await service.fetchRepositories('o');
-    expect(socketService.fetchRepositories).toHaveBeenCalledWith('token', 'o');
+    expect(socketService.request).toHaveBeenCalledWith('fetchRepos', {
+      token: 'token',
+      owner: 'o'
+    });
     expect(res).toEqual(['repo']);
   });
 });

@@ -122,13 +122,15 @@ export class SocketService {
     return true;
   }
 
-  private async request<T>(event: string, payload: any): Promise<T> {
+  async request<T>(event: string, payload: any): Promise<T> {
     if (!this.socket?.isConnected) {
       this.logger.logError('socket', `Cannot send ${event} - socket not connected`);
       throw new Error('socket disconnected');
     }
     this.socket.sendMessage(event, { ...payload, clientId: this.clientId });
-    return Promise.resolve(undefined as unknown as T);
+    // In this demo environment we don't have a real server, so just simulate
+    // an asynchronous response
+    return new Promise(resolve => setTimeout(() => resolve(undefined as unknown as T), 10));
   }
 
   // Server Actions

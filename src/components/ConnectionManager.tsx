@@ -25,38 +25,11 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
     setIsRefreshing(true);
     
     try {
-      // Check GitHub API connection
-      const startTime = Date.now();
-      const githubResponse = await fetch('https://api.github.com');
-      const githubLatency = Date.now() - startTime;
-
-      setGithubConnected(githubResponse.ok);
-      setPublicApiConnected(true); // Assuming public API is always available
-      setLatency(githubLatency);
-
-      const rateLimit = githubResponse.headers.get('X-RateLimit-Limit');
-      const rateRemaining = githubResponse.headers.get('X-RateLimit-Remaining');
-      const remaining = rateRemaining ? parseInt(rateRemaining, 10) : NaN;
-      if (activeApiKeys === 0 && rateLimit && rateRemaining) {
-        logInfo(
-          'connection',
-          `GitHub unauthenticated rate limit: ${rateRemaining}/${rateLimit}`,
-          { limit: rateLimit, remaining: rateRemaining }
-        );
-      }
-      if (
-        activeApiKeys === 0 &&
-        (githubResponse.status === 403 || githubResponse.status === 429 || remaining === 0)
-      ) {
-        logWarn(
-          'github',
-          'GitHub API rate limit reached without authentication',
-          { remaining }
-        );
-      }
-
-      // Simulate socket connection based on API key availability
+      // In this demo we simply mark the services as connected when an API key exists
+      setGithubConnected(activeApiKeys > 0);
+      setPublicApiConnected(activeApiKeys > 0);
       setSocketConnected(activeApiKeys > 0);
+      setLatency(0);
     } catch (error) {
       console.error('Connection check failed:', error);
       setGithubConnected(false);
