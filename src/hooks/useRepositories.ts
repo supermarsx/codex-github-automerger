@@ -122,7 +122,7 @@ export const useRepositories = () => {
 
     addRepositoryActivity(id, {
       type: 'alert',
-      message: `${newStatus ? 'enabled' : 'disabled'} auto merge clean`,
+      message: `${newStatus ? 'enabled' : 'disabled'} auto merge on clean`,
       repo: `${repo.owner}/${repo.name}`,
       timestamp: new Date()
     });
@@ -152,7 +152,7 @@ export const useRepositories = () => {
 
     addRepositoryActivity(id, {
       type: 'alert',
-      message: `${newStatus ? 'enabled' : 'disabled'} auto merge unstable`,
+      message: `${newStatus ? 'enabled' : 'disabled'} auto merge on unstable`,
       repo: `${repo.owner}/${repo.name}`,
       timestamp: new Date()
     });
@@ -190,7 +190,7 @@ export const useRepositories = () => {
 
     addRepositoryActivity(id, {
       type: 'alert',
-      message: `${newStatus ? 'enabled' : 'disabled'} auto delete dirty`,
+      message: `${newStatus ? 'enabled' : 'disabled'} auto delete on dirty`,
       repo: `${repo.owner}/${repo.name}`,
       timestamp: new Date()
     });

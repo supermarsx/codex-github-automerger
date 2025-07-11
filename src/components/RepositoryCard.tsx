@@ -107,7 +107,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   {repo.enabled ? 'Active' : 'Inactive'}
                 </Badge>
                 <Badge variant="secondary" className={`neo-card ${repo.autoMergeOnClean ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
-                  {repo.autoMergeOnClean ? 'Auto Merge on Clean' : 'Auto Merge Clean Off'}
+                  {repo.autoMergeOnClean ? 'Auto Merge on Clean' : 'Auto Merge on Clean Off'}
                 </Badge>
                 <Badge variant="secondary" className="neo-card neo-blue text-black font-bold text-xs">
                   {successRate}% Success
