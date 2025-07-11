@@ -122,6 +122,15 @@ export class SocketService {
     return true;
   }
 
+  private async request<T>(event: string, payload: any): Promise<T> {
+    if (!this.socket?.isConnected) {
+      this.logger.logError('socket', `Cannot send ${event} - socket not connected`);
+      throw new Error('socket disconnected');
+    }
+    this.socket.sendMessage(event, { ...payload, clientId: this.clientId });
+    return Promise.resolve(undefined as unknown as T);
+  }
+
   // Server Actions
   async executeServerAction(action: ServerAction): Promise<boolean> {
     if (!this.socket?.isConnected) {
@@ -205,6 +214,39 @@ export class SocketService {
       apiKeyId,
       repositoryId
     });
+  }
+
+  // GitHub Requests
+  async fetchRepositories(token: string, owner: string): Promise<any> {
+    return this.request('fetchRepos', { token, owner });
+  }
+
+  async fetchPullRequests(token: string, owner: string, repo: string): Promise<any> {
+    return this.request('fetchPullRequests', { token, owner, repo });
+  }
+
+  async mergePR(token: string, owner: string, repo: string, pullNumber: number): Promise<any> {
+    return this.request('mergePR', { token, owner, repo, pullNumber });
+  }
+
+  async closePR(token: string, owner: string, repo: string, pullNumber: number): Promise<any> {
+    return this.request('closePR', { token, owner, repo, pullNumber });
+  }
+
+  async deleteBranch(token: string, owner: string, repo: string, branch: string): Promise<any> {
+    return this.request('deleteBranch', { token, owner, repo, branch });
+  }
+
+  async fetchStrayBranches(token: string, owner: string, repo: string): Promise<any> {
+    return this.request('fetchStrayBranches', { token, owner, repo });
+  }
+
+  async fetchRecentActivity(token: string, repositories: any[]): Promise<any> {
+    return this.request('fetchRecentActivity', { token, repositories });
+  }
+
+  async checkPRMergeable(token: string, owner: string, repo: string, pullNumber: number): Promise<any> {
+    return this.request('checkPRMergeable', { token, owner, repo, pullNumber });
   }
 
   // Connection Management

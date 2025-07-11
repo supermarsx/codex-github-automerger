@@ -1,199 +1,46 @@
-import { Octokit } from '@octokit/rest';
-import { Repository, ApiKey, ActivityItem } from '@/types/dashboard';
+import { Repository, ActivityItem } from '@/types/dashboard';
+import { socketService } from '@/services/SocketService';
 
 export class GitHubService {
-  private octokit: Octokit;
+  private token: string;
 
   constructor(apiKey: string) {
-    this.octokit = new Octokit({
-      auth: apiKey,
-    });
+    this.token = apiKey;
   }
 
   async fetchRepositories(owner: string): Promise<Repository[]> {
-    try {
-      let data;
-      if (owner) {
-        const res = await this.octokit.rest.repos.listForUser({ username: owner, per_page: 100 });
-        data = res.data;
-      } else {
-        const res = await this.octokit.rest.repos.listForAuthenticatedUser({ type: 'all', per_page: 100 });
-        data = res.data;
-      }
-
-      return data.map(repo => ({
-        id: repo.id.toString(),
-        name: repo.name,
-        owner: repo.owner.login,
-        enabled: false,
-        allowedBranches: ['codex-*'],
-        allowedUsers: ['github-actions[bot]'],
-        alertsEnabled: true,
-        lastActivity: new Date(repo.updated_at),
-        stats: {
-          totalMerges: 0,
-          successfulMerges: 0,
-          failedMerges: 0,
-          pendingMerges: 0
-        },
-        activities: []
-      }));
-    } catch (error) {
-      console.error('Error fetching repositories:', error);
-      throw error;
-    }
+    return socketService.fetchRepositories(this.token, owner);
   }
 
   async fetchPullRequests(owner: string, repo: string): Promise<any[]> {
-    try {
-      const { data: pulls } = await this.octokit.rest.pulls.list({
-        owner,
-        repo,
-        state: 'open',
-        per_page: 10,
-      });
-
-      const detailed = await Promise.all(
-        pulls.map(async pr => {
-          try {
-            const { data: details } = await this.octokit.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: pr.number,
-            });
-
-            return {
-              ...pr,
-              mergeable: details.mergeable,
-              mergeable_state: details.mergeable_state,
-            };
-          } catch {
-            return pr;
-          }
-        })
-      );
-
-      return detailed;
-    } catch (error) {
-      console.error('Error fetching pull requests:', error);
-      throw error;
-    }
+    return socketService.fetchPullRequests(this.token, owner, repo);
   }
 
   async mergePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    try {
-      await this.octokit.rest.pulls.merge({
-        owner,
-        repo,
-        pull_number: pullNumber,
-        merge_method: 'merge',
-      });
-      return true;
-    } catch (error) {
-      console.error('Error merging pull request:', error);
-      return false;
-    }
+    await socketService.mergePR(this.token, owner, repo, pullNumber);
+    return true;
   }
 
   async closePullRequest(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    try {
-      await this.octokit.rest.pulls.update({
-        owner,
-        repo,
-        pull_number: pullNumber,
-        state: 'closed'
-      });
-      return true;
-    } catch (error) {
-      console.error('Error closing pull request:', error);
-      return false;
-    }
+    await socketService.closePR(this.token, owner, repo, pullNumber);
+    return true;
   }
 
   async deleteBranch(owner: string, repo: string, branch: string): Promise<boolean> {
-    try {
-      await this.octokit.rest.git.deleteRef({
-        owner,
-        repo,
-        ref: `heads/${branch}`,
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deleting branch:', error);
-      return false;
-    }
+    await socketService.deleteBranch(this.token, owner, repo, branch);
+    return true;
   }
 
   async fetchStrayBranches(owner: string, repo: string): Promise<string[]> {
-    try {
-      const { data: branches } = await this.octokit.rest.repos.listBranches({
-        owner,
-        repo,
-        per_page: 100,
-      });
-
-      const { data: pulls } = await this.octokit.rest.pulls.list({
-        owner,
-        repo,
-        state: 'open',
-        per_page: 100,
-      });
-
-      const activeBranches = new Set(pulls.map(pr => pr.head.ref));
-      return branches
-        .filter(b => !b.protected && !activeBranches.has(b.name))
-        .map(b => b.name);
-    } catch (error) {
-      console.error('Error fetching branches:', error);
-      return [];
-    }
+    return socketService.fetchStrayBranches(this.token, owner, repo);
   }
 
-  async fetchRecentActivity(repositories: Repository[]): Promise<ActivityItem[]> {
-    const activities: ActivityItem[] = [];
-
-    for (const repo of repositories) {
-      try {
-        const { data: events } = await this.octokit.rest.activity.listRepoEvents({
-          owner: repo.owner,
-          repo: repo.name,
-          per_page: 10,
-        });
-
-        events.forEach(event => {
-          if (event.type === 'PullRequestEvent') {
-            const payload = event.payload as any;
-            activities.push({
-              id: event.id || Date.now().toString(),
-              type: payload.action === 'closed' && payload.pull_request?.merged ? 'merge' : 'pull',
-              message: `PR #${payload.pull_request?.number} ${payload.action}`,
-              repo: `${repo.owner}/${repo.name}`,
-              timestamp: new Date(event.created_at),
-              details: payload
-            });
-          }
-        });
-      } catch (error) {
-        console.error(`Error fetching activity for ${repo.name}:`, error);
-      }
-    }
-
-    return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  async fetchRecentActivity(repos: Repository[]): Promise<ActivityItem[]> {
+    return socketService.fetchRecentActivity(this.token, repos);
   }
 
   async checkPullRequestMergeable(owner: string, repo: string, pullNumber: number): Promise<boolean> {
-    try {
-      const { data } = await this.octokit.rest.pulls.get({
-        owner,
-        repo,
-        pull_number: pullNumber,
-      });
-
-      return data.mergeable === true && data.mergeable_state === 'clean';
-    } catch (error) {
-      console.error('Error checking pull request mergeability:', error);
-      return false;
-    }
+    return socketService.checkPRMergeable(this.token, owner, repo, pullNumber);
   }
 }
 
