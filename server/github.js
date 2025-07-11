@@ -4,6 +4,7 @@ export function createGitHubService(token) {
   const octokit = new Octokit({ auth: token });
 
   return {
+    octokit,
     async fetchRepositories(owner) {
       let data;
       if (owner) {

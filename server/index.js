@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import { createGitHubService } from './github.js';
+import { subscribeRepo, unsubscribeRepo } from './watchers.js';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -12,6 +13,7 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', socket => {
+  socket.subscriptions = new Set();
   socket.on('fetchRepos', async (params, cb = () => {}) => {
     try {
       const svc = createGitHubService(params.token);
@@ -82,6 +84,16 @@ io.on('connection', socket => {
     }
   });
 
+  socket.on('subscribeRepo', params => {
+    subscribeRepo(socket, params);
+    socket.subscriptions.add(`${params.owner}/${params.repo}`);
+  });
+
+  socket.on('unsubscribeRepo', params => {
+    unsubscribeRepo(socket, params);
+    socket.subscriptions.delete(`${params.owner}/${params.repo}`);
+  });
+
   socket.on('checkPRMergeable', async (params, cb = () => {}) => {
     try {
       const svc = createGitHubService(params.token);
@@ -89,6 +101,13 @@ io.on('connection', socket => {
       cb({ ok: true, data: ok });
     } catch (err) {
       cb({ ok: false, error: err.message });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    for (const key of socket.subscriptions) {
+      const [owner, repo] = key.split('/');
+      unsubscribeRepo(socket, { owner, repo });
     }
   });
 });
