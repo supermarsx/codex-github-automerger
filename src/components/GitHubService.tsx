@@ -24,8 +24,13 @@ export class GitHubService {
     return this.emit('closePR', { owner, repo, pullNumber });
   }
 
-  deleteBranch(owner: string, repo: string, branch: string): Promise<boolean> {
-    return this.emit('deleteBranch', { owner, repo, branch });
+  deleteBranch(
+    owner: string,
+    repo: string,
+    branch: string,
+    protectedPatterns: string[] = []
+  ): Promise<boolean> {
+    return this.emit('deleteBranch', { owner, repo, branch, protectedPatterns });
   }
 
   fetchStrayBranches(owner: string, repo: string): Promise<string[]> {

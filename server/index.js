@@ -25,6 +25,12 @@ function requirePaired(socket, cb) {
   return true;
 }
 
+function matchesPattern(value, pattern) {
+  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
+  return regex.test(value);
+}
+
 io.on('connection', socket => {
   socket.subscriptions = new Set();
   socket.isPaired = false;
@@ -90,8 +96,13 @@ io.on('connection', socket => {
   socket.on('deleteBranch', async (params, cb = () => {}) => {
     if (!requirePaired(socket, cb)) return;
     try {
-      const svc = createGitHubService(params.token);
-      await svc.deleteBranch(params.owner, params.repo, params.branch);
+      const { token, owner, repo, branch, protectedPatterns = [] } = params;
+      if (protectedPatterns.some(p => matchesPattern(branch, p))) {
+        cb({ ok: false, error: 'branch protected' });
+        return;
+      }
+      const svc = createGitHubService(token);
+      await svc.deleteBranch(owner, repo, branch);
       cb({ ok: true });
     } catch (err) {
       cb({ ok: false, error: err.message });

@@ -283,7 +283,16 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     const token = getDecryptedApiKey(apiKey.id);
     if (!token) return;
     const service = createGitHubService(token);
-    const success = await service.deleteBranch(repo.owner, repo.name, branch);
+    const patterns = [
+      ...(globalConfig.protectedBranches || []),
+      ...(repo.protectedBranches || [])
+    ];
+    const success = await service.deleteBranch(
+      repo.owner,
+      repo.name,
+      branch,
+      patterns
+    );
     if (success) {
       toast({ title: `Deleted branch ${branch}` });
       const activity: ActivityItem = {
