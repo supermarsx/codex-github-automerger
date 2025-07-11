@@ -105,7 +105,13 @@ io.on('connection', socket => {
       await svc.deleteBranch(owner, repo, branch);
       cb({ ok: true });
     } catch (err) {
-      cb({ ok: false, error: err.message });
+      if (err.message === 'branch protected') {
+        cb({ ok: false, error: 'branch protected' });
+      } else if (err.message === 'branch not in stray list') {
+        cb({ ok: false, error: 'branch not in stray list' });
+      } else {
+        cb({ ok: false, error: err.message });
+      }
     }
   });
 
