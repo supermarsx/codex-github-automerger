@@ -152,7 +152,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                       </CardTitle>
                       <CardDescription className="font-bold">
                         {repo.enabled ? 'Active' : 'Inactive'} |
-                        {repo.autoMergeOnClean ? ' Auto Merge on Clean' : ' Auto Merge Clean Off'}
+                        {repo.autoMergeOnClean ? ' Auto Merge on Clean' : ' Auto Merge on Clean Off'}
                       </CardDescription>
                     </div>
                   </div>
