@@ -1,6 +1,7 @@
 import { useRepositories } from './useRepositories';
 import { useApiKeys } from './useApiKeys';
 import { useGlobalConfig } from './useGlobalConfig';
+import { GlobalConfig } from '@/types/dashboard';
 import { useActivities } from './useActivities';
 import { useLogger } from './useLogger';
 import { useWatchModePersistence } from './useWatchModePersistence';
@@ -56,11 +57,55 @@ export const useDashboardData = () => {
 
   const {
     globalConfig,
-    setGlobalConfig,
+    setGlobalConfig: baseSetGlobalConfig,
     resetConfig,
     exportConfig,
     importConfig
   } = useGlobalConfig();
+
+  const setGlobalConfig = (updates: Partial<GlobalConfig>) => {
+    const prev = globalConfig;
+    baseSetGlobalConfig(updates);
+    if (
+      updates.autoMergeOnClean !== undefined &&
+      updates.autoMergeOnClean !== prev.autoMergeOnClean
+    ) {
+      repositories.forEach(repo =>
+        addRepositoryActivity(repo.id, {
+          type: 'alert',
+          message: `${updates.autoMergeOnClean ? 'enabled' : 'disabled'} auto merge on clean (global)`,
+          repo: `${repo.owner}/${repo.name}`,
+          timestamp: new Date()
+        })
+      );
+    }
+    if (
+      updates.autoMergeOnUnstable !== undefined &&
+      updates.autoMergeOnUnstable !== prev.autoMergeOnUnstable
+    ) {
+      repositories.forEach(repo =>
+        addRepositoryActivity(repo.id, {
+          type: 'alert',
+          message: `${updates.autoMergeOnUnstable ? 'enabled' : 'disabled'} auto merge on unstable (global)`,
+          repo: `${repo.owner}/${repo.name}`,
+          timestamp: new Date()
+        })
+      );
+    }
+    if (
+      updates.autoDeleteOnDirty !== undefined &&
+      updates.autoDeleteOnDirty !== prev.autoDeleteOnDirty
+    ) {
+      repositories.forEach(repo =>
+        addRepositoryActivity(repo.id, {
+          type: 'alert',
+          message: `${updates.autoDeleteOnDirty ? 'enabled' : 'disabled'} auto del on dirty (global)`,
+          repo: `${repo.owner}/${repo.name}`,
+          timestamp: new Date()
+        })
+      );
+    }
+  };
 
   const {
     activities,

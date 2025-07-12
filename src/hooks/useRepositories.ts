@@ -190,7 +190,7 @@ export const useRepositories = () => {
 
     addRepositoryActivity(id, {
       type: 'alert',
-      message: `${newStatus ? 'enabled' : 'disabled'} auto delete on dirty`,
+      message: `${newStatus ? 'enabled' : 'disabled'} auto del on dirty`,
       repo: `${repo.owner}/${repo.name}`,
       timestamp: new Date()
     });
