@@ -47,7 +47,17 @@ export const useGlobalConfig = () => {
       if (savedConfig) {
         try {
           const parsed = typeof savedConfig === 'string' ? JSON.parse(savedConfig) : savedConfig;
-          setGlobalConfig(prev => ({ ...prev, ...parsed }));
+          const migrated: any = { ...parsed };
+          if (migrated.autoMergeOnClean === undefined && typeof migrated.autoMergeEnabled === 'boolean') {
+            migrated.autoMergeOnClean = migrated.autoMergeEnabled;
+          }
+          if (migrated.autoDeleteOnDirty === undefined && typeof migrated.autoDeleteBranch === 'boolean') {
+            migrated.autoDeleteOnDirty = migrated.autoDeleteBranch;
+          }
+          if (migrated.autoMergeOnUnstable === undefined) {
+            migrated.autoMergeOnUnstable = false;
+          }
+          setGlobalConfig(prev => ({ ...prev, ...migrated }));
         } catch (error) {
           console.error('Error parsing saved config:', error);
         }
