@@ -33,7 +33,10 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
       alerts: new Set(),
       interval: interval || DEFAULT_INTERVAL,
       timer: null,
-      config: { ...config }
+      config: { ...config },
+      pullRequests: [],
+      strayBranches: [],
+      activityEvents: []
     };
     watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
     watchers.set(key, watcher);
@@ -46,6 +49,15 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
     }
   }
   watcher.sockets.add(socket);
+  const cache = repoCache.get(key) || { events: [], alerts: [] };
+  socket.emit('repoCache', {
+    repo: key,
+    pullRequests: watcher.pullRequests,
+    strayBranches: watcher.strayBranches,
+    activityEvents: watcher.activityEvents,
+    events: cache.events,
+    alerts: cache.alerts
+  });
 }
 
 export function unsubscribeRepo(socket, { owner, repo }) {
@@ -91,6 +103,17 @@ async function pollRepo(watcher) {
         broadcast(watcher, 'security.alert', alert);
       }
     }
+
+    // store additional repo state for caching
+    try {
+      watcher.pullRequests = await svc.fetchPullRequests(owner, repo);
+    } catch {}
+    try {
+      watcher.strayBranches = await svc.fetchStrayBranches(owner, repo);
+    } catch {}
+    try {
+      watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
+    } catch {}
     cacheEntry.timestamp = Date.now();
   } catch (err) {
     console.error('Polling error for', repoKey, err.message);
@@ -151,6 +174,10 @@ function serveCache(watcher, entry) {
   for (const alert of entry.alerts) {
     watcher.sockets.forEach(s => s.emit('repoUpdate', { event: 'security.alert', repo, data: alert }));
   }
+}
+
+export function getWatcher(owner, repo) {
+  return watchers.get(`${owner}/${repo}`);
 }
 
 export const __test = { repoCache, pollRepo };

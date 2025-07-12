@@ -3,7 +3,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import crypto from 'crypto';
 import { createGitHubService } from './github.js';
-import { subscribeRepo, unsubscribeRepo } from './watchers.js';
+import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
 
 const app = express();
 app.use(express.json());
@@ -116,7 +116,12 @@ io.on('connection', socket => {
       const pulls = await svc.fetchPullRequests(params.owner, params.repo);
       cb({ ok: true, data: pulls });
     } catch (err) {
-      cb({ ok: false, error: err.message });
+      const watcher = getWatcher(params.owner, params.repo);
+      if (watcher && watcher.pullRequests.length) {
+        cb({ ok: true, data: watcher.pullRequests });
+      } else {
+        cb({ ok: false, error: err.message });
+      }
     }
   });
 
@@ -182,7 +187,12 @@ io.on('connection', socket => {
       const branches = await svc.fetchStrayBranches(params.owner, params.repo);
       cb({ ok: true, data: branches });
     } catch (err) {
-      cb({ ok: false, error: err.message });
+      const watcher = getWatcher(params.owner, params.repo);
+      if (watcher && watcher.strayBranches.length) {
+        cb({ ok: true, data: watcher.strayBranches });
+      } else {
+        cb({ ok: false, error: err.message });
+      }
     }
   });
 
@@ -193,7 +203,17 @@ io.on('connection', socket => {
       const data = await svc.fetchRecentActivity(params.repositories);
       cb({ ok: true, data });
     } catch (err) {
-      cb({ ok: false, error: err.message });
+      const collected = [];
+      for (const r of params.repositories || []) {
+        const w = getWatcher(r.owner, r.name);
+        if (w && w.activityEvents.length) collected.push(...w.activityEvents);
+      }
+      if (collected.length) {
+        collected.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        cb({ ok: true, data: collected });
+      } else {
+        cb({ ok: false, error: err.message });
+      }
     }
   });
 
