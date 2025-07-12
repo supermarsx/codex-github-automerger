@@ -144,20 +144,31 @@ io.on('connection', socket => {
 
   socket.on('deleteBranch', async (params, cb = () => {}) => {
     if (!requirePaired(socket, cb)) return;
+    const {
+      token,
+      owner,
+      repo,
+      branch,
+      protectedPatterns = [],
+      allowedPatterns = []
+    } = params;
+    if (protectedPatterns.some(p => matchesPattern(branch, p))) {
+      console.log('Deletion blocked for', branch, '- matches protected pattern');
+      cb({ ok: false, error: 'branch protected' });
+      return;
+    }
     try {
-      const { token, owner, repo, branch, protectedPatterns = [] } = params;
-      if (protectedPatterns.some(p => matchesPattern(branch, p))) {
-        cb({ ok: false, error: 'branch protected' });
-        return;
-      }
       const svc = createGitHubService(token);
-      await svc.deleteBranch(owner, repo, branch);
+      await svc.deleteBranch(owner, repo, branch, allowedPatterns);
       cb({ ok: true });
     } catch (err) {
+      console.log('Deletion blocked for', branch, '-', err.message);
       if (err.message === 'branch protected') {
         cb({ ok: false, error: 'branch protected' });
       } else if (err.message === 'branch not in stray list') {
         cb({ ok: false, error: 'branch not in stray list' });
+      } else if (err.message === 'branch not allowed') {
+        cb({ ok: false, error: 'branch not allowed' });
       } else {
         cb({ ok: false, error: err.message });
       }

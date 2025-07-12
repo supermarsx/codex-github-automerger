@@ -60,18 +60,40 @@ export function createGitHubService(token) {
       return true;
     },
 
-    async deleteBranch(owner, repo, branch) {
+    async isBranchProtected(owner, repo, branch) {
+      try {
+        const { data } = await octokit.rest.repos.getBranch({ owner, repo, branch });
+        return !!data.protected;
+      } catch (err) {
+        if (err.status === 404) return false;
+        throw err;
+      }
+    },
+
+    async deleteBranch(owner, repo, branch, allowedPatterns = []) {
+      const matchesPattern = (value, pattern) => {
+        const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
+        return regex.test(value);
+      };
+
       const key = `${owner}/${repo}`;
       const cached = strayBranchCache.get(key) || [];
       if (!cached.includes(branch)) {
         throw new Error('branch not in stray list');
       }
-      try {
-        await octokit.rest.repos.getBranchProtection({ owner, repo, branch });
-        throw new Error('branch protected');
-      } catch (err) {
-        if (err.status && err.status !== 404) throw err;
+      if (
+        allowedPatterns.length &&
+        !allowedPatterns.some(p => matchesPattern(branch, p))
+      ) {
+        throw new Error('branch not allowed');
       }
+
+      const { data } = await octokit.rest.repos.getBranch({ owner, repo, branch });
+      if (data.protected) {
+        throw new Error('branch protected');
+      }
+
       await octokit.rest.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
       strayBranchCache.set(key, cached.filter(b => b !== branch));
       return true;
