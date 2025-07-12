@@ -62,10 +62,15 @@ export const useGlobalConfig = () => {
     });
   }, [globalConfig]);
 
-  // Update theme in IndexedDB when darkMode changes
+  // Update theme preference whenever darkMode changes
   useEffect(() => {
     const theme = globalConfig.darkMode ? 'dark' : 'light';
     setItem('theme', theme);
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (err) {
+      console.error('Error saving theme to localStorage:', err);
+    }
     document.documentElement.setAttribute('data-theme', theme);
     // Apply theme to document
     if (globalConfig.darkMode) {

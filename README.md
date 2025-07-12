@@ -88,3 +88,17 @@ socket clients subscribed via the `subscribeRepo` message receive a `repoUpdate`
 payload and any active webhooks are triggered. The subscribe call may include
 configuration such as protected branch patterns, allowed users or minimum alert
 severity. These settings influence polling and security filtering on the server.
+
+## Theme customization
+
+The dashboard supports a light and dark theme controlled by the **Dark Mode** toggle
+in the Global Configuration panel. The current preference is stored in local
+storage so the correct theme loads instantly on subsequent visits. To customize
+the theme:
+
+1. Open the **Global Configuration** page from the sidebar.
+2. Enable or disable **Dark Mode** to switch themes.
+3. Adjust the **Accent Color** to change primary UI highlights.
+
+Changes are persisted automatically and are applied as soon as you toggle the
+options.
