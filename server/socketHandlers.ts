@@ -1,25 +1,17 @@
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
+// @ts-nocheck
+import type { Server, Socket } from 'socket.io';
+import type express from 'express';
 import crypto from 'crypto';
 import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
+import { logger } from './logger.js';
 
-const app = express();
-app.use(express.json());
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*'
-  }
-});
-
-const pairedClients = new Set();
-const pendingPairings = new Map(); // token -> { socket, clientId, expiry }
+const pairedClients = new Set<string>();
+const pendingPairings = new Map<string, { socket: Socket; clientId: string | null; expiry: number }>();
 const TOKEN_TTL_MS = 5 * 60 * 1000;
 const PAIR_SECRET = process.env.PAIR_SECRET || 'secret';
 
-function requirePaired(socket, cb) {
+function requirePaired(socket: Socket, cb?: (arg0: any) => void) {
   if (!socket.isPaired) {
     if (typeof cb === 'function') {
       cb({ ok: false, error: 'client not paired' });
@@ -43,6 +35,9 @@ function cleanupPairings() {
     }
   }
 }
+
+export function registerSocketHandlers(io: Server, app: express.Express) {
+
 
 app.post('/pairings/:token/approve', (req, res) => {
   if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
@@ -158,7 +153,7 @@ io.on('connection', socket => {
       allowedPatterns = []
     } = params;
     if (protectedPatterns.some(p => matchesPattern(branch, p))) {
-      console.log('Deletion blocked for', branch, '- matches protected pattern');
+      logger.info('Deletion blocked for', branch, '- matches protected pattern');
       cb({ ok: false, error: 'branch protected' });
       return;
     }
@@ -166,8 +161,8 @@ io.on('connection', socket => {
       const svc = createGitHubService(token);
       await svc.deleteBranch(owner, repo, branch, allowedPatterns);
       cb({ ok: true });
-    } catch (err) {
-      console.log('Deletion blocked for', branch, '-', err.message);
+    } catch (err: any) {
+      logger.info('Deletion blocked for', branch, '-', err?.message);
       if (err.message === 'branch protected') {
         cb({ ok: false, error: 'branch protected' });
       } else if (err.message === 'branch not in stray list') {
@@ -251,8 +246,4 @@ io.on('connection', socket => {
     pendingPairings.delete(socket.pairToken);
   });
 });
-
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+}

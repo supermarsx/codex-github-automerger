@@ -1,5 +1,7 @@
+// @ts-nocheck
 import { createGitHubService } from './github.js';
 import { WebhookService } from './webhooks.js';
+import { logger } from './logger.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
@@ -115,8 +117,8 @@ async function pollRepo(watcher) {
       watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
     } catch {}
     cacheEntry.timestamp = Date.now();
-  } catch (err) {
-    console.error('Polling error for', repoKey, err.message);
+  } catch (err: any) {
+    logger.error('Polling error for', repoKey, err?.message);
     serveCache(watcher, cacheEntry);
   }
 }

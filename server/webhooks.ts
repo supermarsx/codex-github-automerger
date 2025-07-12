@@ -1,6 +1,8 @@
+// @ts-nocheck
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { logger } from './logger.js';
 
 const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'webhooks.json');
@@ -60,7 +62,7 @@ export class WebhookService {
       await this.saveWebhook({ ...webhook, lastTriggered: new Date().toISOString() });
       return { success: true };
     } catch (err) {
-      console.error('Webhook trigger error:', err);
+      logger.error('Webhook trigger error:', err);
       return { success: false, error: err.message };
     }
   }
