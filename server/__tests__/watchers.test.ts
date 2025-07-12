@@ -4,7 +4,7 @@ import { __test } from '../watchers.ts';
 let eventsMock: any;
 let alertsMock: any;
 
-vi.mock('../github.js', () => ({
+vi.mock('../github.ts', () => ({
   createGitHubService: () => ({
     octokit: {
       rest: {
