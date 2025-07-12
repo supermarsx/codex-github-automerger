@@ -88,3 +88,11 @@ socket clients subscribed via the `subscribeRepo` message receive a `repoUpdate`
 payload and any active webhooks are triggered. The subscribe call may include
 configuration such as protected branch patterns, allowed users or minimum alert
 severity. These settings influence polling and security filtering on the server.
+
+### Caching
+
+The server keeps a short-lived cache of recent pull requests, stray branches and
+activity events for each watched repository. Results fetched during polling are
+stored on the watcher and sent to newly subscribed sockets via the `repoCache`
+event. If GitHub requests fail, these cached values are returned so the UI can
+continue operating while offline.
