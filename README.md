@@ -96,3 +96,31 @@ activity events for each watched repository. Results fetched during polling are
 stored on the watcher and sent to newly subscribed sockets via the `repoCache`
 event. If GitHub requests fail, these cached values are returned so the UI can
 continue operating while offline.
+
+## Running the server and UI together
+
+1. Build the server TypeScript once:
+
+   ```bash
+   npm run build:server
+   ```
+
+2. Start the Node.js server:
+
+   ```bash
+   npm run server
+   ```
+
+   The server listens on `PORT` (default `3001`). You may also customise
+   `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET`
+   using environment variables.
+
+3. In a separate terminal start the Vite dev server for the UI:
+
+   ```bash
+   npm run dev
+   ```
+
+   The UI communicates with the Node server via WebSockets. GitHub Personal
+   Access Tokens can be provided through the UI itself or by setting the
+   `GITHUB_TOKEN` environment variable before starting the server.
