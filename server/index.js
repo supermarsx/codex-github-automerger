@@ -5,10 +5,10 @@ import crypto from 'crypto';
 import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
 
-const app = express();
+export const app = express();
 app.use(express.json());
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
+export const httpServer = http.createServer(app);
+export const io = new Server(httpServer, {
   cors: {
     origin: '*'
   }
@@ -252,7 +252,19 @@ io.on('connection', socket => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+export function startServer(port = process.env.PORT || 3001) {
+  return httpServer.listen(port, () => {
+    console.log(`Server listening on ${port}`);
+  });
+}
+
+export function stopServer(cb) {
+  io.close();
+  return httpServer.close(cb);
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export const __test = { pendingPairings, pairedClients, cleanupPairings };

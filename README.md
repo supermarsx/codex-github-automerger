@@ -96,3 +96,24 @@ activity events for each watched repository. Results fetched during polling are
 stored on the watcher and sent to newly subscribed sockets via the `repoCache`
 event. If GitHub requests fail, these cached values are returned so the UI can
 continue operating while offline.
+
+## Running the server and UI
+
+Install dependencies and start the API server alongside the Vite dev server:
+
+```bash
+npm install
+npm run server      # starts the API on PORT (default 3001)
+npm run dev         # launches the React UI on http://localhost:5173
+```
+
+The server expects a GitHub personal access token with each socket request. If
+no token is provided, it falls back to the `GITHUB_TOKEN` environment variable.
+Useful environment variables include:
+
+- `GITHUB_TOKEN` - default token for GitHub API requests
+- `PAIR_SECRET` - secret used by `/pairings/:token/approve` and `.../deny`
+- `PORT` - port for the API server (defaults to 3001)
+- `POLL_INTERVAL_MS` - interval for repository polling
+- `CACHE_TTL_MS` - TTL for cached repository data
+- `WEBHOOK_STORAGE_PATH` - path to webhook configuration

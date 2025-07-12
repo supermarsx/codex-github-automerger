@@ -3,7 +3,7 @@ import { Octokit } from '@octokit/rest';
 const strayBranchCache = new Map();
 
 export function createGitHubService(token) {
-  const octokit = new Octokit({ auth: token });
+  const octokit = new Octokit({ auth: token || process.env.GITHUB_TOKEN });
 
   return {
     octokit,
