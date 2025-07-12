@@ -6,6 +6,7 @@ import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo } from './watchers.js';
 
 const app = express();
+app.use(express.json());
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -14,6 +15,9 @@ const io = new Server(httpServer, {
 });
 
 const pairedClients = new Set();
+const pendingPairings = new Map(); // token -> { socket, clientId, expiry }
+const TOKEN_TTL_MS = 5 * 60 * 1000;
+const PAIR_SECRET = process.env.PAIR_SECRET || 'secret';
 
 function requirePaired(socket, cb) {
   if (!socket.isPaired) {
@@ -31,23 +35,68 @@ function matchesPattern(value, pattern) {
   return regex.test(value);
 }
 
+function cleanupPairings() {
+  const now = Date.now();
+  for (const [token, entry] of pendingPairings) {
+    if (now > entry.expiry || entry.socket.disconnected) {
+      pendingPairings.delete(token);
+    }
+  }
+}
+
+app.post('/pairings/:token/approve', (req, res) => {
+  if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
+    res.status(403).json({ error: 'forbidden' });
+    return;
+  }
+  cleanupPairings();
+  const entry = pendingPairings.get(req.params.token);
+  if (!entry) {
+    res.status(404).json({ error: 'not found' });
+    return;
+  }
+  entry.socket.isPaired = true;
+  entry.socket.clientId = entry.clientId;
+  pairedClients.add(entry.clientId);
+  entry.socket.emit('pair_result', { success: true });
+  pendingPairings.delete(req.params.token);
+  res.json({ ok: true });
+});
+
+app.post('/pairings/:token/deny', (req, res) => {
+  if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
+    res.status(403).json({ error: 'forbidden' });
+    return;
+  }
+  cleanupPairings();
+  const entry = pendingPairings.get(req.params.token);
+  if (!entry) {
+    res.status(404).json({ error: 'not found' });
+    return;
+  }
+  entry.socket.emit('pair_result', { success: false });
+  pendingPairings.delete(req.params.token);
+  res.json({ ok: true });
+});
+
 io.on('connection', socket => {
   socket.subscriptions = new Set();
   socket.isPaired = false;
   socket.pairToken = crypto.randomBytes(8).toString('hex');
   socket.clientId = null;
+  pendingPairings.set(socket.pairToken, {
+    socket,
+    clientId: null,
+    expiry: Date.now() + TOKEN_TTL_MS
+  });
 
-  socket.emit('pair_request', { token: socket.pairToken });
-
-  socket.on('pair_approved', ({ token, clientId }) => {
-    if (token === socket.pairToken) {
-      socket.isPaired = true;
-      socket.clientId = clientId;
-      pairedClients.add(clientId);
-      socket.emit('pair_approved', { success: true });
-    } else {
-      socket.emit('pair_approved', { success: false, error: 'invalid token' });
-    }
+  socket.on('pair_request', ({ clientId }) => {
+    cleanupPairings();
+    const entry = pendingPairings.get(socket.pairToken);
+    if (!entry) return;
+    entry.clientId = clientId;
+    socket.clientId = clientId;
+    socket.emit('pair_token', { token: socket.pairToken });
   });
   socket.on('fetchRepos', async (params, cb = () => {}) => {
     if (!requirePaired(socket, cb)) return;
@@ -168,6 +217,7 @@ io.on('connection', socket => {
     if (socket.clientId) {
       pairedClients.delete(socket.clientId);
     }
+    pendingPairings.delete(socket.pairToken);
   });
 });
 
