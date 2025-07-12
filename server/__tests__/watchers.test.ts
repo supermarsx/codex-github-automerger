@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { __test } from '../watchers.js';
+import { __test } from '../watchers.ts';
 
 let eventsMock: any;
 let alertsMock: any;
