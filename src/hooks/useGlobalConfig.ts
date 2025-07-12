@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { getItem, setItem } from '@/utils/storage';
 import { GlobalConfig } from '@/types/dashboard';
 import { hexToHSL } from '@/lib/utils';
@@ -40,6 +41,7 @@ const getDefaultConfig = (): GlobalConfig => ({
 
 export const useGlobalConfig = () => {
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(getDefaultConfig());
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -72,18 +74,12 @@ export const useGlobalConfig = () => {
     });
   }, [globalConfig]);
 
-  // Update theme in IndexedDB when darkMode changes
+  // Update theme when darkMode changes
   useEffect(() => {
     const theme = globalConfig.darkMode ? 'dark' : 'light';
     setItem('theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    // Apply theme to document
-    if (globalConfig.darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [globalConfig.darkMode]);
+    setTheme(theme);
+  }, [globalConfig.darkMode, setTheme]);
 
   // Update accent color
   useEffect(() => {

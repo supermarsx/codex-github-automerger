@@ -124,7 +124,13 @@ export const Dashboard = () => {
       </Dialog>
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        {!globalConfig.hideHeader && <DashboardHeader apiKeys={apiKeys} />}
+        {!globalConfig.hideHeader && (
+          <DashboardHeader
+            apiKeys={apiKeys}
+            darkMode={globalConfig.darkMode}
+            onThemeChange={(dark) => setGlobalConfig({ darkMode: dark })}
+          />
+        )}
 
         {/* Stats Cards */}
         <StatsCards repositories={repositories} apiKeys={apiKeys} mergeStats={mergeStats} statsPeriod={globalConfig.statsPeriod} />

@@ -1,21 +1,20 @@
-import React, { useEffect } from 'react';
-import { setItem } from '@/utils/storage';
+import React from 'react';
+import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ThemeToggleProps {
-  theme: 'light' | 'dark';
-  onThemeChange: (theme: 'light' | 'dark') => void;
+  darkMode: boolean;
+  onThemeChange: (dark: boolean) => void;
 }
 
-export const ThemeToggle = ({ theme, onThemeChange }: ThemeToggleProps) => {
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    setItem('theme', theme);
-  }, [theme]);
+export const ThemeToggle = ({ darkMode, onThemeChange }: ThemeToggleProps) => {
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    onThemeChange(theme === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    onThemeChange(newTheme === 'dark');
   };
 
   return (
@@ -24,7 +23,7 @@ export const ThemeToggle = ({ theme, onThemeChange }: ThemeToggleProps) => {
       className="neo-button-secondary"
       size="sm"
     >
-      {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </Button>
   );
 };
