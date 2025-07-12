@@ -28,6 +28,7 @@ export class SocketService {
   private logger: ReturnType<typeof useLogger>;
   private pairedClients: Set<string> = new Set();
   private pendingPairings: Map<string, PairingRequest> = new Map();
+  private pairToken: string | null = null;
   private clientId: string;
 
   constructor() {
@@ -56,7 +57,21 @@ export class SocketService {
       });
 
       this.logger.logInfo('socket', 'Socket service initialized', { clientId: this.clientId });
-      
+
+      this.socket.onMessage('pair_token', ({ token }) => {
+        this.pairToken = token;
+        this.logger.logInfo('socket', 'Received pairing token', { token });
+      });
+
+      this.socket.onMessage('pair_result', ({ success }) => {
+        if (success) {
+          this.pairedClients.add(this.clientId);
+          this.logger.logInfo('socket', 'Pairing successful');
+        } else {
+          this.logger.logError('socket', 'Pairing denied');
+        }
+      });
+
       // Send pairing request on connection
       this.requestPairing();
       
@@ -72,54 +87,8 @@ export class SocketService {
       this.logger.logError('socket', 'Cannot request pairing - socket not connected');
       return;
     }
-
-    const pairingRequest: PairingRequest = {
-      id: `pair_${Date.now()}`,
-      clientId: this.clientId,
-      timestamp: new Date(),
-      approved: false
-    };
-
-    this.pendingPairings.set(pairingRequest.id, pairingRequest);
-    
-    this.socket.sendMessage('pair_request', pairingRequest);
-    this.logger.logInfo('socket', 'Pairing request sent', { requestId: pairingRequest.id });
-  }
-
-  approvePairing(requestId: string): boolean {
-    const request = this.pendingPairings.get(requestId);
-    if (!request) {
-      this.logger.logError('socket', 'Pairing request not found', { requestId });
-      return false;
-    }
-
-    request.approved = true;
-    this.pairedClients.add(request.clientId);
-    this.pendingPairings.delete(requestId);
-
-    if (this.socket?.isConnected) {
-      this.socket.sendMessage('pair_approved', { requestId, clientId: request.clientId });
-    }
-
-    this.logger.logInfo('socket', 'Pairing approved', { clientId: request.clientId });
-    return true;
-  }
-
-  denyPairing(requestId: string): boolean {
-    const request = this.pendingPairings.get(requestId);
-    if (!request) {
-      this.logger.logError('socket', 'Pairing request not found', { requestId });
-      return false;
-    }
-
-    this.pendingPairings.delete(requestId);
-
-    if (this.socket?.isConnected) {
-      this.socket.sendMessage('pair_denied', { requestId, clientId: request.clientId });
-    }
-
-    this.logger.logInfo('socket', 'Pairing denied', { clientId: request.clientId });
-    return true;
+    this.socket.sendMessage('pair_request', { clientId: this.clientId });
+    this.logger.logInfo('socket', 'Pairing request sent', { clientId: this.clientId });
   }
 
   async request<T>(event: string, payload: any): Promise<T> {

@@ -23,6 +23,7 @@ export const useSocket = (config: SocketConfig) => {
   const pingInterval = useRef<NodeJS.Timeout | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const lastPingTime = useRef<number>(0);
+  const listeners = useRef(new Map<string, Set<(data: any) => void>>());
 
   const connect = () => {
     try {
@@ -85,6 +86,24 @@ export const useSocket = (config: SocketConfig) => {
     return false;
   };
 
+  const emitMessage = (type: string, data: any) => {
+    setLastMessage({ type, data, timestamp: new Date() });
+    const setListeners = listeners.current.get(type);
+    if (setListeners) {
+      for (const cb of setListeners) cb(data);
+    }
+  };
+
+  const onMessage = (type: string, cb: (data: any) => void) => {
+    let setListeners = listeners.current.get(type);
+    if (!setListeners) {
+      setListeners = new Set();
+      listeners.current.set(type, setListeners);
+    }
+    setListeners.add(cb);
+    return () => setListeners!.delete(cb);
+  };
+
   const sendPing = () => {
     lastPingTime.current = Date.now();
     return sendMessage('ping', {});
@@ -105,6 +124,8 @@ export const useSocket = (config: SocketConfig) => {
     connect,
     disconnect,
     sendMessage,
-    sendPing
+    sendPing,
+    onMessage,
+    emitMessage
   };
 };
