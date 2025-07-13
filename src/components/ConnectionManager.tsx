@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Github, Server, Key } from 'lucide-react';
 import { useLogger } from '@/hooks/useLogger';
 
+import { ApiKey } from '@/types/dashboard';
+
 interface ConnectionManagerProps {
-  apiKeys: any[];
+  apiKeys: ApiKey[];
   compact?: boolean;
   checkInterval?: number;
 }
@@ -21,7 +23,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
 
   const activeApiKeys = apiKeys.filter(k => k.isActive).length;
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     
     try {
@@ -39,7 +41,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [activeApiKeys]);
 
   // Periodic server checks
   useEffect(() => {
@@ -50,7 +52,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
     }, checkInterval);
     
     return () => clearInterval(interval);
-  }, [checkInterval, activeApiKeys]);
+  }, [checkInterval, activeApiKeys, handleRefresh]);
 
   if (compact) {
     return (

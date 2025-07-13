@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface SocketConfig {
   url: string;
@@ -9,7 +9,7 @@ interface SocketConfig {
 
 interface SocketMessage {
   type: string;
-  data: any;
+  data: unknown;
   timestamp: Date;
 }
 
@@ -23,9 +23,9 @@ export const useSocket = (config: SocketConfig) => {
   const pingInterval = useRef<NodeJS.Timeout | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const lastPingTime = useRef<number>(0);
-  const listeners = useRef(new Map<string, Set<(data: any) => void>>());
+  const listeners = useRef(new Map<string, Set<(data: unknown) => void>>());
 
-  const connect = () => {
+  const connect = useCallback(() => {
     try {
       // Simulate WebSocket connection for demo
       setIsConnected(true);
@@ -42,9 +42,9 @@ export const useSocket = (config: SocketConfig) => {
       console.error('Socket connection failed:', error);
       scheduleReconnect();
     }
-  };
+  }, [config]);
 
-  const disconnect = () => {
+  const disconnect = useCallback(() => {
     if (ws.current) {
       ws.current.close();
     }
@@ -55,7 +55,7 @@ export const useSocket = (config: SocketConfig) => {
       clearTimeout(reconnectTimeout.current);
     }
     setIsConnected(false);
-  };
+  }, []);
 
   const scheduleReconnect = () => {
     if (connectionAttempts >= (config.maxReconnectAttempts || 5)) {
@@ -72,7 +72,7 @@ export const useSocket = (config: SocketConfig) => {
     }, delay);
   };
 
-  const sendMessage = (type: string, data: any) => {
+  const sendMessage = (type: string, data: unknown) => {
     if (isConnected && ws.current) {
       const message = {
         type,
@@ -86,7 +86,7 @@ export const useSocket = (config: SocketConfig) => {
     return false;
   };
 
-  const emitMessage = (type: string, data: any) => {
+  const emitMessage = (type: string, data: unknown) => {
     setLastMessage({ type, data, timestamp: new Date() });
     const setListeners = listeners.current.get(type);
     if (setListeners) {
@@ -94,7 +94,7 @@ export const useSocket = (config: SocketConfig) => {
     }
   };
 
-  const onMessage = (type: string, cb: (data: any) => void) => {
+  const onMessage = (type: string, cb: (data: unknown) => void) => {
     let setListeners = listeners.current.get(type);
     if (!setListeners) {
       setListeners = new Set();
@@ -114,7 +114,7 @@ export const useSocket = (config: SocketConfig) => {
     return () => {
       disconnect();
     };
-  }, []);
+  }, [connect, disconnect]);
 
   return {
     isConnected,

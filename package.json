@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "build:server": "tsc -p server/tsconfig.json",
-    "server": "ts-node server/index.ts"
+    "server": "ts-node server/index.ts",
+    "pretest": "npm run lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

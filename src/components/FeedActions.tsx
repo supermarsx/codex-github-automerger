@@ -97,7 +97,12 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
             </div>
             <div>
               <Label>Event Type</Label>
-              <Select value={newAction.eventType} onValueChange={(value: any) => setNewAction({ ...newAction, eventType: value })}>
+              <Select
+                value={newAction.eventType}
+                onValueChange={(value: FeedAction['eventType']) =>
+                  setNewAction({ ...newAction, eventType: value })
+                }
+              >
                 <SelectTrigger className="neo-input">
                   <SelectValue />
                 </SelectTrigger>
@@ -113,7 +118,12 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
             </div>
             <div>
               <Label>Action Type</Label>
-              <Select value={newAction.actionType} onValueChange={(value: any) => setNewAction({ ...newAction, actionType: value })}>
+              <Select
+                value={newAction.actionType}
+                onValueChange={(value: FeedAction['actionType']) =>
+                  setNewAction({ ...newAction, actionType: value })
+                }
+              >
                 <SelectTrigger className="neo-input">
                   <SelectValue />
                 </SelectTrigger>
