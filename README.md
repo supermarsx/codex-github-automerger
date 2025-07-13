@@ -97,6 +97,15 @@ stored on the watcher and sent to newly subscribed sockets via the `repoCache`
 event. If GitHub requests fail, these cached values are returned so the UI can
 continue operating while offline.
 
+### Configuration sync
+
+After a client pairs with the server it should emit a `syncConfig` Socket.IO
+message containing its configuration (for example a list of protected branch
+patterns). The server stores this data per client in `server/config.json` and
+uses the settings when handling actions such as `fetchStrayBranches` and
+`deleteBranch`. The file persists across restarts so important settings remain
+available.
+
 ## Running the server and UI together
 
 1. Build the server TypeScript once:
