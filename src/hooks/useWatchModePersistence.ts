@@ -25,7 +25,7 @@ export const useWatchModePersistence = () => {
 
   useEffect(() => {
     (async () => {
-      const saved = await getItem<any>(WATCH_MODE_STORAGE_KEY);
+      const saved = await getItem<WatchModeState>(WATCH_MODE_STORAGE_KEY);
       if (saved) {
         try {
           const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;

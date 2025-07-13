@@ -12,7 +12,7 @@ export const useStatsPersistence = () => {
 
   useEffect(() => {
     (async () => {
-      const savedStats = await getItem<any>(STATS_STORAGE_KEY);
+      const savedStats = await getItem<MergeStats>(STATS_STORAGE_KEY);
       if (savedStats) {
         try {
           const parsed = typeof savedStats === 'string' ? JSON.parse(savedStats) : savedStats;

@@ -15,11 +15,11 @@ export const useRepositories = () => {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const savedRepos = await getItem<any>(REPOSITORIES_STORAGE_KEY);
+      const savedRepos = await getItem<Repository[]>(REPOSITORIES_STORAGE_KEY);
       if (!mounted || !savedRepos) return;
       try {
         const parsed = typeof savedRepos === 'string' ? JSON.parse(savedRepos) : savedRepos;
-        const repos = parsed.map((repo: any) => ({
+        const repos = parsed.map((repo: Repository) => ({
           ...repo,
           autoMergeOnClean: repo.autoMergeOnClean ?? repo.autoMergeEnabled ?? repo.enabled ?? true,
           autoMergeOnUnstable: repo.autoMergeOnUnstable ?? false,
@@ -32,7 +32,7 @@ export const useRepositories = () => {
             ...repo.recentPull,
             timestamp: new Date(repo.recentPull.timestamp)
           } : undefined,
-          activities: (repo.activities || []).map((activity: any) => ({
+          activities: (repo.activities || []).map((activity: ActivityItem) => ({
             ...activity,
             timestamp: new Date(activity.timestamp)
           }))
@@ -57,7 +57,7 @@ export const useRepositories = () => {
         variant: 'destructive'
       });
     });
-  }, [repositories]);
+  }, [repositories, toast]);
 
   function addRepositoryActivity(
     repoId: string,

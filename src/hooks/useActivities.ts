@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActivityItem } from '@/types/dashboard';
+import { ActivityItem, Repository, ApiKey } from '@/types/dashboard';
 import { useStatsPersistence } from './useStatsPersistence';
 import { createGitHubService } from '@/components/GitHubService';
 
@@ -9,8 +9,8 @@ export const useActivities = () => {
   const { mergeStats, updateStats, resetSessionStats } = useStatsPersistence();
 
   const fetchActivities = async (
-    repositories: any[],
-    apiKeys: any[],
+    repositories: Repository[],
+    apiKeys: ApiKey[],
     getKey: (id: string) => string | null,
     addRepoActivity?: (repoId: string, activity: Omit<ActivityItem, 'id'>) => void
   ) => {
