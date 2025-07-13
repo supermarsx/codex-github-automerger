@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
 import { logger } from './logger.js';
+import { getClientConfig, setClientConfig } from './config.js';
 
 const pairedClients = new Set<string>();
 const pendingPairings = new Map<string, { socket: Socket; clientId: string | null; expiry: number }>();
@@ -93,6 +94,16 @@ io.on('connection', socket => {
     socket.clientId = clientId;
     socket.emit('pair_token', { token: socket.pairToken });
   });
+
+  socket.on('syncConfig', async (config, cb = () => {}) => {
+    if (!requirePaired(socket, cb)) return;
+    try {
+      await setClientConfig(socket.clientId, config || {});
+      cb({ ok: true });
+    } catch (err) {
+      cb({ ok: false, error: err.message });
+    }
+  });
   socket.on('fetchRepos', async (params, cb = () => {}) => {
     if (!requirePaired(socket, cb)) return;
     try {
@@ -152,7 +163,12 @@ io.on('connection', socket => {
       protectedPatterns = [],
       allowedPatterns = []
     } = params;
-    if (protectedPatterns.some(p => matchesPattern(branch, p))) {
+    const cfg = getClientConfig(socket.clientId);
+    const patterns = [
+      ...(cfg.protectedBranches || []),
+      ...(protectedPatterns || [])
+    ];
+    if (patterns.some(p => matchesPattern(branch, p))) {
       logger.info('Deletion blocked for', branch, '- matches protected pattern');
       cb({ ok: false, error: 'branch protected' });
       return;
@@ -180,11 +196,21 @@ io.on('connection', socket => {
     try {
       const svc = createGitHubService(params.token);
       const branches = await svc.fetchStrayBranches(params.owner, params.repo);
-      cb({ ok: true, data: branches });
+      const cfg = getClientConfig(socket.clientId);
+      const protectedPatterns = cfg.protectedBranches || [];
+      const filtered = branches.filter(
+        b => !protectedPatterns.some(p => matchesPattern(b, p))
+      );
+      cb({ ok: true, data: filtered });
     } catch (err) {
       const watcher = getWatcher(params.owner, params.repo);
       if (watcher && watcher.strayBranches.length) {
-        cb({ ok: true, data: watcher.strayBranches });
+        const cfg = getClientConfig(socket.clientId);
+        const protectedPatterns = cfg.protectedBranches || [];
+        const filtered = watcher.strayBranches.filter(
+          b => !protectedPatterns.some(p => matchesPattern(b, p))
+        );
+        cb({ ok: true, data: filtered });
       } else {
         cb({ ok: false, error: err.message });
       }

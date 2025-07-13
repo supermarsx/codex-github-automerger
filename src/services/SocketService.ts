@@ -30,6 +30,7 @@ export class SocketService {
   private pendingPairings: Map<string, PairingRequest> = new Map();
   private pairToken: string | null = null;
   private clientId: string;
+  private configSupplier: (() => any) | null = null;
 
   constructor() {
     this.clientId = this.generateClientId();
@@ -67,6 +68,7 @@ export class SocketService {
         if (success) {
           this.pairedClients.add(this.clientId);
           this.logger.logInfo('socket', 'Pairing successful');
+          this.syncConfig();
         } else {
           this.logger.logError('socket', 'Pairing denied');
         }
@@ -89,6 +91,19 @@ export class SocketService {
     }
     this.socket.sendMessage('pair_request', { clientId: this.clientId });
     this.logger.logInfo('socket', 'Pairing request sent', { clientId: this.clientId });
+  }
+
+  setConfigSupplier(fn: () => any) {
+    this.configSupplier = fn;
+  }
+
+  private syncConfig(): void {
+    if (!this.socket?.isConnected || !this.pairedClients.has(this.clientId)) return;
+    const cfg = this.configSupplier ? this.configSupplier() : null;
+    if (cfg) {
+      this.socket.sendMessage('syncConfig', cfg);
+      this.logger.logInfo('socket', 'Configuration synced');
+    }
   }
 
   async request<T>(event: string, payload: any): Promise<T> {

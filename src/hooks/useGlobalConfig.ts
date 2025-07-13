@@ -3,6 +3,7 @@ import { useTheme } from 'next-themes';
 import { getItem, setItem } from '@/utils/storage';
 import { GlobalConfig } from '@/types/dashboard';
 import { hexToHSL } from '@/lib/utils';
+import { socketService } from '@/services/SocketService';
 
 const GLOBAL_CONFIG_STORAGE_KEY = 'automerger-global-config';
 
@@ -92,6 +93,10 @@ export const useGlobalConfig = () => {
   const updateConfig = (updates: Partial<GlobalConfig>) => {
     setGlobalConfig(prev => ({ ...prev, ...updates }));
   };
+
+  useEffect(() => {
+    socketService.setConfigSupplier(() => globalConfig);
+  }, [globalConfig]);
 
   const resetConfig = () => {
     const defaultConfig = getDefaultConfig();

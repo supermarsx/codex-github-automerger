@@ -7,10 +7,10 @@ import supertest from 'supertest';
 
 import { registerSocketHandlers } from '../socketHandlers.ts';
 
+let svcMock: any;
+
 vi.mock('../github.ts', () => ({
-  createGitHubService: vi.fn(() => ({
-    fetchRepositories: vi.fn(async () => ['repo'])
-  }))
+  createGitHubService: vi.fn(() => svcMock)
 }));
 
 let ioServer: Server;
@@ -29,6 +29,11 @@ beforeEach(async () => {
   request = supertest(app);
   client = Client(`http://localhost:${port}`, { transports: ['websocket'] });
   await new Promise(resolve => client.on('connect', resolve));
+  svcMock = {
+    fetchRepositories: vi.fn(async () => ['repo']),
+    fetchStrayBranches: vi.fn(async () => []),
+    deleteBranch: vi.fn(async () => true)
+  };
 });
 
 afterEach(() => {
@@ -68,4 +73,33 @@ describe('socket handlers', () => {
     });
     expect(resp2).toEqual({ ok: true, data: ['repo'] });
   });
+
+  it('honours synced protected branches', async () => {
+    svcMock.fetchStrayBranches.mockResolvedValue(['keep', 'remove']);
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+    const resultPromise = new Promise(resolve => {
+      client.once('pair_result', resolve);
+    });
+    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
+    await resultPromise;
+
+    const syncRes = await new Promise<any>(resolve => {
+      client.emit('syncConfig', { protectedBranches: ['keep'] }, resolve);
+    });
+    expect(syncRes).toEqual({ ok: true });
+
+    const strayResp = await new Promise<any>(resolve => {
+      client.emit('fetchStrayBranches', { token: 't', owner: 'o', repo: 'r' }, resolve);
+    });
+    expect(strayResp).toEqual({ ok: true, data: ['remove'] });
+
+    const delResp = await new Promise<any>(resolve => {
+      client.emit('deleteBranch', { token: 't', owner: 'o', repo: 'r', branch: 'keep' }, resolve);
+    });
+    expect(delResp).toEqual({ ok: false, error: 'branch protected' });
+    expect(svcMock.deleteBranch).not.toHaveBeenCalled();
+  }, 10000);
 });
