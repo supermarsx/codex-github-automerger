@@ -22,7 +22,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Overall Statistics */}
-      <Card className="neo-card">
+      <Card className="nb-card">
         <CardHeader>
           <CardTitle className="text-2xl font-black flex items-center gap-2">
             <BarChart3 className="w-6 h-6" />
@@ -53,7 +53,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
 
       {/* Top Performers */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="neo-card">
+        <Card className="nb-card">
           <CardHeader>
             <CardTitle className="font-black flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
@@ -66,7 +66,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
           </CardContent>
         </Card>
 
-        <Card className="neo-card">
+        <Card className="nb-card">
           <CardHeader>
             <CardTitle className="font-black flex items-center gap-2">
               <Calendar className="w-5 h-5" />
@@ -79,7 +79,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
           </CardContent>
         </Card>
 
-        <Card className="neo-card">
+        <Card className="nb-card">
           <CardHeader>
             <CardTitle className="font-black flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -92,7 +92,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
           </CardContent>
         </Card>
 
-        <Card className="neo-card">
+        <Card className="nb-card">
           <CardHeader>
             <CardTitle className="font-black flex items-center gap-2">
               <ActivityIcon className="w-5 h-5" />
@@ -107,7 +107,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
       </div>
 
       {/* Repository Details */}
-      <Card className="neo-card">
+      <Card className="nb-card">
         <CardHeader>
           <CardTitle className="text-xl font-black flex items-center gap-2">
             <GitBranch className="w-5 h-5" />
@@ -116,11 +116,11 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
         </CardHeader>
         <CardContent className="space-y-4">
           {Object.entries(realStats.repositories).map(([repoId, stats]) => (
-            <div key={repoId} className="neo-card p-4 space-y-3">
+            <div key={repoId} className="nb-card p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-black text-lg">{stats.name}</h3>
                 <div className="flex items-center gap-2">
-                  <Badge className="neo-card neo-green text-black font-bold">
+                  <Badge className="nb-card nb-green text-black font-bold">
                     {getSuccessRate(stats.successes, stats.merges)}% success
                   </Badge>
                   <Badge variant="outline" className={`font-bold ${stats.weeklyTrend > 0 ? 'text-green-600' : stats.weeklyTrend < 0 ? 'text-red-600' : 'text-gray-600'}`}>

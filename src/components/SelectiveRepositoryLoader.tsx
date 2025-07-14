@@ -206,7 +206,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
   };
 
   return (
-    <Card className="neo-card">
+    <Card className="nb-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Download className="w-5 h-5" />
@@ -239,7 +239,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
           <Button
             onClick={() => selectedApiKey && loadRepositories(selectedApiKey)}
             disabled={!selectedApiKey || isLoading}
-            className="neo-button-secondary"
+            className="nb-button-secondary"
             size="sm"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -366,7 +366,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
                 <span className="text-sm text-muted-foreground">
                   {selectedRepos.size} repositories selected
                 </span>
-                <Button onClick={handleAddSelected} className="neo-button">
+                <Button onClick={handleAddSelected} className="nb-button">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Selected ({selectedRepos.size})
                 </Button>

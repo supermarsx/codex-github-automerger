@@ -104,7 +104,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
   return (
     <div className="space-y-6">
       {/* Add Repository */}
-      <Card className="neo-card">
+      <Card className="nb-card">
         <CardHeader>
           <CardTitle className="text-2xl font-black flex items-center gap-2">
             <Plus className="w-6 h-6" />
@@ -117,17 +117,17 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
               placeholder="Repository name"
               value={newRepo.name}
               onChange={(e) => setNewRepo({ ...newRepo, name: e.target.value })}
-              className="neo-input"
+              className="nb-input"
             />
             <Input
               placeholder="Owner/Organization"
               value={newRepo.owner}
               onChange={(e) => setNewRepo({ ...newRepo, owner: e.target.value })}
-              className="neo-input"
+              className="nb-input"
             />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleAddRepository} className="neo-button">
+            <Button onClick={handleAddRepository} className="nb-button">
               <Plus className="w-4 h-4 mr-2" />
               Add Repository
             </Button>
@@ -139,11 +139,11 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
       <div className="grid gap-6">
         {repositories.map((repo) => (
           <Collapsible key={repo.id} open={!collapsedRepos.has(repo.id)}>
-            <Card className="neo-card">
+            <Card className="nb-card">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`neo-card p-2 ${repo.enabled ? 'neo-green' : 'neo-red'}`}>
+                    <div className={`nb-card p-2 ${repo.enabled ? 'nb-green' : 'nb-red'}`}>
                       <Github className="w-5 h-5 text-black" />
                     </div>
                     <div>
@@ -207,7 +207,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                            console.log('Update branches for repo:', repo.id, updatedBranches);
                          }}
                          placeholder="e.g., codex-feature/*"
-                         itemColor="neo-yellow"
+                         itemColor="nb-yellow"
                        />
                        <h4 className="font-black text-lg my-3 flex items-center gap-2">
                          <GitBranch className="w-5 h-5" />
@@ -221,7 +221,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                            console.log('Update protected branches for repo:', repo.id, updatedBranches);
                          }}
                          placeholder="e.g., main"
-                         itemColor="neo-red"
+                         itemColor="nb-red"
                        />
                     </div>
 
@@ -231,7 +231,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         <Users className="w-5 h-5" />
                         Allowed Users
                         {repo.allowAllUsers && (
-                          <Badge className="neo-card neo-red text-white font-bold ml-2">
+                          <Badge className="nb-card nb-red text-white font-bold ml-2">
                             <Shield className="w-3 h-3 mr-1" />
                             ALL USERS
                           </Badge>
@@ -247,7 +247,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                            console.log('Update users for repo:', repo.id, updatedUsers);
                          }}
                          placeholder="e.g., github-actions[bot]"
-                         itemColor="neo-blue"
+                         itemColor="nb-blue"
                        />
                     </div>
                   </div>
@@ -260,7 +260,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         API Key
                       </h4>
                       <Select defaultValue={repo.apiKeyId || "global"}>
-                        <SelectTrigger className="neo-input">
+                        <SelectTrigger className="nb-input">
                           <SelectValue placeholder="Select API key" />
                         </SelectTrigger>
                         <SelectContent>
@@ -278,7 +278,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         Fetch Mode
                       </h4>
                       <Select defaultValue={repo.fetchMode || "global"}>
-                        <SelectTrigger className="neo-input">
+                        <SelectTrigger className="nb-input">
                           <SelectValue placeholder="Select fetch mode" />
                         </SelectTrigger>
                         <SelectContent>
@@ -295,7 +295,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                         Webhook Method
                       </h4>
                       <Select defaultValue={repo.webhookMethod || "global"}>
-                        <SelectTrigger className="neo-input">
+                        <SelectTrigger className="nb-input">
                           <SelectValue placeholder="Select webhook method" />
                         </SelectTrigger>
                         <SelectContent>

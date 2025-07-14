@@ -204,7 +204,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
   const secureRepoAccess = repositories.every(r => r.fetchMode === 'github-api');
   const passkeyPending = credentials.length === 0;
     return (
-      <Card className="neo-card max-w-4xl mx-auto text-sm">
+      <Card className="nb-card max-w-4xl mx-auto text-sm">
       <CardHeader>
         <CardTitle className="text-2xl font-black flex items-center gap-2">
           <Shield className="w-6 h-6" />
@@ -216,14 +216,14 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="neo-card p-4 neo-purple">
+          <div className="nb-card p-4 nb-purple">
             <h4 className="font-black text-lg mb-2 text-black">Passkey Authentication</h4>
             <p className="text-sm text-black font-bold mb-4">
               {passkeySupported ? 'Enable passkey authentication for enhanced security' : 'Passkeys not supported in this browser'}
             </p>
             <div className="space-y-2">
               {credentials.length > 0 && (
-                <Button onClick={handleAuthenticatePasskey} className="neo-button bg-black text-white w-full">
+                <Button onClick={handleAuthenticatePasskey} className="nb-button bg-black text-white w-full">
                   <Lock className="w-4 h-4 mr-2" />
                   Authenticate
                 </Button>
@@ -231,14 +231,14 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
               <Dialog open={showPasskeyDialog} onOpenChange={setShowPasskeyDialog}>
                 <DialogTrigger asChild>
                   <Button
-                    className="neo-button bg-black text-white w-full"
+                    className="nb-button bg-black text-white w-full"
                     disabled={!passkeySupported || credentials.length >= 1}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {credentials.length > 0 ? 'Add Passkey' : 'Setup Passkey'}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="neo-card">
+                <DialogContent className="nb-card">
                   <DialogHeader>
                     <DialogTitle>Register Passkey</DialogTitle>
                   </DialogHeader>
@@ -249,10 +249,10 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="Enter username"
-                        className="neo-input"
+                        className="nb-input"
                       />
                     </div>
-                    <Button onClick={handleRegisterPasskey} className="neo-button">
+                    <Button onClick={handleRegisterPasskey} className="nb-button">
                       Register Passkey
                     </Button>
                   </div>
@@ -280,7 +280,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
               </div>
             )}
             <Dialog open={!!credentialToDelete} onOpenChange={(o) => !o && setCredentialToDelete(null)}>
-              <DialogContent className="neo-card">
+              <DialogContent className="nb-card">
                 <DialogHeader>
                   <DialogTitle>Delete Passkey?</DialogTitle>
                 </DialogHeader>
@@ -295,19 +295,19 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
             </Dialog>
           </div>
           
-          <div className="neo-card p-4 neo-orange">
+          <div className="nb-card p-4 nb-orange">
             <h4 className="font-black text-lg mb-2 text-black">Webhook Configuration</h4>
             <p className="text-sm text-black font-bold mb-4">
               Configure webhooks for real-time notifications
             </p>
             <Dialog open={showWebhookDialog} onOpenChange={setShowWebhookDialog}>
               <DialogTrigger asChild>
-                <Button className="neo-button bg-black text-white w-full">
+                <Button className="nb-button bg-black text-white w-full">
                   <Webhook className="w-4 h-4 mr-2" />
                   Configure Webhooks
                 </Button>
               </DialogTrigger>
-              <DialogContent className="neo-card max-w-2xl">
+              <DialogContent className="nb-card max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Add Webhook</DialogTitle>
                 </DialogHeader>
@@ -319,7 +319,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                         value={newWebhook.name}
                         onChange={(e) => setNewWebhook({...newWebhook, name: e.target.value})}
                         placeholder="Webhook name"
-                        className="neo-input"
+                        className="nb-input"
                       />
                     </div>
                     <div>
@@ -328,7 +328,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                         value={newWebhook.url}
                         onChange={(e) => setNewWebhook({...newWebhook, url: e.target.value})}
                         placeholder="https://example.com/webhook"
-                        className="neo-input"
+                        className="nb-input"
                       />
                     </div>
                   </div>
@@ -338,7 +338,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                       value={newWebhook.secret}
                       onChange={(e) => setNewWebhook({...newWebhook, secret: e.target.value})}
                       placeholder="Webhook secret for validation"
-                      className="neo-input"
+                      className="nb-input"
                     />
                   </div>
                   <div>
@@ -370,7 +370,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                       ))}
                     </div>
                   </div>
-                  <Button onClick={handleSaveWebhook} className="neo-button">
+                  <Button onClick={handleSaveWebhook} className="nb-button">
                     Save Webhook
                   </Button>
                 </div>
@@ -395,7 +395,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
             )}
           </div>
 
-          <div className="neo-card p-4 neo-green">
+          <div className="nb-card p-4 nb-green">
             <h4 className="font-black text-lg mb-2 text-black">Encryption & Recovery</h4>
             <p className="text-sm text-black font-bold mb-4">
               Manage API key encryption and recovery options
@@ -403,12 +403,12 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
             <div className="space-y-2">
               <Dialog open={showEncryptionDialog} onOpenChange={setShowEncryptionDialog}>
                 <DialogTrigger asChild>
-                  <Button className="neo-button bg-black text-white w-full">
+                  <Button className="nb-button bg-black text-white w-full">
                     <Key className="w-4 h-4 mr-2" />
                     Encryption Settings
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="neo-card max-w-2xl">
+                <DialogContent className="nb-card max-w-2xl">
                   <DialogHeader>
                     <DialogTitle>Encryption & Recovery</DialogTitle>
                   </DialogHeader>
@@ -422,7 +422,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                             type="number"
                             value={benchmarkDuration}
                             onChange={(e) => setBenchmarkDuration(parseInt(e.target.value) || 1000)}
-                            className="neo-input"
+                            className="nb-input"
                             min="100"
                             max="10000"
                           />
@@ -433,7 +433,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                             type="number"
                             value={targetIterations}
                             onChange={(e) => setTargetIterations(parseInt(e.target.value) || 100000)}
-                            className="neo-input"
+                            className="nb-input"
                             min="1000"
                             max="1000000"
                           />
@@ -441,13 +441,13 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                       </div>
                       
                       <div className="flex gap-4">
-                        <Button onClick={runBenchmark} disabled={isBenchmarking} className="neo-button">
+                        <Button onClick={runBenchmark} disabled={isBenchmarking} className="nb-button">
                           <Timer className="w-4 h-4 mr-2" />
                           {isBenchmarking ? 'Running...' : 'Run Benchmark'}
                         </Button>
                         
                         {benchmarkResult && (
-                          <Badge className="neo-card neo-green text-white font-bold">
+                          <Badge className="nb-card nb-green text-white font-bold">
                             {benchmarkResult.iterations} iterations / {benchmarkResult.time}ms
                           </Badge>
                         )}
@@ -457,17 +457,17 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                     <div>
                       <h4 className="font-bold mb-2">Recovery Phrase</h4>
                       <div className="flex flex-wrap gap-4">
-                        <Button onClick={generateRecoveryPhrase} className="neo-button">
+                        <Button onClick={generateRecoveryPhrase} className="nb-button">
                           <Key className="w-4 h-4 mr-2" />
                           Generate Recovery Phrase
                         </Button>
                         
-                        <Button onClick={saveRecoveryPhrase} className="neo-button" disabled={!recoveryPhrase}>
+                        <Button onClick={saveRecoveryPhrase} className="nb-button" disabled={!recoveryPhrase}>
                           <Save className="w-4 h-4 mr-2" />
                           Save to File
                         </Button>
                         
-                        <Button onClick={printRecoveryPhrase} className="neo-button" disabled={!recoveryPhrase}>
+                        <Button onClick={printRecoveryPhrase} className="nb-button" disabled={!recoveryPhrase}>
                           <Printer className="w-4 h-4 mr-2" />
                           Print
                         </Button>
@@ -475,7 +475,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                         <Button 
                           onClick={() => setShowRecoveryPhrase(!showRecoveryPhrase)}
                           variant="outline"
-                          className="neo-button-secondary"
+                          className="nb-button-secondary"
                         >
                           {showRecoveryPhrase ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </Button>
@@ -507,7 +507,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
           </div>
         </div>
         
-        <div className="neo-card p-4 neo-pink">
+        <div className="nb-card p-4 nb-pink">
           <h4 className="font-black text-lg mb-2 text-black">Security Status</h4>
           <div className="space-y-2">
             <div className="flex items-center gap-2">

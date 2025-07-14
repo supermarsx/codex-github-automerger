@@ -23,37 +23,37 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
     {
       title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : '0',
       label: 'Active Repos',
-      color: 'neo-green',
+      color: 'nb-green',
       subtitle: `${repositories.length} total`
     },
     {
       title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : '0',
       label: 'Active Keys',
-      color: 'neo-blue',
+      color: 'nb-blue',
       subtitle: `${apiKeys.length} total`
     },
     {
       title: hasData ? currentStats.pending.toString() : '0',
       label: 'Pending',
-      color: 'neo-yellow',
+      color: 'nb-yellow',
       subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
       title: hasData ? currentStats.merged.toString() : '0',
       label: 'Merged',
-      color: 'neo-green',
+      color: 'nb-green',
       subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
       title: hasData ? currentStats.failed.toString() : '0',
       label: 'Failed',
-      color: 'neo-red',
+      color: 'nb-red',
       subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
       title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : '0%',
       label: 'Success Rate',
-      color: 'neo-purple',
+      color: 'nb-purple',
       subtitle: 'Performance'
     }
   ];
@@ -63,7 +63,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className={`neo-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_hsl(var(--foreground))]`}
+          className={`nb-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_hsl(var(--foreground))]`}
         >
           <div className="text-center">
             <div className="text-black dark:text-white font-black text-base mb-1">

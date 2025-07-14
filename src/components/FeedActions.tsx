@@ -71,19 +71,19 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
 
   const getEventColor = (type: string) => {
     switch (type) {
-      case 'merge': return 'neo-green';
-      case 'pull': return 'neo-blue';
-      case 'alert': return 'neo-yellow';
-      case 'success': return 'neo-green';
-      case 'failure': return 'neo-red';
-      default: return 'neo-purple';
+      case 'merge': return 'nb-green';
+      case 'pull': return 'nb-blue';
+      case 'alert': return 'nb-yellow';
+      case 'success': return 'nb-green';
+      case 'failure': return 'nb-red';
+      default: return 'nb-purple';
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Add Action */}
-      <Card className="neo-card">
+      <Card className="nb-card">
         <CardHeader>
           <CardTitle className="text-2xl font-black flex items-center gap-2">
             <Plus className="w-6 h-6" />
@@ -98,7 +98,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                 placeholder="e.g., Slack Notifications"
                 value={newAction.name}
                 onChange={(e) => setNewAction({ ...newAction, name: e.target.value })}
-                className="neo-input"
+                className="nb-input"
               />
             </div>
             <div>
@@ -109,7 +109,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                   setNewAction({ ...newAction, eventType: value as FeedAction['eventType'] })
                 }
               >
-                <SelectTrigger className="neo-input">
+                <SelectTrigger className="nb-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -130,7 +130,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                   setNewAction({ ...newAction, actionType: value as FeedAction['actionType'] })
                 }
               >
-                <SelectTrigger className="neo-input">
+                <SelectTrigger className="nb-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -146,11 +146,11 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                 placeholder="https://hooks.slack.com/..."
                 value={newAction.endpoint}
                 onChange={(e) => setNewAction({ ...newAction, endpoint: e.target.value })}
-                className="neo-input"
+                className="nb-input"
               />
             </div>
           </div>
-          <Button onClick={addAction} className="neo-button">
+          <Button onClick={addAction} className="nb-button">
             <Plus className="w-4 h-4 mr-2" />
             Add Action
           </Button>
@@ -160,20 +160,20 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
       {/* Actions List */}
       <div className="grid gap-4">
         {actions.map((action) => (
-          <Card key={action.id} className="neo-card">
+          <Card key={action.id} className="nb-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`neo-card p-2 ${action.enabled ? 'neo-green' : 'neo-red'}`}>
+                  <div className={`nb-card p-2 ${action.enabled ? 'nb-green' : 'nb-red'}`}>
                     {getActionIcon(action.actionType)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-black text-lg">{action.name}</h3>
-                      <Badge variant="secondary" className={`neo-card ${getEventColor(action.eventType)} text-black font-bold`}>
+                      <Badge variant="secondary" className={`nb-card ${getEventColor(action.eventType)} text-black font-bold`}>
                         {action.eventType}
                       </Badge>
-                      <Badge variant="secondary" className="neo-card neo-blue text-black font-bold">
+                      <Badge variant="secondary" className="nb-card nb-blue text-black font-bold">
                         {action.actionType}
                       </Badge>
                     </div>
@@ -192,7 +192,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                     variant="destructive"
                     size="sm"
                     onClick={() => deleteAction(action.id)}
-                    className="neo-button bg-red-500 hover:bg-red-600"
+                    className="nb-button bg-red-500 hover:bg-red-600"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
