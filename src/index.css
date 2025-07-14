@@ -101,7 +101,7 @@
 
 @layer components {
   .nb-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
+    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme('colors.foreground')];
 
   }
 
@@ -122,22 +122,22 @@
   .dark .nb-card.nb-red { @apply text-white border-2 border-gray-600; }
   
   .nb-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .nb-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .nb-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
-           focus:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           focus:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;
   }
