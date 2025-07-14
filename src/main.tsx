@@ -14,7 +14,7 @@ function renderApp() {
   }
   if (!container.hasChildNodes()) {
     root.render(
-      <ThemeProvider attribute="class" defaultTheme="system">
+      <ThemeProvider attribute="data-theme" defaultTheme="system">
         <App />
         <Toaster />
       </ThemeProvider>
