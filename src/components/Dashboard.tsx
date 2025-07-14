@@ -123,7 +123,7 @@ export const Dashboard = () => {
         </DialogContent>
       </Dialog>
       
-      <div className="container mx-auto p-4 space-y-6 pb-32">
+      <div className="container mx-auto p-4 space-y-4 pb-20">
         {/* Header */}
         {!globalConfig.hideHeader && (
           <DashboardHeader
@@ -281,130 +281,37 @@ export const Dashboard = () => {
         </div>
       </div>
       
-      {/* Floating Action Bar */}
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40">
-        <div className="neo-card rounded-full px-3 py-2 backdrop-blur-sm bg-card/95 border-2 border-foreground shadow-lg">
+      {/* Fixed Floating Action Bar */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="neo-card bg-card/95 backdrop-blur-sm px-3 py-2">
           <div className="flex items-center gap-1">
-            <button
-              title="Feed"
-              onClick={() => {
-                updateActiveTab('feed');
-                markActivity();
-                logInfo('dashboard', 'Switched to feed tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'feed' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Activity className="w-4 h-4" />
-            </button>
-            <button
-              title="Repositories"
-              onClick={() => {
-                updateActiveTab('repositories');
-                markActivity();
-                logInfo('dashboard', 'Switched to repositories tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'repositories' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <GitBranch className="w-4 h-4" />
-            </button>
-            <button
-              title="API Keys"
-              onClick={() => {
-                updateActiveTab('api-keys');
-                markActivity();
-                logInfo('dashboard', 'Switched to api-keys tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'api-keys' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Key className="w-4 h-4" />
-            </button>
-            <button
-              title="Actions"
-              onClick={() => {
-                updateActiveTab('actions');
-                markActivity();
-                logInfo('dashboard', 'Switched to actions tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'actions' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Zap className="w-4 h-4" />
-            </button>
-            <button
-              title="Config"
-              onClick={() => {
-                updateActiveTab('config');
-                markActivity();
-                logInfo('dashboard', 'Switched to config tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'config' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-            <button
-              title="Security"
-              onClick={() => {
-                updateActiveTab('security');
-                markActivity();
-                logInfo('dashboard', 'Switched to security tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'security' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Shield className="w-4 h-4" />
-            </button>
-            <button
-              title="Statistics"
-              onClick={() => {
-                updateActiveTab('statistics');
-                markActivity();
-                logInfo('dashboard', 'Switched to statistics tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'statistics' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-            </button>
-            <button
-              title="Logs"
-              onClick={() => {
-                updateActiveTab('logs');
-                markActivity();
-                logInfo('dashboard', 'Switched to logs tab via floating action bar');
-              }}
-              className={`rounded-full p-3 transition-all duration-200 ${
-                appState.activeTab === 'logs' 
-                  ? 'bg-primary text-primary-foreground shadow-md' 
-                  : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-            </button>
+            {[
+              { key: 'feed', icon: Activity, title: 'Feed' },
+              { key: 'repositories', icon: GitBranch, title: 'Repositories' },
+              { key: 'api-keys', icon: Key, title: 'API Keys' },
+              { key: 'actions', icon: Zap, title: 'Actions' },
+              { key: 'config', icon: Settings, title: 'Config' },
+              { key: 'security', icon: Shield, title: 'Security' },
+              { key: 'statistics', icon: BarChart3, title: 'Statistics' },
+              { key: 'logs', icon: FileText, title: 'Logs' }
+            ].map(({ key, icon: Icon, title }) => (
+              <button
+                key={key}
+                title={title}
+                onClick={() => {
+                  updateActiveTab(key);
+                  markActivity();
+                  logInfo('dashboard', `Switched to ${key} tab via floating action bar`);
+                }}
+                className={`p-2 transition-all duration-200 ${
+                  appState.activeTab === key 
+                    ? 'neo-button neo-blue text-white' 
+                    : 'hover:bg-muted/80 text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+              </button>
+            ))}
           </div>
         </div>
       </div>
