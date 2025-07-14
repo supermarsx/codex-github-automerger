@@ -81,22 +81,22 @@ export const Dashboard: React.FC = () => {
     logInfo('dashboard', `Setting up auto-refresh for ${repositories.length} repositories`);
     const interval = setInterval(() => {
       logInfo('dashboard', 'Auto-refreshing activities');
-      fetchActivities(repositories, apiKeys);
+      fetchActivities(repositories, apiKeys, getDecryptedApiKey);
     }, 30000);
 
     return () => {
       logInfo('dashboard', 'Clearing auto-refresh interval');
       clearInterval(interval);
     };
-  }, [repositories.length, apiKeys.length, fetchActivities, logInfo]);
+  }, [repositories.length, apiKeys.length, fetchActivities, logInfo, getDecryptedApiKey]);
 
   // Initial fetch when repos or keys change
   useEffect(() => {
     if (repositories.length > 0 && apiKeys.length > 0) {
       logInfo('dashboard', `Initial fetch for ${repositories.length} repositories with ${apiKeys.length} API keys`);
-      fetchActivities(repositories, apiKeys);
+      fetchActivities(repositories, apiKeys, getDecryptedApiKey);
     }
-  }, [repositories.length, apiKeys.length, fetchActivities, logInfo]);
+  }, [repositories.length, apiKeys.length, fetchActivities, logInfo, getDecryptedApiKey]);
 
   // Log app initialization
   useEffect(() => {
