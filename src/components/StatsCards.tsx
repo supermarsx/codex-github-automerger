@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Repository, ApiKey, MergeStats, StatsPeriod } from '@/types/dashboard';
 
 interface StatsCardsProps {
@@ -21,57 +22,56 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
   
   const stats = [
     {
-      title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : '0',
+      title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : 'N/A',
       label: 'Active Repos',
       color: 'neo-green',
-      subtitle: `${repositories.length} total`
+      subtitle: repositories.length > 0 ? `${repositories.length} total` : 'No repositories'
     },
     {
-      title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : '0',
+      title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : 'N/A',
       label: 'Active Keys',
       color: 'neo-blue',
-      subtitle: `${apiKeys.length} total`
+      subtitle: apiKeys.length > 0 ? `${apiKeys.length} total` : 'No API keys'
     },
     {
-      title: hasData ? currentStats.pending.toString() : '0',
+      title: hasData ? currentStats.pending.toString() : 'N/A',
       label: 'Pending',
       color: 'neo-yellow',
-      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: hasData ? currentStats.merged.toString() : '0',
+      title: hasData ? currentStats.merged.toString() : 'N/A',
       label: 'Merged',
       color: 'neo-green',
-      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: hasData ? currentStats.failed.toString() : '0',
+      title: hasData ? currentStats.failed.toString() : 'N/A',
       label: 'Failed',
       color: 'neo-red',
-      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
+      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
-      title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : '0%',
+      title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : 'N/A',
       label: 'Success Rate',
       color: 'neo-purple',
-      subtitle: 'Performance'
+      subtitle: hasData ? 'Overall performance' : 'No data available'
     }
   ];
 
   return (
-    <div className="flex gap-2 overflow-x-auto py-2">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {stats.map((stat, index) => (
-        <Card
-          key={index}
-          className={`neo-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_hsl(var(--foreground))]`}
-        >
-          <div className="text-center">
-            <div className="text-black dark:text-white font-black text-base mb-1">
+        <Card key={index} className={`neo-card ${stat.color} p-2`}>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-black dark:text-white font-black text-lg text-center">
               {stat.title}
-            </div>
-            <div className="text-black dark:text-white font-bold text-xs mb-1">{stat.label}</div>
-            <div className="text-black dark:text-white text-xs opacity-75">{stat.subtitle}</div>
-          </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 text-center">
+            <p className="text-black dark:text-white font-bold text-sm">{stat.label}</p>
+            <p className="text-black dark:text-white text-xs opacity-75">{stat.subtitle}</p>
+          </CardContent>
         </Card>
       ))}
     </div>
