@@ -109,13 +109,19 @@ async function pollRepo(watcher) {
     // store additional repo state for caching
     try {
       watcher.pullRequests = await svc.fetchPullRequests(owner, repo);
-    } catch {}
+    } catch (err) {
+      // ignore pull request errors
+    }
     try {
       watcher.strayBranches = await svc.fetchStrayBranches(owner, repo);
-    } catch {}
+    } catch (err) {
+      // ignore stray branch errors
+    }
     try {
       watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
-    } catch {}
+    } catch (err) {
+      // ignore activity fetch errors
+    }
     cacheEntry.timestamp = Date.now();
   } catch (err: any) {
     logger.error('Polling error for', repoKey, err?.message);

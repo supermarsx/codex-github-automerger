@@ -57,7 +57,11 @@ export const useApiKeys = () => {
         logInfo('api-key', 'No passkey registered, skipping unlock');
         const map: Record<string, string> = {};
         apiKeys.forEach(k => {
-          try { map[k.id] = atob(k.key); } catch {}
+          try {
+            map[k.id] = atob(k.key);
+          } catch (err) {
+            // ignore decoding errors
+          }
         });
         setDecryptedKeys(map);
         setUnlocked(true);
@@ -71,7 +75,11 @@ export const useApiKeys = () => {
       if (result.success) {
         const map: Record<string, string> = {};
         apiKeys.forEach(k => {
-          try { map[k.id] = atob(k.key); } catch {}
+          try {
+            map[k.id] = atob(k.key);
+          } catch (err) {
+            // ignore decoding errors
+          }
         });
         setDecryptedKeys(map);
         setUnlocked(true);
