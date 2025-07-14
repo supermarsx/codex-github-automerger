@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const mockSocket = { request: vi.fn() };
+vi.mock('../services/SocketService', () => {
+  return {
+    getSocketService: () => mockSocket
+
 const requestMock = vi.fn();
 vi.mock('@/services/SocketService', () => {
   return {
