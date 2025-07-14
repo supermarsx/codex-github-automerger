@@ -2,10 +2,10 @@
 import type { Server, Socket } from 'socket.io';
 import type express from 'express';
 import crypto from 'crypto';
-import { createGitHubService } from './github.ts';
-import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.ts';
-import { logger } from './logger.ts';
-import { getClientConfig, setClientConfig } from './config.ts';
+import { createGitHubService } from './github.js';
+import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
+import { logger } from './logger.js';
+import { getClientConfig, setClientConfig } from './config.js';
 
 const pairedClients = new Set<string>();
 const pendingPairings = new Map<string, { socket: Socket; clientId: string | null; expiry: number }>();
