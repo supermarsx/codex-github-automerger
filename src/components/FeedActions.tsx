@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,10 +20,15 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
   actions,
   onActionsChange
 }) => {
-  const [newAction, setNewAction] = useState({
+  const [newAction, setNewAction] = useState<{
+    name: string;
+    eventType: FeedAction['eventType'];
+    actionType: FeedAction['actionType'];
+    endpoint: string;
+  }>({
     name: '',
-    eventType: 'all' as const,
-    actionType: 'webhook' as const,
+    eventType: 'all',
+    actionType: 'webhook',
     endpoint: ''
   });
   const { toast } = useToast();
@@ -99,8 +105,8 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
               <Label>Event Type</Label>
               <Select
                 value={newAction.eventType}
-                onValueChange={(value: FeedAction['eventType']) =>
-                  setNewAction({ ...newAction, eventType: value })
+                onValueChange={(value) =>
+                  setNewAction({ ...newAction, eventType: value as FeedAction['eventType'] })
                 }
               >
                 <SelectTrigger className="neo-input">
@@ -120,8 +126,8 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
               <Label>Action Type</Label>
               <Select
                 value={newAction.actionType}
-                onValueChange={(value: FeedAction['actionType']) =>
-                  setNewAction({ ...newAction, actionType: value })
+                onValueChange={(value) =>
+                  setNewAction({ ...newAction, actionType: value as FeedAction['actionType'] })
                 }
               >
                 <SelectTrigger className="neo-input">
