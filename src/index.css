@@ -28,13 +28,13 @@
     --radius: 0.5rem;
     
     /* Neobrutalism colors */
-    --neo-yellow: 51 100% 50%;
-    --neo-pink: 330 100% 71%;
-    --neo-blue: 217 91% 60%;
-    --neo-purple: 262 83% 58%;
-    --neo-orange: 25 95% 53%;
-    --neo-green: 142 76% 36%;
-    --neo-red: 0 84% 60%;
+    --nb-yellow: 51 100% 50%;
+    --nb-pink: 330 100% 71%;
+    --nb-blue: 217 91% 60%;
+    --nb-purple: 262 83% 58%;
+    --nb-orange: 25 95% 53%;
+    --nb-green: 142 76% 36%;
+    --nb-red: 0 84% 60%;
     
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -69,13 +69,13 @@
     --radius: 0.5rem;
     
     /* Neobrutalism colors for light theme */
-    --neo-yellow: 51 100% 50%;
-    --neo-pink: 330 100% 71%;
-    --neo-blue: 217 91% 60%;
-    --neo-purple: 262 83% 58%;
-    --neo-orange: 25 95% 53%;
-    --neo-green: 142 76% 36%;
-    --neo-red: 0 84% 60%;
+    --nb-yellow: 51 100% 50%;
+    --nb-pink: 330 100% 71%;
+    --nb-blue: 217 91% 60%;
+    --nb-purple: 262 83% 58%;
+    --nb-orange: 25 95% 53%;
+    --nb-green: 142 76% 36%;
+    --nb-red: 0 84% 60%;
     
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -100,44 +100,45 @@
 }
 
 @layer components {
-  .neo-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme('colors.foreground')];
+  .nb-card {
+    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
+
   }
+
+  .nb-card.nb-yellow { @apply bg-[hsl(var(--nb-yellow))] text-black border-foreground; }
+  .nb-card.nb-pink { @apply bg-[hsl(var(--nb-pink))] text-black border-foreground; }
+  .nb-card.nb-blue { @apply bg-[hsl(var(--nb-blue))] text-white border-foreground; }
+  .nb-card.nb-purple { @apply bg-[hsl(var(--nb-purple))] text-white border-foreground; }
+  .nb-card.nb-orange { @apply bg-[hsl(var(--nb-orange))] text-black border-foreground; }
+  .nb-card.nb-green { @apply bg-[hsl(var(--nb-green))] text-white border-foreground; }
+  .nb-card.nb-red { @apply bg-[hsl(var(--nb-red))] text-white border-foreground; }
+
+  .dark .nb-card.nb-yellow { @apply text-black border-2 border-gray-600; }
+  .dark .nb-card.nb-pink { @apply text-black border-2 border-gray-600; }
+  .dark .nb-card.nb-blue { @apply text-white border-2 border-gray-600; }
+  .dark .nb-card.nb-purple { @apply text-white border-2 border-gray-600; }
+  .dark .nb-card.nb-orange { @apply text-black border-2 border-gray-600; }
+  .dark .nb-card.nb-green { @apply text-white border-2 border-gray-600; }
+  .dark .nb-card.nb-red { @apply text-white border-2 border-gray-600; }
   
-  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
-  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
-  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-white border-foreground; }
-  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-white border-foreground; }
-  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black border-foreground; }
-  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-white border-foreground; }
-  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-white border-foreground; }
-  
-  .dark .neo-card.neo-yellow { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-pink { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-blue { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-purple { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
-  
-  .neo-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
-           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
-           hover:translate-x-[2px] hover:translate-y-[2px] 
+  .nb-button {
+    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
+           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+           hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
-  .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
-           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
-           hover:translate-x-[2px] hover:translate-y-[2px] 
+  .nb-button-secondary {
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
+           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+           hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
-  .neo-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
-           focus:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
-           focus:translate-x-[2px] focus:translate-y-[2px] 
+  .nb-input {
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)]
+           focus:shadow-[2px_2px_0px_0px_theme(colors.foreground)]
+           focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;
   }
   
@@ -148,7 +149,7 @@
     text-shadow: 2px 2px 0px theme('colors.foreground');
   }
   
-  .neo-hover:hover {
+  .nb-hover:hover {
     transform: translateX(2px) translateY(2px);
     box-shadow: 2px 2px 0px 0px theme('colors.foreground');
   }

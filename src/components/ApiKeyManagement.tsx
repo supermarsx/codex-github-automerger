@@ -40,12 +40,12 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
   return (
     <div className="relative space-y-4 max-w-3xl mx-auto text-sm">
       {!isUnlocked && (
-        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 neo-card font-black text-xl">
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 nb-card font-black text-xl">
           Need authentication first
         </div>
       )}
       {!isUnlocked && (
-        <Alert variant="destructive" className="neo-card">
+        <Alert variant="destructive" className="nb-card">
           <AlertCircle className="w-4 h-4" />
           <AlertTitle>API Keys Locked</AlertTitle>
           <AlertDescription>
@@ -54,7 +54,7 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
         </Alert>
       )}
       {/* Add API Key */}
-      <Card className="neo-card">
+      <Card className="nb-card">
         <CardHeader>
           <CardTitle className="text-2xl font-black flex items-center gap-2">
             <Plus className="w-6 h-6" />
@@ -67,25 +67,25 @@ export const ApiKeyManagement: React.FC<ApiKeyManagementProps> = ({
               placeholder="Key name"
               value={newApiKey.name}
               onChange={(e) => setNewApiKey({ ...newApiKey, name: e.target.value })}
-              className="neo-input"
+              className="nb-input"
             />
             <Input
               placeholder="GitHub Personal Access Token"
               type="password"
               value={newApiKey.key}
               onChange={(e) => setNewApiKey({ ...newApiKey, key: e.target.value })}
-              className="neo-input"
+              className="nb-input"
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={handleAddApiKey} className="neo-button">
+            <Button onClick={handleAddApiKey} className="nb-button">
               <Plus className="w-4 h-4 mr-2" />
               Add API Key
             </Button>
             <Button
               onClick={() => window.open('https://github.com/settings/tokens/new?scopes=repo,read:user&description=Auto-merger+bot', '_blank')}
               variant="outline"
-              className="neo-button-secondary"
+              className="nb-button-secondary"
             >
               Get 30-day PAT
             </Button>

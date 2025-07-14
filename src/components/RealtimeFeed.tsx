@@ -27,19 +27,19 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'merge': return 'neo-green';
-      case 'pull': return 'neo-blue';
-      case 'alert': return 'neo-yellow';
-      case 'success': return 'neo-green';
-      case 'failure': return 'neo-red';
-      default: return 'neo-purple';
+      case 'merge': return 'nb-green';
+      case 'pull': return 'nb-blue';
+      case 'alert': return 'nb-yellow';
+      case 'success': return 'nb-green';
+      case 'failure': return 'nb-red';
+      default: return 'nb-purple';
     }
   };
 
   return (
-    <Card className="neo-card relative">
+    <Card className="nb-card relative">
       {!isUnlocked && (
-        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 font-black text-xl neo-card">
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 font-black text-xl nb-card">
           Need authentication first
         </div>
       )}
@@ -49,7 +49,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
             <Activity className="w-5 h-5" />
             Recent Activity
           </CardTitle>
-          <Button onClick={onExportReport} size="sm" className="neo-button-secondary">
+          <Button onClick={onExportReport} size="sm" className="nb-button-secondary">
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
@@ -66,8 +66,8 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                 </div>
               ) : (
                 activities.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-3 p-3 neo-card">
-                    <div className={`neo-card p-2 ${getActivityColor(activity.type)}`}>
+                  <div key={activity.id} className="flex items-center gap-3 p-3 nb-card">
+                    <div className={`nb-card p-2 ${getActivityColor(activity.type)}`}>
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1">
@@ -75,14 +75,14 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                       <p className="text-sm text-muted-foreground">{activity.repo}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs neo-card rounded-none">
+                      <Badge variant="outline" className="text-xs nb-card rounded-none">
                         {new Date(activity.timestamp).toLocaleString()}
                       </Badge>
                       <Button
                         onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
                         variant="outline"
                         size="sm"
-                        className="neo-button-secondary"
+                        className="nb-button-secondary"
                       >
                         View
                       </Button>
