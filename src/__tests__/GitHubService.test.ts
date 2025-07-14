@@ -1,18 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../services/SocketService', () => ({
-  socketService: {
-    request: vi.fn()
-  }
-}));
+vi.mock('../services/SocketService', () => {
+  return {
+    getSocketService: () => ({
+      request: vi.fn()
+    })
+  };
+});
 
-import { socketService } from '../services/SocketService';
+import { getSocketService } from '../services/SocketService';
 import { GitHubService } from '../components/GitHubService';
 
 let service: GitHubService;
+let socketService: any;
 
 beforeEach(() => {
   service = new GitHubService('token');
+  socketService = getSocketService();
   vi.clearAllMocks();
 });
 

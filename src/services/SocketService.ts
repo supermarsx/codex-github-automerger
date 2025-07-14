@@ -285,4 +285,11 @@ export class SocketService {
   }
 }
 
-export const socketService = SocketService.getInstance();
+let instance: SocketService | null = null;
+
+export function getSocketService(): SocketService {
+  if (!instance) {
+    instance = SocketService.getInstance();
+  }
+  return instance;
+}
