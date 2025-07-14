@@ -19,8 +19,9 @@ export default {
 			}
 		},
 		extend: {
-			colors: {
-				border: 'hsl(var(--border))',
+                        colors: {
+                                border: 'hsl(var(--border))',
+                                nbBorder: 'hsl(var(--nb-border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
