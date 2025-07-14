@@ -1,11 +1,14 @@
 import { Repository, ActivityItem } from '@/types/dashboard';
-import { socketService } from '@/services/SocketService';
+import { getSocketService } from '@/services/SocketService';
 
 export class GitHubService {
   constructor(private token: string) {}
 
   private emit<T>(event: string, payload: Record<string, any>): Promise<T> {
-    return socketService.request<T>(event, { ...payload, token: this.token });
+    return getSocketService().request<T>(event, {
+      ...payload,
+      token: this.token
+    });
   }
 
   fetchRepositories(owner: string): Promise<Repository[]> {
