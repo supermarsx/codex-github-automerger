@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { logger } from './logger.js';
+import { logger } from './logger.ts';
 
 const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'webhooks.json');
