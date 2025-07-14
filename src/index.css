@@ -102,6 +102,7 @@
 @layer components {
   .nb-card {
     @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
+
   }
 
   .nb-card.nb-yellow { @apply bg-[hsl(var(--nb-yellow))] text-black border-foreground; }
@@ -145,11 +146,11 @@
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px theme(colors.foreground);
+    text-shadow: 2px 2px 0px theme('colors.foreground');
   }
   
   .nb-hover:hover {
     transform: translateX(2px) translateY(2px);
-    box-shadow: 2px 2px 0px 0px theme(colors.foreground);
+    box-shadow: 2px 2px 0px 0px theme('colors.foreground');
   }
 }
