@@ -1,5 +1,5 @@
-import { useSocket } from '@/hooks/useSocket';
-import { useLogger } from '@/hooks/useLogger';
+import { BasicSocket } from './BasicSocket';
+import { logger, Logger } from './Logger';
 
 export interface PairingRequest {
   id: string;
@@ -24,8 +24,8 @@ export interface ServerAction {
 
 export class SocketService {
   private static instance: SocketService;
-  private socket: ReturnType<typeof useSocket> | null = null;
-  private logger: ReturnType<typeof useLogger>;
+  private socket: BasicSocket | null = null;
+  private logger: Logger;
   private pairedClients: Set<string> = new Set();
   private pendingPairings: Map<string, PairingRequest> = new Map();
   private pairToken: string | null = null;
@@ -34,7 +34,7 @@ export class SocketService {
 
   constructor() {
     this.clientId = this.generateClientId();
-    this.logger = useLogger();
+    this.logger = logger;
   }
 
   static getInstance(): SocketService {
@@ -50,12 +50,8 @@ export class SocketService {
 
   initialize(socketUrl: string = 'ws://localhost:8080') {
     try {
-      this.socket = useSocket({
-        url: socketUrl,
-        reconnectInterval: 5000,
-        maxReconnectAttempts: 10,
-        checkInterval: 30000
-      });
+      this.socket = new BasicSocket();
+      this.socket.connect();
 
       this.logger.logInfo('socket', 'Socket service initialized', { clientId: this.clientId });
 
