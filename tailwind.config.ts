@@ -7,6 +7,7 @@ export default {
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
+                "./src/index.css",
 		"./src/**/*.{ts,tsx}",
 	],
 	prefix: "",
@@ -53,6 +54,25 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// NeoBrutalism color palette
+				neo: {
+					default: 'hsl(var(--neo-default))',
+					'default-text': 'hsl(var(--neo-default-text))',
+					orange: 'hsl(var(--neo-orange))',
+					'orange-text': 'hsl(var(--neo-orange-text))',
+					blue: 'hsl(var(--neo-blue))',
+					'blue-text': 'hsl(var(--neo-blue-text))',
+					green: 'hsl(var(--neo-green))',
+					'green-text': 'hsl(var(--neo-green-text))',
+					yellow: 'hsl(var(--neo-yellow))',
+					'yellow-text': 'hsl(var(--neo-yellow-text))',
+					pink: 'hsl(var(--neo-pink))',
+					'pink-text': 'hsl(var(--neo-pink-text))',
+					purple: 'hsl(var(--neo-purple))',
+					'purple-text': 'hsl(var(--neo-purple-text))',
+					red: 'hsl(var(--neo-red))',
+					'red-text': 'hsl(var(--neo-red-text))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -65,9 +85,9 @@ export default {
 				}
 			},
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				lg: '0px', // No rounded corners in brutalism
+				md: '0px',
+				sm: '0px'
 			},
 			keyframes: {
 				'accordion-down': {
@@ -93,5 +113,5 @@ export default {
 			}
 		}
 	},
-        plugins: [animatePlugin],
+       plugins: [animatePlugin],
 } satisfies Config;

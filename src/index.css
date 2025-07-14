@@ -2,154 +2,288 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@reference border-border;
+@reference bg-background;
+@reference text-foreground;
+@reference bg-card;
+@reference border-foreground;
+@reference bg-primary;
+@reference bg-secondary;
+@reference bg-foreground;
 
-/* Neobrutalism Design System with Dark Mode */
+/* Clean Design System - Traditional Dashboard */
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 8%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 3.7% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 20%;
-    --muted-foreground: 240 5% 84.9%;
-    --accent: 240 3.7% 20%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 25%;
-    --input: 240 3.7% 20%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
-    
-    /* Neobrutalism colors */
-    --neo-yellow: 51 100% 50%;
-    --neo-pink: 330 100% 71%;
-    --neo-blue: 217 91% 60%;
-    --neo-purple: 262 83% 58%;
-    --neo-orange: 25 95% 53%;
-    --neo-green: 142 76% 36%;
-    --neo-red: 0 84% 60%;
-    
-    --sidebar-background: 240 10% 3.9%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  [data-theme="light"] {
+    /* Clean, professional colors */
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 222.2 84% 4.9%;
     
-    /* Neobrutalism colors for light theme */
-    --neo-yellow: 51 100% 50%;
-    --neo-pink: 330 100% 71%;
-    --neo-blue: 217 91% 60%;
-    --neo-purple: 262 83% 58%;
-    --neo-orange: 25 95% 53%;
-    --neo-green: 142 76% 36%;
-    --neo-red: 0 84% 60%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
     
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 222.2 47.4% 11.2%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222.2 84% 4.9%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 222.2 84% 4.9%;
+  }
+
+  [data-theme="dark"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 222.2 47.4% 11.2%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 212.7 26.8% 83.9%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
   }
 }
 
 @layer components {
+  /* NeoBrutalist Cards */
   .neo-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
+    background-color: hsl(var(--neo-default));
+    color: hsl(var(--neo-default-text));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+    transition: all 0.1s ease;
+    font-weight: 600;
   }
   
-  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
-  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
-  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-white border-foreground; }
-  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-white border-foreground; }
-  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black border-foreground; }
-  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-white border-foreground; }
-  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-white border-foreground; }
+  .neo-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+  }
   
-  .dark .neo-card.neo-yellow { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-pink { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-blue { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-purple { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
-  .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
-  .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
+  /* Color variants for cards */
+  .neo-card.neo-orange { 
+    background-color: hsl(var(--neo-orange)); 
+    color: hsl(var(--neo-orange-text)); 
+  }
+  .neo-card.neo-blue { 
+    background-color: hsl(var(--neo-blue)); 
+    color: hsl(var(--neo-blue-text)); 
+  }
+  .neo-card.neo-green { 
+    background-color: hsl(var(--neo-green)); 
+    color: hsl(var(--neo-green-text)); 
+  }
+  .neo-card.neo-yellow { 
+    background-color: hsl(var(--neo-yellow)); 
+    color: hsl(var(--neo-yellow-text)); 
+  }
+  .neo-card.neo-pink { 
+    background-color: hsl(var(--neo-pink)); 
+    color: hsl(var(--neo-pink-text)); 
+  }
+  .neo-card.neo-purple { 
+    background-color: hsl(var(--neo-purple)); 
+    color: hsl(var(--neo-purple-text)); 
+  }
+  .neo-card.neo-red { 
+    background-color: hsl(var(--neo-red)); 
+    color: hsl(var(--neo-red-text)); 
+  }
   
+  /* NeoBrutalist Buttons */
   .neo-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
-           hover:translate-x-[2px] hover:translate-y-[2px] 
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--neo-default));
+    color: hsl(var(--neo-default-text));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition: all 0.1s ease;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
   }
   
+  .neo-button:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+  }
+  
+  .neo-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  /* Button color variants */
+  .neo-button.neo-orange { 
+    background-color: hsl(var(--neo-orange)); 
+    color: hsl(var(--neo-orange-text)); 
+  }
+  .neo-button.neo-blue { 
+    background-color: hsl(var(--neo-blue)); 
+    color: hsl(var(--neo-blue-text)); 
+  }
+  .neo-button.neo-green { 
+    background-color: hsl(var(--neo-green)); 
+    color: hsl(var(--neo-green-text)); 
+  }
+  .neo-button.neo-red { 
+    background-color: hsl(var(--neo-red)); 
+    color: hsl(var(--neo-red-text)); 
+  }
+  
+  /* Secondary button style */
   .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
-           hover:translate-x-[2px] hover:translate-y-[2px] 
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition: all 0.1s ease;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
   }
   
+  .neo-button-secondary:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+  }
+  
+  .neo-button-secondary:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  /* NeoBrutalist Inputs */
   .neo-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           focus:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
-           focus:translate-x-[2px] focus:translate-y-[2px] 
-           transition-all duration-150 font-bold;
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 4px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+    transition: all 0.1s ease;
+    font-weight: bold;
+    padding: 0.75rem 1rem;
   }
   
+  .neo-input:focus {
+    outline: none;
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
+  }
+  
+  .neo-input::placeholder {
+    color: hsl(var(--muted-foreground));
+    font-weight: bold;
+  }
+  
+  /* Input color variants */
+  .neo-input.neo-orange { 
+    background-color: hsl(var(--neo-orange)); 
+    color: hsl(var(--neo-orange-text)); 
+  }
+  .neo-input.neo-blue { 
+    background-color: hsl(var(--neo-blue)); 
+    color: hsl(var(--neo-blue-text)); 
+  }
+  .neo-input.neo-green { 
+    background-color: hsl(var(--neo-green)); 
+    color: hsl(var(--neo-green-text)); 
+  }
+  
+  /* NeoBrutalist Switch */
+  .neo-switch {
+    background-color: hsl(var(--background));
+    border: 4px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
+  }
+  
+  .neo-switch-thumb {
+    background-color: hsl(var(--foreground));
+    border: 2px solid hsl(var(--foreground));
+  }
+  
+  /* NeoBrutalist Badges/Tags */
+  .neo-badge {
+    background-color: hsl(var(--neo-yellow));
+    color: hsl(var(--neo-yellow-text));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 3px 3px 0px 0px hsl(var(--foreground));
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.5rem;
+  }
 }
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px theme(colors.foreground);
+    text-shadow: 2px 2px 0px hsl(var(--foreground));
   }
   
   .neo-hover:hover {
     transform: translateX(2px) translateY(2px);
-    box-shadow: 2px 2px 0px 0px theme(colors.foreground);
+    box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
+  }
+  
+  /* Brutalist text utilities */
+  .text-brutal {
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .shadow-brutal {
+    text-shadow: 3px 3px 0px hsl(var(--foreground));
   }
 }
