@@ -101,7 +101,7 @@
 
 @layer components {
   .neo-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
+    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme('colors.foreground')];
   }
   
   .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
@@ -121,22 +121,22 @@
   .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
   
   .neo-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            hover:translate-x-[2px] hover:translate-y-[2px] 
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           hover:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            hover:translate-x-[2px] hover:translate-y-[2px] 
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .neo-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
-           focus:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme('colors.foreground')]
+           focus:shadow-[2px_2px_0px_0px_theme('colors.foreground')]
            focus:translate-x-[2px] focus:translate-y-[2px] 
            transition-all duration-150 font-bold;
   }
@@ -145,11 +145,11 @@
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px theme(colors.foreground);
+    text-shadow: 2px 2px 0px theme('colors.foreground');
   }
   
   .neo-hover:hover {
     transform: translateX(2px) translateY(2px);
-    box-shadow: 2px 2px 0px 0px theme(colors.foreground);
+    box-shadow: 2px 2px 0px 0px theme('colors.foreground');
   }
 }
