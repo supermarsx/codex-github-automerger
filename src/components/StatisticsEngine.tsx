@@ -167,18 +167,21 @@ export class StatisticsEngine {
     switch (period) {
       case 'today':
         return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      case 'week':
+      case 'week': {
         const weekStart = new Date(now);
         weekStart.setDate(now.getDate() - 7);
         return weekStart;
-      case 'month':
+      }
+      case 'month': {
         const monthStart = new Date(now);
         monthStart.setMonth(now.getMonth() - 1);
         return monthStart;
-      case 'year':
+      }
+      case 'year': {
         const yearStart = new Date(now);
         yearStart.setFullYear(now.getFullYear() - 1);
         return yearStart;
+      }
       default:
         return new Date(now.getFullYear(), now.getMonth(), now.getDate());
     }
