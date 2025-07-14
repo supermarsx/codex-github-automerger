@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { getItem, setItem, removeItem } from '@/utils/storage';
 import { Repository, ActivityItem } from '@/types/dashboard';
@@ -21,10 +22,10 @@ export const useRepositories = () => {
         const parsed = typeof savedRepos === 'string' ? JSON.parse(savedRepos) : savedRepos;
         const repos = parsed.map((repo: Repository) => ({
           ...repo,
-          autoMergeOnClean: repo.autoMergeOnClean ?? repo.autoMergeEnabled ?? repo.enabled ?? true,
+          autoMergeOnClean: repo.autoMergeOnClean ?? true,
           autoMergeOnUnstable: repo.autoMergeOnUnstable ?? false,
           watchEnabled: repo.watchEnabled ?? false,
-          autoDeleteOnDirty: repo.autoDeleteOnDirty ?? repo.autoDeleteBranch ?? false,
+          autoDeleteOnDirty: repo.autoDeleteOnDirty ?? false,
           autoCloseBranch: repo.autoCloseBranch ?? false,
           protectedBranches: repo.protectedBranches ?? ['main'],
           lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,

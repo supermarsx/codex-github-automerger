@@ -1,15 +1,29 @@
+
 import { useState, useEffect } from 'react';
 import { getItem, setItem, removeItem } from '@/utils/storage';
+import { ActivityItem } from '@/types/dashboard';
 
 const WATCH_MODE_STORAGE_KEY = 'automerger-watch-mode';
 // Maximum number of items persisted per repository history list.
 // Older entries are trimmed before being saved to IndexedDB.
 const MAX_ITEMS = 50;
 
+interface PullRequest {
+  id: number;
+  number: number;
+  title: string;
+  user: { login: string };
+  head: { ref: string };
+  base: { ref: string };
+  html_url: string;
+  mergeable?: boolean | null;
+  mergeable_state?: string;
+}
+
 export interface WatchModeState {
   lastUpdateTime: Date;
-  repoActivities: Record<string, unknown[]>;
-  repoPullRequests: Record<string, unknown[]>;
+  repoActivities: Record<string, ActivityItem[]>;
+  repoPullRequests: Record<string, PullRequest[]>;
   repoStrayBranches: Record<string, string[]>;
   repoLastFetched: Record<string, number>;
 }
@@ -29,15 +43,19 @@ export const useWatchModePersistence = () => {
       if (saved) {
         try {
           const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
-          const cap = (obj: Record<string, unknown[]>) =>
+          const capActivities = (obj: Record<string, any[]>) =>
             Object.fromEntries(
               Object.entries(obj || {}).map(([k, v]) => [k, v.slice(0, 50)])
             );
+          const capBranches = (obj: Record<string, any[]>) =>
+            Object.fromEntries(
+              Object.entries(obj || {}).map(([k, v]) => [k, (v || []).filter((item: any) => typeof item === 'string').slice(0, 50)])
+            );
           setWatchModeState({
             lastUpdateTime: new Date(parsed.lastUpdateTime),
-            repoActivities: cap(parsed.repoActivities),
-            repoPullRequests: cap(parsed.repoPullRequests),
-            repoStrayBranches: cap(parsed.repoStrayBranches),
+            repoActivities: capActivities(parsed.repoActivities),
+            repoPullRequests: capActivities(parsed.repoPullRequests),
+            repoStrayBranches: capBranches(parsed.repoStrayBranches),
             repoLastFetched: parsed.repoLastFetched || {}
           });
         } catch (error) {
@@ -67,7 +85,7 @@ export const useWatchModePersistence = () => {
     });
   }, [watchModeState]);
 
-  const updateRepoActivities = (repoId: string, activities: unknown[]) => {
+  const updateRepoActivities = (repoId: string, activities: ActivityItem[]) => {
     const trimmed = activities.slice(-MAX_ITEMS);
     setWatchModeState(prev => ({
       ...prev,
@@ -92,7 +110,7 @@ export const useWatchModePersistence = () => {
     });
   };
 
-  const updateRepoPullRequests = (repoId: string, prs: unknown[]) => {
+  const updateRepoPullRequests = (repoId: string, prs: PullRequest[]) => {
     const trimmed = prs.slice(-MAX_ITEMS);
     setWatchModeState(prev => ({
       ...prev,
