@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { createGitHubService } from './github.ts';
-import { WebhookService } from './webhooks.ts';
-import { logger } from './logger.ts';
+import { createGitHubService } from './github.js';
+import { WebhookService } from './webhooks.js';
+import { logger } from './logger.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);

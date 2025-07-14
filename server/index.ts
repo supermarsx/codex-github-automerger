@@ -2,8 +2,8 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-import { registerSocketHandlers } from './socketHandlers.ts';
-import { logger } from './logger.ts';
+import { registerSocketHandlers } from './socketHandlers.js';
+import { logger } from './logger.js';
 import { fileURLToPath } from 'url';
 
 export function startServer(port: number = Number(process.env.PORT) || 3001) {
