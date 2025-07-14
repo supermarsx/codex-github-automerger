@@ -114,7 +114,7 @@ available.
    npm run build:server
    ```
 
-2. Start the Node.js server:
+2. Start the Node.js server using the compiled files:
 
    ```bash
    npm run server

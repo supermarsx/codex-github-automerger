@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "build:server": "tsc -p server/tsconfig.json",
-    "server": "ts-node server/index.ts",
+    "server": "node server/dist/index.js",
     "pretest": "npm run lint"
   },
   "dependencies": {
