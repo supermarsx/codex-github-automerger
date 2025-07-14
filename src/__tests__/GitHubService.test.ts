@@ -4,19 +4,26 @@ const mockSocket = { request: vi.fn() };
 vi.mock('../services/SocketService', () => {
   return {
     getSocketService: () => mockSocket
+
+const requestMock = vi.fn();
+vi.mock('@/services/SocketService', () => {
+  return {
+    getSocketService: () => ({
+      request: requestMock
+    })
   };
 });
 
-import { getSocketService } from '../services/SocketService';
+import { getSocketService } from '@/services/SocketService';
 import { GitHubService } from '../components/GitHubService';
 
 let service: GitHubService;
 let socketService: any;
 
 beforeEach(() => {
+  vi.clearAllMocks();
   service = new GitHubService('token');
   socketService = getSocketService();
-  vi.clearAllMocks();
 });
 
 describe('GitHubService', () => {

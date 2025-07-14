@@ -124,13 +124,13 @@
   .neo-card.neo-green { background-color: hsl(var(--neo-green)); color: white; border-color: hsl(var(--foreground)); }
   .neo-card.neo-red { background-color: hsl(var(--neo-red)); color: white; border-color: hsl(var(--foreground)); }
   
-  .dark .neo-card.neo-yellow { color: black; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-pink { color: black; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-blue { color: white; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-purple { color: white; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-orange { color: black; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-green { color: white; border-width: 2px; border-color: #4b5563; }
-  .dark .neo-card.neo-red { color: white; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-yellow { color: black; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-pink { color: black; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-blue { color: white; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-purple { color: white; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-orange { color: black; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-green { color: white; border-width: 2px; border-color: #4b5563; }
+  [data-theme="dark"] .neo-card.neo-red { color: white; border-width: 2px; border-color: #4b5563; }
   
   .neo-button {
     background-color: hsl(var(--primary));
