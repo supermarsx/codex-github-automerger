@@ -140,15 +140,15 @@ export const Dashboard = () => {
         <ConnectionManager apiKeys={apiKeys} checkInterval={globalConfig.serverCheckInterval} />
 
         {/* Main Content */}
-        <div className="w-full">
+        <div className="w-full max-w-2xl mx-auto">
           <Tabs value={appState.activeTab} onValueChange={(tab) => {
             updateActiveTab(tab);
             markActivity();
             logInfo('dashboard', `Switched to tab: ${tab}`);
           }} className="w-full">
 
-            <TabsContent value="feed" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="feed" className="space-y-4">
+              <div className="w-full">
                 <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} isUnlocked={isUnlocked} />
                 <WatchMode
                   repositories={repositories}
@@ -162,8 +162,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="repositories" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="repositories" className="space-y-4">
+              <div className="w-full">
                 <SelectiveRepositoryLoader
                   apiKeys={apiKeys}
                   existingRepos={repositories.map(r => `${r.owner}/${r.name}`)}
@@ -197,8 +197,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="api-keys" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="api-keys" className="space-y-4">
+              <div className="w-full">
                 <ApiKeyManagement
                   apiKeys={apiKeys}
                   isUnlocked={isUnlocked}
@@ -212,8 +212,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="actions" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="actions" className="space-y-4">
+              <div className="w-full">
                 <FeedActions
                   actions={globalConfig.feedActions}
                   onActionsChange={(actions) => setGlobalConfig({ ...globalConfig, feedActions: actions })}
@@ -221,8 +221,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="config" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="config" className="space-y-4">
+              <div className="w-full">
                 <GlobalConfiguration 
                   config={globalConfig} 
                   repositories={repositories}
@@ -234,8 +234,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="security" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="security" className="space-y-4">
+              <div className="w-full">
                 <SecurityManagement
                   apiKeys={apiKeys}
                   repositories={repositories}
@@ -245,8 +245,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="statistics" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="statistics" className="space-y-4">
+              <div className="w-full">
                 <DetailedStatistics 
                   repositories={repositories} 
                   activities={activities.map(activity => ({
@@ -264,8 +264,8 @@ export const Dashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="logs" className="space-y-6">
-              <div className="max-w-4xl mx-auto">
+            <TabsContent value="logs" className="space-y-4">
+              <div className="w-full">
                 {!globalConfig.logsDisabled ? (
                   <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} />
                 ) : (

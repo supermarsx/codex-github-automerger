@@ -113,8 +113,9 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Lexend Mega', 'Public Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-weight: bold;
+    font-family: 'Inter', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
   }
 }
 
@@ -123,15 +124,15 @@
   .neo-card {
     background-color: hsl(var(--neo-default));
     color: hsl(var(--neo-default-text));
-    border: 4px solid hsl(var(--foreground));
-    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
     transition: all 0.1s ease;
-    font-weight: bold;
+    font-weight: 600;
   }
   
   .neo-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0px 0px hsl(var(--foreground));
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
   }
   
   /* Color variants for cards */
@@ -168,22 +169,22 @@
   .neo-button {
     background-color: hsl(var(--neo-default));
     color: hsl(var(--neo-default-text));
-    border: 4px solid hsl(var(--foreground));
-    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
     transition: all 0.1s ease;
-    font-weight: 900;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
   
   .neo-button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
   }
   
   .neo-button:active {
-    transform: translate(2px, 2px);
+    transform: translate(1px, 1px);
     box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
   }
   
@@ -209,21 +210,22 @@
   .neo-button-secondary {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
-    border: 4px solid hsl(var(--foreground));
-    box-shadow: 6px 6px 0px 0px hsl(var(--foreground));
+    border: 3px solid hsl(var(--foreground));
+    box-shadow: 4px 4px 0px 0px hsl(var(--foreground));
     transition: all 0.1s ease;
-    font-weight: 900;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-size: 0.75rem;
   }
   
   .neo-button-secondary:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0px 0px hsl(var(--foreground));
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px 0px hsl(var(--foreground));
   }
   
   .neo-button-secondary:active {
-    transform: translate(2px, 2px);
+    transform: translate(1px, 1px);
     box-shadow: 2px 2px 0px 0px hsl(var(--foreground));
   }
   

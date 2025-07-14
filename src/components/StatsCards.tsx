@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Repository, ApiKey, MergeStats, StatsPeriod } from '@/types/dashboard';
 
 interface StatsCardsProps {
@@ -22,60 +21,59 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
   
   const stats = [
     {
-      title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : 'N/A',
+      title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : '0',
       label: 'Active Repos',
       color: 'neo-green',
-      subtitle: repositories.length > 0 ? `${repositories.length} total` : 'No repositories'
+      subtitle: `${repositories.length} total`
     },
     {
-      title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : 'N/A',
+      title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : '0',
       label: 'Active Keys',
       color: 'neo-blue',
-      subtitle: apiKeys.length > 0 ? `${apiKeys.length} total` : 'No API keys'
+      subtitle: `${apiKeys.length} total`
     },
     {
-      title: hasData ? currentStats.pending.toString() : 'N/A',
+      title: hasData ? currentStats.pending.toString() : '0',
       label: 'Pending',
       color: 'neo-yellow',
-      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
+      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
-      title: hasData ? currentStats.merged.toString() : 'N/A',
+      title: hasData ? currentStats.merged.toString() : '0',
       label: 'Merged',
       color: 'neo-green',
-      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
+      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
-      title: hasData ? currentStats.failed.toString() : 'N/A',
+      title: hasData ? currentStats.failed.toString() : '0',
       label: 'Failed',
       color: 'neo-red',
-      subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
+      subtitle: statsPeriod === 'session' ? 'Session' : 'Total'
     },
     {
-      title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : 'N/A',
+      title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : '0%',
       label: 'Success Rate',
       color: 'neo-purple',
-      subtitle: hasData ? 'Overall performance' : 'No data available'
+      subtitle: 'Performance'
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="flex gap-2 overflow-x-auto py-2">
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className={`neo-card ${stat.color} p-2 shadow-[4px_4px_0_hsl(var(--foreground))]`}
+          className={`neo-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_hsl(var(--foreground))]`}
         >
-          <CardHeader className="pb-1">
-            <CardTitle className="text-black dark:text-white font-black text-lg text-center">
+          <div className="text-center">
+            <div className="text-black dark:text-white font-black text-base mb-1">
               {stat.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0 text-center">
-            <p className="text-black dark:text-white font-bold text-sm">{stat.label}</p>
-            <p className="text-black dark:text-white text-xs opacity-75">{stat.subtitle}</p>
-          </CardContent>
+            </div>
+            <div className="text-black dark:text-white font-bold text-xs mb-1">{stat.label}</div>
+            <div className="text-black dark:text-white text-xs opacity-75">{stat.subtitle}</div>
+          </div>
         </Card>
       ))}
     </div>
-  );};
+  );
+};
