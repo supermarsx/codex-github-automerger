@@ -97,14 +97,13 @@
   
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Lexend Mega', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
   .nb-card {
     @apply bg-card border-4 border-nbBorder shadow-[8px_8px_0px_0px_theme('colors.nbBorder')];
-
   }
 
   .nb-card.nb-yellow { @apply bg-[hsl(var(--nb-yellow))] text-black border-nbBorder; }
@@ -115,13 +114,13 @@
   .nb-card.nb-green { @apply bg-[hsl(var(--nb-green))] text-white border-nbBorder; }
   .nb-card.nb-red { @apply bg-[hsl(var(--nb-red))] text-white border-nbBorder; }
 
-  .dark .nb-card.nb-yellow { @apply text-black border-2 border-gray-600; }
-  .dark .nb-card.nb-pink { @apply text-black border-2 border-gray-600; }
-  .dark .nb-card.nb-blue { @apply text-white border-2 border-gray-600; }
-  .dark .nb-card.nb-purple { @apply text-white border-2 border-gray-600; }
-  .dark .nb-card.nb-orange { @apply text-black border-2 border-gray-600; }
-  .dark .nb-card.nb-green { @apply text-white border-2 border-gray-600; }
-  .dark .nb-card.nb-red { @apply text-white border-2 border-gray-600; }
+  .dark .nb-card.nb-yellow { @apply text-black border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-pink { @apply text-black border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-blue { @apply text-white border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-purple { @apply text-white border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-orange { @apply text-black border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-green { @apply text-white border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-red { @apply text-white border-[2.5px] border-gray-600; }
   
   .nb-button {
     @apply bg-primary border-4 border-nbBorder shadow-[4px_4px_0px_0px_theme('colors.nbBorder')]
