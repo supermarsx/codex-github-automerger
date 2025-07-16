@@ -58,7 +58,7 @@ export class WebhookService {
         },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       await this.saveWebhook({ ...webhook, lastTriggered: new Date().toISOString() });
       return { success: true };
     } catch (err) {
