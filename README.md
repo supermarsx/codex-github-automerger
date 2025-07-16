@@ -121,7 +121,8 @@ available.
    ```
 
    The server listens on `PORT` (default `3001`). You may also customise
-   `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET`
+   `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `STRAY_BRANCH_CACHE_TTL_MS`,
+   `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET`
    using environment variables.
 
 3. In a separate terminal start the Vite dev server for the UI:

@@ -1,7 +1,23 @@
 // @ts-nocheck
 import { Octokit } from '@octokit/rest';
 
-const strayBranchCache = new Map();
+const STRAY_CACHE_TTL = parseInt(
+  process.env.STRAY_BRANCH_CACHE_TTL_MS || '300000',
+  10
+);
+
+type StrayEntry = { branches: string[]; timestamp: number };
+
+const strayBranchCache = new Map<string, StrayEntry>();
+
+function cleanupStrayCache() {
+  const now = Date.now();
+  for (const [key, entry] of strayBranchCache) {
+    if (now - entry.timestamp > STRAY_CACHE_TTL) strayBranchCache.delete(key);
+  }
+}
+
+setInterval(cleanupStrayCache, STRAY_CACHE_TTL);
 
 export function createGitHubService(token) {
   const octokit = new Octokit({ auth: token });
@@ -79,7 +95,9 @@ export function createGitHubService(token) {
       };
 
       const key = `${owner}/${repo}`;
-      const cached = strayBranchCache.get(key) || [];
+      cleanupStrayCache();
+      const cachedEntry = strayBranchCache.get(key);
+      const cached = cachedEntry ? cachedEntry.branches : [];
       if (!cached.includes(branch)) {
         throw new Error('branch not in stray list');
       }
@@ -96,18 +114,25 @@ export function createGitHubService(token) {
       }
 
       await octokit.rest.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
-      strayBranchCache.set(key, cached.filter(b => b !== branch));
+      strayBranchCache.set(key, {
+        branches: cached.filter(b => b !== branch),
+        timestamp: Date.now()
+      });
       return true;
     },
 
     async fetchStrayBranches(owner, repo) {
+      cleanupStrayCache();
       const { data: branches } = await octokit.rest.repos.listBranches({ owner, repo, per_page: 100 });
       const { data: pulls } = await octokit.rest.pulls.list({ owner, repo, state: 'open', per_page: 100 });
       const activeBranches = new Set(pulls.map(pr => pr.head.ref));
       const stray = branches
         .filter(b => !b.protected && !activeBranches.has(b.name))
         .map(b => b.name);
-      strayBranchCache.set(`${owner}/${repo}`, stray);
+      strayBranchCache.set(`${owner}/${repo}`, {
+        branches: stray,
+        timestamp: Date.now()
+      });
       return stray;
     },
 
@@ -132,9 +157,15 @@ export function createGitHubService(token) {
       return activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     },
 
-    async checkPullRequestMergeable(owner, repo, pullNumber) {
+  async checkPullRequestMergeable(owner, repo, pullNumber) {
       const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber });
       return data.mergeable === true && data.mergeable_state === 'clean';
     }
   };
 }
+
+export const __test = {
+  strayBranchCache,
+  cleanupStrayCache,
+  STRAY_CACHE_TTL
+};
