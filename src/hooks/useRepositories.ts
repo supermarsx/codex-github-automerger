@@ -9,7 +9,7 @@ const REPOSITORIES_STORAGE_KEY = 'automerger-repositories';
 
 export const useRepositories = () => {
   const { toast } = useToast();
-  const { logInfo } = useLogger();
+  const { logInfo, logError } = useLogger();
   
   const [repositories, setRepositories] = useState<Repository[]>([]);
 
@@ -40,7 +40,7 @@ export const useRepositories = () => {
         }));
         setRepositories(repos);
       } catch (error) {
-        console.error('Error parsing saved repositories:', error);
+        logError('repository', 'Error parsing saved repositories', error);
       }
     })();
     return () => {
@@ -50,14 +50,14 @@ export const useRepositories = () => {
 
   // Persist repositories to IndexedDB whenever they change
   useEffect(() => {
-    setItem(REPOSITORIES_STORAGE_KEY, repositories).catch(error => {
-      console.error('Error saving repositories:', error);
-      toast({
-        title: 'Storage error',
-        description: 'Unable to save repository data to IndexedDB.',
-        variant: 'destructive'
+      setItem(REPOSITORIES_STORAGE_KEY, repositories).catch(error => {
+        logError('repository', 'Error saving repositories', error);
+        toast({
+          title: 'Storage error',
+          description: 'Unable to save repository data to IndexedDB.',
+          variant: 'destructive'
+        });
       });
-    });
   }, [repositories, toast]);
 
   function addRepositoryActivity(
