@@ -25,6 +25,7 @@ function cleanCache() {
 export function subscribeRepo(socket, { token, owner, repo, interval, config = {} }) {
   const key = `${owner}/${repo}`;
   let watcher = watchers.get(key);
+  let isNew = false;
   if (!watcher) {
     watcher = {
       token,
@@ -40,8 +41,8 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
       strayBranches: [],
       activityEvents: []
     };
-    watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
     watchers.set(key, watcher);
+    isNew = true;
   } else {
     watcher.config = { ...watcher.config, ...config };
     if (interval && interval !== watcher.interval) {
@@ -51,6 +52,10 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
     }
   }
   watcher.sockets.add(socket);
+  if (isNew) {
+    pollRepo(watcher);
+    watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
+  }
   const cache = repoCache.get(key) || { events: [], alerts: [] };
   socket.emit('repoCache', {
     repo: key,
