@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 const STORAGE_PATH = process.env.CONFIG_STORAGE_PATH ||
@@ -6,25 +6,20 @@ const STORAGE_PATH = process.env.CONFIG_STORAGE_PATH ||
 
 let configs: Record<string, any> = {};
 
-function loadSync() {
+export async function load() {
   try {
-    const data = fs.readFileSync(STORAGE_PATH, 'utf8');
+    const data = await fs.readFile(STORAGE_PATH, 'utf8');
     configs = JSON.parse(data);
   } catch {
     configs = {};
   }
 }
 
-async function load() {
-  loadSync();
-}
+export const loadPromise = load();
 
 async function save() {
-  await fs.promises.writeFile(STORAGE_PATH, JSON.stringify(configs, null, 2));
+  await fs.writeFile(STORAGE_PATH, JSON.stringify(configs, null, 2));
 }
-
-// Load immediately and synchronously so configs are ready
-loadSync();
 
 export function getClientConfig(clientId: string) {
   return configs[clientId] || {};
@@ -35,4 +30,4 @@ export async function setClientConfig(clientId: string, cfg: any) {
   await save();
 }
 
-export const __test = { load, save, configs, STORAGE_PATH };
+export const __test = { load, loadPromise, save, configs, STORAGE_PATH };
