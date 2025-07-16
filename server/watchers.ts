@@ -2,18 +2,13 @@
 import { createGitHubService } from './github.js';
 import { WebhookService } from './webhooks.js';
 import { logger } from './logger.js';
+import { matchesPattern } from './utils/patterns.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
 
 const watchers = new Map();
 const repoCache = new Map();
-
-function matchesPattern(value, pattern) {
-  const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
-  return regex.test(value);
-}
 
 function cleanCache() {
   const now = Date.now();

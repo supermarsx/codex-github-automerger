@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Octokit } from '@octokit/rest';
+import { matchesPattern } from './utils/patterns.js';
 
 const STRAY_CACHE_TTL = parseInt(
   process.env.STRAY_BRANCH_CACHE_TTL_MS || '300000',
@@ -88,11 +89,6 @@ export function createGitHubService(token) {
     },
 
     async deleteBranch(owner, repo, branch, allowedPatterns = []) {
-      const matchesPattern = (value, pattern) => {
-        const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp('^' + pattern.split('*').map(escapeRegex).join('.*') + '$');
-        return regex.test(value);
-      };
 
       const key = `${owner}/${repo}`;
       cleanupStrayCache();
