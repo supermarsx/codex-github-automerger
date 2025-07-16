@@ -19,7 +19,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
   const [latency, setLatency] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { logInfo, logWarn } = useLogger();
+  const { logInfo } = useLogger();
 
   const activeApiKeys = apiKeys.filter(k => k.isActive).length;
 
@@ -103,3 +103,4 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
     </div>
   );
 };
+
