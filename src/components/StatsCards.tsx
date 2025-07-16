@@ -63,7 +63,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className={`nb-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_theme('colors.foreground')]`}
+          className={`nb-card ${stat.color} p-3 min-w-[110px] flex-shrink-0 shadow-[3px_3px_0_hsl(var(--foreground))]`}
         >
           <div className="text-center">
             <div className="text-black dark:text-white font-black text-base mb-1">

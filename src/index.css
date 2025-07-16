@@ -92,7 +92,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
@@ -103,7 +103,7 @@
 
 @layer components {
   .nb-card {
-    @apply bg-card border-4 border-nbBorder shadow-[8px_8px_0px_0px_theme('colors.nbBorder')];
+    @apply bg-card border-4 border-nbBorder shadow-[8px_8px_0px_0px_hsl(var(--nb-border))];
   }
 
   .nb-card.nb-yellow { @apply bg-[hsl(var(--nb-yellow))] text-black border-nbBorder; }
@@ -123,22 +123,22 @@
   .dark .nb-card.nb-red { @apply text-white border-[2.5px] border-gray-600; }
   
   .nb-button {
-    @apply bg-primary border-4 border-nbBorder shadow-[4px_4px_0px_0px_theme('colors.nbBorder')]
-           hover:shadow-[2px_2px_0px_0px_theme('colors.nbBorder')]
+    @apply bg-primary border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
+           hover:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .nb-button-secondary {
-    @apply bg-secondary border-4 border-nbBorder shadow-[4px_4px_0px_0px_theme('colors.nbBorder')]
-           hover:shadow-[2px_2px_0px_0px_theme('colors.nbBorder')]
+    @apply bg-secondary border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
+           hover:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .nb-input {
-    @apply bg-background border-4 border-nbBorder shadow-[4px_4px_0px_0px_theme('colors.nbBorder')]
-           focus:shadow-[2px_2px_0px_0px_theme('colors.nbBorder')]
+    @apply bg-background border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
+           focus:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
            focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;
   }
@@ -147,11 +147,11 @@
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px theme('colors.nbBorder');
+    text-shadow: 2px 2px 0px hsl(var(--nb-border));
   }
   
   .nb-hover:hover {
     transform: translateX(2px) translateY(2px);
-    box-shadow: 2px 2px 0px 0px theme('colors.nbBorder');
+    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
   }
 }
