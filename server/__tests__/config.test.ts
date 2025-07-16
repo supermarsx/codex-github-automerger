@@ -10,6 +10,7 @@ let mod: typeof import('../config.js');
 async function loadModule() {
   vi.resetModules();
   mod = await import('../config.ts');
+  await mod.loadPromise;
 }
 
 beforeEach(async () => {
