@@ -44,12 +44,14 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
     watchers.set(key, watcher);
     isNew = true;
   } else {
+    watcher.token = token;
     watcher.config = { ...watcher.config, ...config };
     if (interval && interval !== watcher.interval) {
       clearInterval(watcher.timer);
       watcher.interval = interval;
       watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
     }
+    pollRepo(watcher);
   }
   watcher.sockets.add(socket);
   if (isNew) {
