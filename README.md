@@ -108,29 +108,15 @@ available.
 
 ## Running the server and UI together
 
-1. Build the server TypeScript once:
+Run both the Node.js server and the Vite dev server with a single command:
 
-   ```bash
-   npm run build:server
-   ```
+```bash
+npm run dev
+```
 
-2. Start the Node.js server using the compiled files:
-
-   ```bash
-   npm run server
-   ```
-
-   The server listens on `PORT` (default `3001`). You may also customise
-   `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `STRAY_BRANCH_CACHE_TTL_MS`,
-   `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET`
-   using environment variables.
-
-3. In a separate terminal start the Vite dev server for the UI:
-
-   ```bash
-   npm run dev
-   ```
-
-   The UI communicates with the Node server via WebSockets. GitHub Personal
-   Access Tokens can be provided through the UI itself or by setting the
-   `GITHUB_TOKEN` environment variable before starting the server.
+The script builds the server and then starts it on `PORT` (default `3001`) while
+launching the Vite dev server concurrently. You can still customise
+`POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `STRAY_BRANCH_CACHE_TTL_MS`,
+`WEBHOOK_STORAGE_PATH` and `PAIR_SECRET` using environment variables. GitHub
+Personal Access Tokens can be provided through the UI itself or by setting the
+`GITHUB_TOKEN` environment variable before starting the server.
