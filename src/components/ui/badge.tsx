@@ -14,7 +14,7 @@ const badgeVariants = cva(
           "nb-card nb-blue text-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--nb-border))]",
         destructive:
           "nb-card nb-red text-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--nb-border))]",
-        outline: "nb-card bg-background text-foreground hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--nb-border))]",
+        outline: "nb-card bg-card text-foreground hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_hsl(var(--nb-border))]",
       },
     },
     defaultVariants: {

@@ -106,13 +106,13 @@
     @apply bg-card border-4 border-nbBorder shadow-[8px_8px_0px_0px_hsl(var(--nb-border))];
   }
 
-  .nb-card.nb-yellow { @apply bg-[hsl(var(--nb-yellow))] text-black border-nbBorder; }
-  .nb-card.nb-pink { @apply bg-[hsl(var(--nb-pink))] text-black border-nbBorder; }
-  .nb-card.nb-blue { @apply bg-[hsl(var(--nb-blue))] text-white border-nbBorder; }
-  .nb-card.nb-purple { @apply bg-[hsl(var(--nb-purple))] text-white border-nbBorder; }
-  .nb-card.nb-orange { @apply bg-[hsl(var(--nb-orange))] text-black border-nbBorder; }
-  .nb-card.nb-green { @apply bg-[hsl(var(--nb-green))] text-white border-nbBorder; }
-  .nb-card.nb-red { @apply bg-[hsl(var(--nb-red))] text-white border-nbBorder; }
+  .nb-card.nb-yellow { @apply bg-nbYellow text-black border-nbBorder; }
+  .nb-card.nb-pink { @apply bg-nbPink text-black border-nbBorder; }
+  .nb-card.nb-blue { @apply bg-nbBlue text-white border-nbBorder; }
+  .nb-card.nb-purple { @apply bg-nbPurple text-white border-nbBorder; }
+  .nb-card.nb-orange { @apply bg-nbOrange text-black border-nbBorder; }
+  .nb-card.nb-green { @apply bg-nbGreen text-white border-nbBorder; }
+  .nb-card.nb-red { @apply bg-nbRed text-white border-nbBorder; }
 
   .dark .nb-card.nb-yellow { @apply text-black border-[2.5px] border-gray-600; }
   .dark .nb-card.nb-pink { @apply text-black border-[2.5px] border-gray-600; }
@@ -137,7 +137,7 @@
   }
   
   .nb-input {
-    @apply bg-background border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
+    @apply bg-card border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
            focus:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
            focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;

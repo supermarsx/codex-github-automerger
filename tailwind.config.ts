@@ -19,9 +19,9 @@ export default {
 			}
 		},
 		extend: {
-                        colors: {
-                                border: 'hsl(var(--border))',
-                                nbBorder: 'hsl(var(--nb-border))',
+			colors: {
+				border: 'hsl(var(--border))',
+				nbBorder: 'hsl(var(--nb-border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
@@ -63,7 +63,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				nbYellow: 'hsl(var(--nb-yellow))',
+				nbPink: 'hsl(var(--nb-pink))',
+				nbBlue: 'hsl(var(--nb-blue))',
+				nbPurple: 'hsl(var(--nb-purple))',
+				nbOrange: 'hsl(var(--nb-orange))',
+				nbGreen: 'hsl(var(--nb-green))',
+				nbRed: 'hsl(var(--nb-red))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

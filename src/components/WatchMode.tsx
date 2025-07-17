@@ -314,7 +314,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
     <>
     <div className="relative space-y-6">
       {!isUnlocked && (
-        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 nb-card font-black text-xl">
+        <div className="absolute inset-0 bg-card/80 flex items-center justify-center z-10 nb-card font-black text-xl">
           Need authentication first
         </div>
       )}

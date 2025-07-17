@@ -39,7 +39,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
   return (
     <Card className="nb-card relative">
       {!isUnlocked && (
-        <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+        <div className="absolute inset-0 bg-card/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
           <div className="nb-card nb-red p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-6 h-6 text-white" />
@@ -75,7 +75,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
               </div>
             ) : (
               activities.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-4 p-4 nb-card bg-background/50 hover:bg-background/80 transition-colors">
+                <div key={activity.id} className="flex items-center gap-4 p-4 nb-card bg-card/50 hover:bg-card/80 transition-colors">
                   <div className={`nb-card p-3 ${getActivityColor(activity.type)} flex-shrink-0`}>
                     {getActivityIcon(activity.type)}
                   </div>
@@ -84,7 +84,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                     <p className="text-sm text-muted-foreground font-bold truncate">{activity.repo}</p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <Badge variant="outline" className="text-xs nb-card bg-background/50 font-bold">
+                    <Badge variant="outline" className="text-xs nb-card bg-card/50 font-bold">
                       {new Date(activity.timestamp).toLocaleString()}
                     </Badge>
                     <Button
