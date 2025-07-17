@@ -96,51 +96,76 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Lexend Mega', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
   .nb-card {
-    @apply bg-card border-4 border-nbBorder shadow-[8px_8px_0px_0px_hsl(var(--nb-border))];
+    background-color: hsl(var(--card));
+    border: 4px solid hsl(var(--nb-border));
+    box-shadow: 8px 8px 0px 0px hsl(var(--nb-border));
   }
 
-  .nb-card.nb-yellow { @apply bg-nbYellow text-black border-nbBorder; }
-  .nb-card.nb-pink { @apply bg-nbPink text-black border-nbBorder; }
-  .nb-card.nb-blue { @apply bg-nbBlue text-white border-nbBorder; }
-  .nb-card.nb-purple { @apply bg-nbPurple text-white border-nbBorder; }
-  .nb-card.nb-orange { @apply bg-nbOrange text-black border-nbBorder; }
-  .nb-card.nb-green { @apply bg-nbGreen text-white border-nbBorder; }
-  .nb-card.nb-red { @apply bg-nbRed text-white border-nbBorder; }
+  .nb-card.nb-yellow { background-color: hsl(var(--nb-yellow)); color: black; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-pink { background-color: hsl(var(--nb-pink)); color: black; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-blue { background-color: hsl(var(--nb-blue)); color: white; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-purple { background-color: hsl(var(--nb-purple)); color: white; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-orange { background-color: hsl(var(--nb-orange)); color: black; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-green { background-color: hsl(var(--nb-green)); color: white; border-color: hsl(var(--nb-border)); }
+  .nb-card.nb-red { background-color: hsl(var(--nb-red)); color: white; border-color: hsl(var(--nb-border)); }
 
-  .dark .nb-card.nb-yellow { @apply text-black border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-pink { @apply text-black border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-blue { @apply text-white border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-purple { @apply text-white border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-orange { @apply text-black border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-green { @apply text-white border-[2.5px] border-gray-600; }
-  .dark .nb-card.nb-red { @apply text-white border-[2.5px] border-gray-600; }
+  .dark .nb-card.nb-yellow { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-pink { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-blue { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-purple { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-orange { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-green { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
+  .dark .nb-card.nb-red { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
   
   .nb-button {
-    @apply bg-primary border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
-           hover:translate-x-[2px] hover:translate-y-[2px]
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--primary));
+    border: 4px solid hsl(var(--nb-border));
+    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
+    transition: all 150ms;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nb-button:hover {
+    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
+    transform: translateX(2px) translateY(2px);
   }
   
   .nb-button-secondary {
-    @apply bg-secondary border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
-           hover:translate-x-[2px] hover:translate-y-[2px]
-           transition-all duration-150 font-black uppercase tracking-wider;
+    background-color: hsl(var(--secondary));
+    border: 4px solid hsl(var(--nb-border));
+    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
+    transition: all 150ms;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nb-button-secondary:hover {
+    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
+    transform: translateX(2px) translateY(2px);
   }
   
   .nb-input {
-    @apply bg-card border-4 border-nbBorder shadow-[4px_4px_0px_0px_hsl(var(--nb-border))]
-           focus:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))]
-           focus:translate-x-[2px] focus:translate-y-[2px]
-           transition-all duration-150 font-bold;
+    background-color: hsl(var(--card));
+    border: 4px solid hsl(var(--nb-border));
+    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
+    transition: all 150ms;
+    font-weight: 700;
+  }
+
+  .nb-input:focus {
+    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
+    transform: translateX(2px) translateY(2px);
   }
   
 }
