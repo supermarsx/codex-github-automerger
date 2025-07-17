@@ -39,14 +39,21 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
   return (
     <Card className="nb-card relative">
       {!isUnlocked && (
-        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-10 font-black text-xl nb-card">
-          Need authentication first
+        <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+          <div className="nb-card nb-red p-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 text-white" />
+              <span className="font-black text-white text-lg">Authentication Required</span>
+            </div>
+          </div>
         </div>
       )}
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-black flex items-center gap-2">
-            <Activity className="w-5 h-5" />
+          <CardTitle className="text-2xl font-black flex items-center gap-3 text-shadow">
+            <div className="nb-card nb-blue p-2">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
             Recent Activity
           </CardTitle>
           <Button onClick={onExportReport} size="sm" className="nb-button-secondary">
@@ -55,44 +62,46 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
           </Button>
         </div>
       </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-96">
-            <div className="space-y-3">
-              {activities.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No recent activity</p>
-                  <p className="text-sm">Enable repositories and API keys to see activity</p>
+      <CardContent>
+        <ScrollArea className="h-96">
+          <div className="space-y-4">
+            {activities.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="nb-card nb-purple p-6 mx-auto w-fit mb-6">
+                  <Activity className="w-12 h-12 text-white mx-auto" />
                 </div>
-              ) : (
-                activities.map((activity) => (
-                  <div key={activity.id} className="flex items-center gap-3 p-3 nb-card">
-                    <div className={`nb-card p-2 ${getActivityColor(activity.type)}`}>
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-bold text-foreground">{activity.message}</p>
-                      <p className="text-sm text-muted-foreground">{activity.repo}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs nb-card rounded-none">
-                        {new Date(activity.timestamp).toLocaleString()}
-                      </Badge>
-                      <Button
-                        onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
-                        variant="outline"
-                        size="sm"
-                        className="nb-button-secondary"
-                      >
-                        View
-                      </Button>
-                    </div>
+                <h3 className="font-black text-lg mb-2">No Recent Activity</h3>
+                <p className="text-muted-foreground font-bold">Enable repositories and API keys to see activity</p>
+              </div>
+            ) : (
+              activities.map((activity) => (
+                <div key={activity.id} className="flex items-center gap-4 p-4 nb-card bg-background/50 hover:bg-background/80 transition-colors">
+                  <div className={`nb-card p-3 ${getActivityColor(activity.type)} flex-shrink-0`}>
+                    {getActivityIcon(activity.type)}
                   </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-foreground truncate">{activity.message}</p>
+                    <p className="text-sm text-muted-foreground font-bold truncate">{activity.repo}</p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <Badge variant="outline" className="text-xs nb-card bg-background/50 font-bold">
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </Badge>
+                    <Button
+                      onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
+                      variant="outline"
+                      size="sm"
+                      className="nb-button-secondary"
+                    >
+                      View
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 };
