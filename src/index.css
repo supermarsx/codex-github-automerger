@@ -28,13 +28,29 @@
     --radius: 0.5rem;
     
     /* Neobrutalism colors */
-    --nb-yellow: 51 100% 50%;
-    --nb-pink: 330 100% 71%;
-    --nb-blue: 217 91% 60%;
-    --nb-purple: 262 83% 58%;
-    --nb-orange: 25 95% 53%;
-    --nb-green: 142 76% 36%;
-    --nb-red: 0 84% 60%;
+    --neo-yellow: 51 100% 50%;
+    --neo-pink: 330 100% 71%;
+    --neo-blue: 217 91% 60%;
+    --neo-purple: 262 83% 58%;
+    --neo-orange: 25 95% 53%;
+    --neo-green: 142 76% 36%;
+    --neo-red: 0 84% 60%;
+    /* Alias nb-* variables for compatibility */
+    --nb-yellow: var(--neo-yellow);
+    --nb-pink: var(--neo-pink);
+    --nb-blue: var(--neo-blue);
+    --nb-purple: var(--neo-purple);
+    --nb-orange: var(--neo-orange);
+    --nb-green: var(--neo-green);
+    --nb-red: var(--neo-red);
+    /* Alias nb-* variables for compatibility */
+    --nb-yellow: var(--neo-yellow);
+    --nb-pink: var(--neo-pink);
+    --nb-blue: var(--neo-blue);
+    --nb-purple: var(--neo-purple);
+    --nb-orange: var(--neo-orange);
+    --nb-green: var(--neo-green);
+    --nb-red: var(--neo-red);
     --nb-border: 0 0% 0%;
     
     --sidebar-background: 240 10% 3.9%;
@@ -70,14 +86,13 @@
     --radius: 0.5rem;
     
     /* Neobrutalism colors for light theme */
-    --nb-yellow: 51 100% 50%;
-    --nb-pink: 330 100% 71%;
-    --nb-blue: 217 91% 60%;
-    --nb-purple: 262 83% 58%;
-    --nb-orange: 25 95% 53%;
-    --nb-green: 142 76% 36%;
-    --nb-red: 0 84% 60%;
-    --nb-border: 0 0% 0%;
+    --neo-yellow: 51 100% 50%;
+    --neo-pink: 330 100% 71%;
+    --neo-blue: 217 91% 60%;
+    --neo-purple: 262 83% 58%;
+    --neo-orange: 25 95% 53%;
+    --neo-green: 142 76% 36%;
+    --neo-red: 0 84% 60%;
     
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -92,91 +107,82 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
   
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: 'Lexend Mega', 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 @layer components {
-  .nb-card {
-    background-color: hsl(var(--card));
-    border: 4px solid hsl(var(--nb-border));
-    box-shadow: 8px 8px 0px 0px hsl(var(--nb-border));
-  }
-
-  .nb-card.nb-yellow { background-color: hsl(var(--nb-yellow)); color: black; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-pink { background-color: hsl(var(--nb-pink)); color: black; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-blue { background-color: hsl(var(--nb-blue)); color: white; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-purple { background-color: hsl(var(--nb-purple)); color: white; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-orange { background-color: hsl(var(--nb-orange)); color: black; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-green { background-color: hsl(var(--nb-green)); color: white; border-color: hsl(var(--nb-border)); }
-  .nb-card.nb-red { background-color: hsl(var(--nb-red)); color: white; border-color: hsl(var(--nb-border)); }
-
-  .dark .nb-card.nb-yellow { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-pink { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-blue { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-purple { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-orange { color: black; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-green { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
-  .dark .nb-card.nb-red { color: white; border-width: 2.5px; border-color: rgb(75 85 99); }
-  
-  .nb-button {
-    background-color: hsl(var(--primary));
-    border: 4px solid hsl(var(--nb-border));
-    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
-    transition: all 150ms;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .nb-button:hover {
-    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
-    transform: translateX(2px) translateY(2px);
+  .neo-card {
+    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_theme(colors.foreground)];
   }
   
-  .nb-button-secondary {
-    background-color: hsl(var(--secondary));
-    border: 4px solid hsl(var(--nb-border));
-    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
-    transition: all 150ms;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+  .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
+  .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
+  .neo-card.neo-blue { @apply bg-[hsl(var(--neo-blue))] text-white border-foreground; }
+  .neo-card.neo-purple { @apply bg-[hsl(var(--neo-purple))] text-white border-foreground; }
+  .neo-card.neo-orange { @apply bg-[hsl(var(--neo-orange))] text-black border-foreground; }
+  .neo-card.neo-green { @apply bg-[hsl(var(--neo-green))] text-white border-foreground; }
+  .neo-card.neo-red { @apply bg-[hsl(var(--neo-red))] text-white border-foreground; }
+  
+  .dark .neo-card.neo-yellow { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-pink { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-blue { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-purple { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
+  .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
+  .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
+  
+  .neo-button {
+    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
+           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+           hover:translate-x-[2px] hover:translate-y-[2px] 
+           transition-all duration-150 font-black uppercase tracking-wider;
   }
 
-  .nb-button-secondary:hover {
-    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
-    transform: translateX(2px) translateY(2px);
+  /* Aliases for nb-* class names used in newer code */
+  .nb-card {@apply neo-card;}
+  .nb-card.nb-yellow {@apply neo-card neo-yellow;}
+  .nb-card.nb-pink {@apply neo-card neo-pink;}
+  .nb-card.nb-blue {@apply neo-card neo-blue;}
+  .nb-card.nb-purple {@apply neo-card neo-purple;}
+  .nb-card.nb-orange {@apply neo-card neo-orange;}
+  .nb-card.nb-green {@apply neo-card neo-green;}
+  .nb-card.nb-red {@apply neo-card neo-red;}
+
+  .nb-button {@apply neo-button;}
+  .nb-button-secondary {@apply neo-button-secondary;}
+  .nb-input {@apply neo-input;}
+  
+  .neo-button-secondary {
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
+           hover:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+           hover:translate-x-[2px] hover:translate-y-[2px] 
+           transition-all duration-150 font-black uppercase tracking-wider;
   }
   
-  .nb-input {
-    background-color: hsl(var(--card));
-    border: 4px solid hsl(var(--nb-border));
-    box-shadow: 4px 4px 0px 0px hsl(var(--nb-border));
-    transition: all 150ms;
-    font-weight: 700;
-  }
-
-  .nb-input:focus {
-    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
-    transform: translateX(2px) translateY(2px);
+  .neo-input {
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
+           focus:shadow-[2px_2px_0px_0px_theme(colors.foreground)] 
+           focus:translate-x-[2px] focus:translate-y-[2px] 
+           transition-all duration-150 font-bold;
   }
   
 }
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px hsl(var(--nb-border));
+    text-shadow: 2px 2px 0px theme(colors.foreground);
   }
   
-  .nb-hover:hover {
+  .neo-hover:hover {
     transform: translateX(2px) translateY(2px);
-    box-shadow: 2px 2px 0px 0px hsl(var(--nb-border));
+    box-shadow: 2px 2px 0px 0px theme(colors.foreground);
   }
+
+  .nb-hover:hover {@apply neo-hover;}
 }
