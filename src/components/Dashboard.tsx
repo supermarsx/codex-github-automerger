@@ -127,7 +127,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-card">
       {/* Header */}
-      <header className="border-b border-nbBorder bg-card/50 backdrop-blur-sm sticky top-0 z-40">
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40" style={{ borderColor: 'hsl(var(--nb-border))' }}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
