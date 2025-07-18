@@ -43,14 +43,6 @@
     --nb-orange: var(--neo-orange);
     --nb-green: var(--neo-green);
     --nb-red: var(--neo-red);
-    /* Alias nb-* variables for compatibility */
-    --nb-yellow: var(--neo-yellow);
-    --nb-pink: var(--neo-pink);
-    --nb-blue: var(--neo-blue);
-    --nb-purple: var(--neo-purple);
-    --nb-orange: var(--neo-orange);
-    --nb-green: var(--neo-green);
-    --nb-red: var(--neo-red);
     --nb-border: 0 0% 0%;
     
     --sidebar-background: 240 10% 3.9%;
