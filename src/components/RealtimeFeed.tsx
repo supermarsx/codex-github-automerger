@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Activity, GitMerge, GitPullRequest, AlertTriangle, CheckCircle, XCircle, Download } from 'lucide-react';
 import { ActivityItem } from '@/types/dashboard';
 
@@ -37,6 +36,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
   };
 
   return (
+
     <Card className="neo-card relative">
       {!isUnlocked && (
         <div className="absolute inset-0 bg-card/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
@@ -63,7 +63,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-96">
+        <div>
           <div className="space-y-4">
             {activities.length === 0 ? (
               <div className="text-center py-12">
@@ -100,7 +100,7 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
               ))
             )}
           </div>
-        </ScrollArea>
+          </div>
       </CardContent>
     </Card>
   );
