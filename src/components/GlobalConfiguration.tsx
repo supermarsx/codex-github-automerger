@@ -213,7 +213,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   };
 
   return (
-    <Card className="nb-card">
+    <Card className="neo-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-black flex items-center gap-2">
@@ -224,12 +224,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
             <div className="flex gap-2">
               <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
                 <DialogTrigger asChild>
-                  <Button className="nb-button-secondary" size="sm">
+                  <Button className="neo-button-secondary" size="sm">
                     <Download className="w-4 h-4 mr-2" />
                     Export
                   </Button>
                 </DialogTrigger>
-              <DialogContent className="nb-card">
+              <DialogContent className="neo-card">
                 <DialogHeader>
                   <DialogTitle>Export Configuration</DialogTitle>
                 </DialogHeader>
@@ -301,19 +301,19 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                         placeholder="Encryption password"
                         value={exportPassword}
                         onChange={(e) => setExportPassword(e.target.value)}
-                        className="nb-input"
+                        className="neo-input"
                       />
                     )}
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button onClick={handleExport} className="nb-button">
+                    <Button onClick={handleExport} className="neo-button">
                       Export Configuration
                     </Button>
                     <Button 
                       onClick={() => setShowExportDialog(false)} 
                       variant="outline"
-                      className="nb-button-secondary"
+                      className="neo-button-secondary"
                     >
                       Cancel
                     </Button>
@@ -324,12 +324,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
             <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
               <DialogTrigger asChild>
-                <Button className="nb-button-secondary" size="sm">
+                <Button className="neo-button-secondary" size="sm">
                   <Upload className="w-4 h-4 mr-2" />
                   Import
                 </Button>
               </DialogTrigger>
-              <DialogContent className="nb-card">
+              <DialogContent className="neo-card">
                 <DialogHeader>
                   <DialogTitle>Import Configuration</DialogTitle>
                 </DialogHeader>
@@ -340,7 +340,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                       type="file"
                       accept=".json"
                       onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                      className="nb-input"
+                      className="neo-input"
                     />
                   </div>
                   
@@ -351,18 +351,18 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                       placeholder="Enter password if file is encrypted"
                       value={importPassword}
                       onChange={(e) => setImportPassword(e.target.value)}
-                      className="nb-input"
+                      className="neo-input"
                     />
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button onClick={handleImport} className="nb-button">
+                    <Button onClick={handleImport} className="neo-button">
                       Import Configuration
                     </Button>
                     <Button 
                       onClick={() => setShowImportDialog(false)} 
                       variant="outline"
-                      className="nb-button-secondary"
+                      className="neo-button-secondary"
                     >
                       Cancel
                     </Button>
@@ -370,7 +370,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 </div>
               </DialogContent>
               </Dialog>
-              <Button onClick={handleCheckUpdates} className="nb-button-secondary" size="sm">
+              <Button onClick={handleCheckUpdates} className="neo-button-secondary" size="sm">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Check Updates
               </Button>
@@ -381,7 +381,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
       <CardContent className="space-y-6">
         {/* Approval Settings */}
         <div className="space-y-4">
-          <h4 className="font-black text-lg">Approval Settings</h4>
+          <h4 className="font-semibold text-lg">Approval Settings</h4>
           <div className="space-y-4">
             <ConfigToggle
               id="requireApproval"
@@ -406,43 +406,43 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Default Branch Patterns */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Default Branch Patterns</h4>
+          <h4 className="font-semibold text-lg">Default Branch Patterns</h4>
           <EditableList
             items={config.defaultBranchPatterns}
             reorderable
             onItemsChange={(items) => onConfigChange({ ...config, defaultBranchPatterns: items })}
             placeholder="e.g., codex-*"
-            itemColor="nb-blue"
+            itemColor="neo-blue"
           />
         </div>
 
         {/* Default Allowed Users */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Default Allowed Users</h4>
+          <h4 className="font-semibold text-lg">Default Allowed Users</h4>
           <EditableList
             items={config.defaultAllowedUsers}
             reorderable
             onItemsChange={(items) => onConfigChange({ ...config, defaultAllowedUsers: items })}
             placeholder="e.g., github-actions[bot]"
-            itemColor="nb-green"
+            itemColor="neo-green"
           />
         </div>
 
         {/* Protected Branches */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Protected Branches</h4>
+          <h4 className="font-semibold text-lg">Protected Branches</h4>
           <EditableList
             items={config.protectedBranches}
             reorderable
             onItemsChange={(items) => onConfigChange({ ...config, protectedBranches: items })}
             placeholder="e.g., main"
-            itemColor="nb-red"
+            itemColor="neo-red"
           />
         </div>
 
         {/* Advanced Settings */}
         <div className="space-y-4">
-          <h4 className="font-black text-lg">Advanced Settings</h4>
+          <h4 className="font-semibold text-lg">Advanced Settings</h4>
            <div className="grid grid-cols-1 gap-4">
             <ConfigToggle
                id="autoMergeOnClean"
@@ -530,7 +530,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Alert Configuration */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Alert Configuration</h4>
+          <h4 className="font-semibold text-lg">Alert Configuration</h4>
           <div className="space-y-4">
             <ConfigSelector
               id="alertThreshold"
@@ -553,7 +553,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* System Configuration */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">System Configuration</h4>
+          <h4 className="font-semibold text-lg">System Configuration</h4>
           <div className="space-y-4">
             <ConfigSelector
               id="serverCheckInterval"
@@ -597,7 +597,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 value={config.accentColor}
                 onValueChange={(value) => onConfigChange({ ...config, accentColor: value })}
               >
-                <SelectTrigger className="nb-input">
+                <SelectTrigger className="neo-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -637,7 +637,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                   clearWatchModeState();
                   toast({ title: 'Watch mode data cleared' });
                 }}
-                className="nb-button bg-red-500 hover:bg-red-600"
+                className="neo-button bg-red-500 hover:bg-red-600"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear Watch Mode

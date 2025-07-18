@@ -312,8 +312,13 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   return (
     <>
     <div className="relative space-y-6">
+      {!isUnlocked && (
+        <div className="absolute inset-0 bg-card/80 flex items-center justify-center z-10 neo-card font-black text-xl">
+          Need authentication first
+        </div>
+      )}
       {showControlPanel && (
-      <Card className="nb-card">
+      <Card className="neo-card">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -329,7 +334,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                 onClick={refreshAllWatched}
                 disabled={isLoading || watchedRepos.length === 0}
                 size="sm"
-                className="nb-button-secondary"
+                className="neo-button-secondary"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
@@ -357,7 +362,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
               const activities = repoActivities[repo.id] || [];
               
               return (
-                <Card key={repo.id} className="nb-card">
+                <Card key={repo.id} className="neo-card">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -371,7 +376,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                         <Button
                           onClick={() => window.open(`https://github.com/${repo.owner}/${repo.name}`, '_blank')}
                           size="sm"
-                          className="nb-button-secondary"
+                          className="neo-button-secondary"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
                           View on GitHub
@@ -432,7 +437,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <Button
                                       onClick={() => handleMerge(repo, pr.number)}
                                       size="sm"
-                                      className="nb-button"
+                                      className="neo-button"
                                       disabled={pr.mergeable !== true}
                                     >
                                       <GitMerge className="w-3 h-3 mr-1" />
@@ -441,7 +446,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <Button
                                       onClick={() => handleClose(repo, pr.number)}
                                       size="sm"
-                                      className="nb-button nb-red"
+                                      className="neo-button neo-red"
                                     >
                                       <XCircle className="w-3 h-3 mr-1" />
                                       Close
@@ -522,7 +527,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                   </span>
                                   <Button
                                     size="sm"
-                                    className="nb-button nb-red"
+                                    className="neo-button neo-red"
                                     variant="destructive"
                                     onClick={() => {
                                       if (globalConfig.confirmBranchDeletion) {

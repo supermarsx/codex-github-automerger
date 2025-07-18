@@ -70,10 +70,10 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'merged': return 'nb-green';
-      case 'pending': return 'nb-yellow';
-      case 'failed': return 'nb-red';
-      default: return 'nb-purple';
+      case 'merged': return 'neo-green';
+      case 'pending': return 'neo-yellow';
+      case 'failed': return 'neo-red';
+      default: return 'neo-purple';
     }
   };
 
@@ -91,11 +91,11 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
     : '0';
 
   return (
-    <Card className="nb-card">
+    <Card className="neo-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`nb-card p-2 ${repo.enabled ? 'nb-green' : 'nb-red'}`}>
+            <div className={`neo-card p-2 ${repo.enabled ? 'neo-green' : 'neo-red'}`}>
               <Github className="w-5 h-5 text-black" />
             </div>
             <div>
@@ -103,16 +103,16 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                 {repo.owner}/{repo.name}
               </CardTitle>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="secondary" className={`nb-card ${repo.enabled ? 'nb-green' : 'nb-red'} text-black font-bold text-xs`}>
+                <Badge variant="secondary" className={`neo-card ${repo.enabled ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
                   {repo.enabled ? 'Active' : 'Inactive'}
                 </Badge>
-                <Badge variant="secondary" className={`nb-card ${repo.autoMergeOnClean ? 'nb-green' : 'nb-red'} text-black font-bold text-xs`}>
+                <Badge variant="secondary" className={`neo-card ${repo.autoMergeOnClean ? 'neo-green' : 'neo-red'} text-black font-bold text-xs`}>
                   {repo.autoMergeOnClean ? 'Auto Merge on Clean' : 'Auto Merge on Clean Off'}
                 </Badge>
-                <Badge variant="secondary" className="nb-card nb-blue text-black font-bold text-xs">
+                <Badge variant="secondary" className="neo-card neo-blue text-black font-bold text-xs">
                   {successRate}% Success
                 </Badge>
-                <Badge variant="secondary" className="nb-card nb-purple text-black font-bold text-xs">
+                <Badge variant="secondary" className="neo-card neo-purple text-black font-bold text-xs">
                   {repo.stats.totalMerges} Total
                 </Badge>
               </div>
@@ -121,14 +121,14 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           <div className="flex items-center gap-2">
             <Button
               onClick={() => onExportConfig(repo.id)}
-              className="nb-button-secondary"
+              className="neo-button-secondary"
               size="sm"
             >
               <Download className="w-4 h-4" />
             </Button>
             <Button
               onClick={() => onImportConfig(repo.id)}
-              className="nb-button-secondary"
+              className="neo-button-secondary"
               size="sm"
             >
               <Upload className="w-4 h-4" />
@@ -143,15 +143,15 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
         
         {/* Recent Activity Summary */}
         {repo.recentPull && (
-          <div className="mt-4 p-3 rounded nb-card">
+          <div className="mt-4 p-3 rounded neo-card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-sm">Latest Pull Request</p>
+                <p className="text-sm font-semibold">Latest Pull Request</p>
                 <p className="text-xs text-muted-foreground">
                   #{repo.recentPull.number} - {repo.recentPull.title}
                 </p>
               </div>
-              <Badge variant="secondary" className={`nb-card ${getStatusColor(repo.recentPull.status)} text-black font-bold`}>
+              <Badge variant="secondary" className={`neo-card ${getStatusColor(repo.recentPull.status)} text-black font-bold`}>
                 {repo.recentPull.status}
               </Badge>
             </div>
@@ -161,7 +161,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
       
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-between nb-button-secondary">
+          <Button variant="ghost" className="w-full justify-between neo-button-secondary">
             Configuration & Activity
             {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
@@ -207,19 +207,19 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
 
             {/* Repository Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <div className="nb-card p-3 nb-yellow text-center">
+              <div className="neo-card p-3 neo-yellow text-center">
                 <p className="text-black font-black text-lg">{repo.stats.pendingMerges}</p>
                 <p className="text-black font-bold text-xs">Pending</p>
               </div>
-              <div className="nb-card p-3 nb-green text-center">
+              <div className="neo-card p-3 neo-green text-center">
                 <p className="text-black font-black text-lg">{repo.stats.successfulMerges}</p>
                 <p className="text-black font-bold text-xs">Success</p>
               </div>
-              <div className="nb-card p-3 nb-red text-center">
+              <div className="neo-card p-3 neo-red text-center">
                 <p className="text-black font-black text-lg">{repo.stats.failedMerges}</p>
                 <p className="text-black font-bold text-xs">Failed</p>
               </div>
-              <div className="nb-card p-3 nb-purple text-center">
+              <div className="neo-card p-3 neo-purple text-center">
                 <p className="text-black font-black text-lg">{repo.stats.totalMerges}</p>
                 <p className="text-black font-bold text-xs">Total</p>
               </div>
@@ -233,7 +233,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               </h4>
               <div className="flex flex-wrap gap-2 mb-3">
                 {repo.allowedBranches.map((branch, index) => (
-                  <Badge key={index} variant="secondary" className="nb-card nb-blue text-black font-bold" title={branch}>
+                  <Badge key={index} variant="secondary" className="neo-card neo-blue text-black font-bold" title={branch}>
                     {abbreviate(branch)}
                     <button
                       onClick={() => onRemoveBranch(repo.id, index)}
@@ -249,10 +249,10 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   placeholder="e.g., codex-feature/*"
                   value={newBranch}
                   onChange={(e) => setNewBranch(e.target.value)}
-                  className="nb-input"
+                  className="neo-input"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddBranch()}
                 />
-                <Button onClick={handleAddBranch} className="nb-button" size="sm">
+                <Button onClick={handleAddBranch} className="neo-button" size="sm">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -266,7 +266,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
               </h4>
               <div className="flex flex-wrap gap-2 mb-3">
                 {repo.allowedUsers.map((user, index) => (
-                  <Badge key={index} variant="secondary" className="nb-card nb-green text-black font-bold">
+                  <Badge key={index} variant="secondary" className="neo-card neo-green text-black font-bold">
                     {user}
                     <button
                       onClick={() => onRemoveUser(repo.id, index)}
@@ -282,10 +282,10 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
                   placeholder="e.g., github-actions[bot]"
                   value={newUser}
                   onChange={(e) => setNewUser(e.target.value)}
-                  className="nb-input"
+                  className="neo-input"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddUser()}
                 />
-                <Button onClick={handleAddUser} className="nb-button" size="sm">
+                <Button onClick={handleAddUser} className="neo-button" size="sm">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>

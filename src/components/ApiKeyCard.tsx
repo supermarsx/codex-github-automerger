@@ -38,33 +38,33 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
   };
 
   return (
-    <Card className="nb-card">
+    <Card className="neo-card">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`nb-card p-2 ${apiKey.isActive ? 'nb-green' : 'nb-red'}`}>
+            <div className={`neo-card p-2 ${apiKey.isActive ? 'neo-green' : 'neo-red'}`}>
               <Key className="w-5 h-5 text-black" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-lg">{apiKey.name}</h3>
+                <h3 className="font-semibold text-lg">{apiKey.name}</h3>
                 {apiKey.encrypted && (
-                  <Badge variant="secondary" className="nb-card nb-purple text-black font-bold">
+                  <Badge variant="secondary" className="neo-card neo-purple text-black font-bold">
                     <Shield className="w-3 h-3 mr-1" />
                     Encrypted
                   </Badge>
                 )}
                 {!apiKey.encrypted && (
-                  <Badge variant="secondary" className="nb-card nb-yellow text-black font-bold">
+                  <Badge variant="secondary" className="neo-card neo-yellow text-black font-bold">
                     <ShieldAlert className="w-3 h-3 mr-1" />
                     Unencrypted
                   </Badge>
                 )}
                 {apiKey.isActive && (
-                  <Badge variant="secondary" className={`nb-card font-bold ${
-                    apiKey.connectionStatus === 'connected' ? 'nb-green text-black' :
-                    apiKey.connectionStatus === 'disconnected' ? 'nb-red text-white' :
-                    'nb-yellow text-black'
+                  <Badge variant="secondary" className={`neo-card font-bold ${
+                    apiKey.connectionStatus === 'connected' ? 'neo-green text-black' :
+                    apiKey.connectionStatus === 'disconnected' ? 'neo-red text-white' :
+                    'neo-yellow text-black'
                   }`}>
                     {apiKey.connectionStatus === 'connected' && <CheckCircle className="w-3 h-3 mr-1" />}
                     {apiKey.connectionStatus === 'disconnected' && <XCircle className="w-3 h-3 mr-1" />}
@@ -75,7 +75,7 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground font-bold">
+              <p className="text-sm text-muted-foreground">
                 Created: {apiKey.created.toLocaleDateString()}
                 {apiKey.lastUsed && ` • Last used: ${apiKey.lastUsed.toLocaleDateString()}`}
               </p>
@@ -91,7 +91,7 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onToggleShow(apiKey.id)}
-              className="nb-button-secondary"
+              className="neo-button-secondary"
             >
               {showKey === apiKey.id ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </Button>
@@ -99,14 +99,14 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
               variant="destructive"
               size="sm"
               onClick={handleDelete}
-              className="nb-button bg-red-500 hover:bg-red-600"
+              className="neo-button bg-red-500 hover:bg-red-600"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         </div>
         {showKey === apiKey.id && (
-          <div className="mt-4 p-3 bg-muted rounded nb-card">
+          <div className="mt-4 p-3 bg-muted rounded neo-card">
             <code className="text-sm font-mono break-all">
               {apiKey.encrypted ? '[ENCRYPTED] ' + maskKey(apiKey.key) : apiKey.key}
             </code>
