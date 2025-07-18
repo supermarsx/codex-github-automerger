@@ -76,6 +76,10 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-trick
 
 The dashboard keeps a running history of actions in the **Logs** tab. You can download this history using **Export Logs** or remove it entirely using the new **Clear Logs** button next to the export option.
 
+## Theme preference
+
+The dashboard remembers whether you last used light or dark mode. This preference is stored locally so the interface loads with your chosen theme on your next visit.
+
 ## Server configuration
 
 The Node.js server polls GitHub for repository updates. The polling interval can

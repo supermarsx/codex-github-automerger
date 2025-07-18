@@ -72,7 +72,7 @@ export const Dashboard: React.FC = () => {
     fetchActivities
   } = useDashboardData();
 
-  const { appState, updateActiveTab } = useAppPersistence();
+  const { appState, updateActiveTab, updateTheme } = useAppPersistence();
   const { logInfo } = useLogger();
   const { theme, setTheme } = useTheme();
 
@@ -111,6 +111,7 @@ export const Dashboard: React.FC = () => {
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
+    updateTheme(newTheme);
   };
 
   const tabs = [
