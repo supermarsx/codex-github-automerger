@@ -200,12 +200,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                        <EditableList
                          items={repo.allowedBranches}
                          reorderable
-                         onItemsChange={(items) => {
-                           // Update branch patterns for this repository
-                           const updatedBranches = items;
-                           // This would need to be implemented in the parent component
-                           console.log('Update branches for repo:', repo.id, updatedBranches);
-                         }}
+                         onItemsChange={() => {}}
                          placeholder="e.g., codex-feature/*"
                          itemColor="nb-yellow"
                        />
@@ -216,10 +211,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                        <EditableList
                          items={repo.protectedBranches || []}
                          reorderable
-                         onItemsChange={(items) => {
-                           const updatedBranches = items;
-                           console.log('Update protected branches for repo:', repo.id, updatedBranches);
-                         }}
+                         onItemsChange={() => {}}
                          placeholder="e.g., main"
                          itemColor="nb-red"
                        />
@@ -240,12 +232,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                        <EditableList
                          items={repo.allowedUsers}
                          reorderable
-                         onItemsChange={(items) => {
-                           // Update allowed users for this repository
-                           const updatedUsers = items;
-                           // This would need to be implemented in the parent component
-                           console.log('Update users for repo:', repo.id, updatedUsers);
-                         }}
+                         onItemsChange={() => {}}
                          placeholder="e.g., github-actions[bot]"
                          itemColor="nb-blue"
                        />
