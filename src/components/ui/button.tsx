@@ -31,11 +31,11 @@ const buttonVariants = cva(
 )
 
 const variantClasses: Record<NonNullable<VariantProps<typeof buttonVariants>["variant"]>, string> = {
-  default: "nb-button",
-  destructive: "nb-button nb-red",
-  outline: "nb-button-secondary",
-  secondary: "nb-button-secondary",
-  ghost: "nb-button-secondary",
+  default: "neo-button",
+  destructive: "neo-button neo-red",
+  outline: "neo-button-secondary",
+  secondary: "neo-button-secondary",
+  ghost: "neo-button-secondary",
   link: ""
 }
 

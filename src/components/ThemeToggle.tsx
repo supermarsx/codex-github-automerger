@@ -20,7 +20,7 @@ export const ThemeToggle = ({ darkMode, onThemeChange }: ThemeToggleProps) => {
   return (
     <Button
       onClick={toggleTheme}
-      className="nb-button-secondary"
+      className="neo-button-secondary"
       size="sm"
     >
       {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

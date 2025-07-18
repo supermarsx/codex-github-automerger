@@ -45,18 +45,18 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'success': return 'nb-green';
-      case 'info': return 'nb-blue';
-      case 'warn': return 'nb-yellow';
-      case 'error': return 'nb-red';
-      case 'debug': return 'nb-purple';
-      default: return 'nb-blue';
+      case 'success': return 'neo-green';
+      case 'info': return 'neo-blue';
+      case 'warn': return 'neo-yellow';
+      case 'error': return 'neo-red';
+      case 'debug': return 'neo-purple';
+      default: return 'neo-blue';
     }
   };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto text-sm">
-      <Card className="nb-card">
+      <Card className="neo-card">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -69,11 +69,11 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleExportLogs} className="nb-button">
+              <Button onClick={handleExportLogs} className="neo-button">
                 <Download className="w-4 h-4 mr-2" />
                 Export Logs
               </Button>
-              <Button onClick={handleClearLogs} variant="outline" className="nb-button-secondary">
+              <Button onClick={handleClearLogs} variant="outline" className="neo-button-secondary">
                 <Trash2 className="w-4 h-4 mr-2" />
 
                 Clear Logs
@@ -88,13 +88,13 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
                 placeholder="Search logs..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="nb-input"
+                className="neo-input"
               />
             </div>
             <select
               value={levelFilter}
               onChange={(e) => setLevelFilter(e.target.value)}
-              className="nb-input px-3 py-2"
+              className="neo-input px-3 py-2"
             >
               <option value="all">All Levels</option>
               <option value="debug">Debug</option>
@@ -109,15 +109,15 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
 
       <div className="space-y-3">
         {filteredLogs.map((log) => (
-          <Card key={log.id} className="nb-card">
+          <Card key={log.id} className="neo-card">
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <Badge className={`nb-card ${getLevelColor(log.level)} text-white font-bold`}>
+                    <Badge className={`neo-card ${getLevelColor(log.level)} text-white font-bold`}>
                       {log.level.toUpperCase()}
                     </Badge>
-                    <Badge variant="secondary" className="nb-card text-white font-bold">
+                    <Badge variant="secondary" className="neo-card text-white font-bold">
                       {log.category}
                     </Badge>
                     <span className="text-sm text-muted-foreground font-bold">
@@ -142,7 +142,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
         ))}
         
         {filteredLogs.length === 0 && (
-          <Card className="nb-card">
+          <Card className="neo-card">
             <CardContent className="p-8 text-center">
               <p className="text-muted-foreground font-bold">No logs match your filters</p>
             </CardContent>
