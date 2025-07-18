@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { getItem, setItem } from '@/utils/storage';
 
 const APP_STATE_STORAGE_KEY = 'automerger-app-state';
@@ -11,6 +12,7 @@ export interface AppState {
     compactMode: boolean;
     autoRefresh: boolean;
     notificationsEnabled: boolean;
+    theme: 'light' | 'dark';
   };
 }
 
@@ -23,8 +25,11 @@ export const useAppPersistence = () => {
       compactMode: false,
       autoRefresh: true,
       notificationsEnabled: true,
+      theme: 'light'
     },
   });
+
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -32,17 +37,26 @@ export const useAppPersistence = () => {
       if (saved) {
         try {
           const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
-          setAppState({
+          setAppState(prev => ({
+            ...prev,
             ...parsed,
             lastActivity: new Date(parsed.lastActivity),
             sessionStartTime: new Date(parsed.sessionStartTime),
-          });
+            userPreferences: {
+              ...prev.userPreferences,
+              ...parsed.userPreferences,
+            },
+          }));
         } catch (error) {
           console.error('Error parsing saved app state:', error);
         }
       }
     })();
   }, []);
+
+  useEffect(() => {
+    setTheme(appState.userPreferences.theme);
+  }, [appState.userPreferences.theme, setTheme]);
 
   useEffect(() => {
     setItem(APP_STATE_STORAGE_KEY, appState).catch(err => {
@@ -59,9 +73,17 @@ export const useAppPersistence = () => {
   };
 
   const updateUserPreferences = (preferences: Partial<AppState['userPreferences']>) => {
-    setAppState(prev => ({ 
-      ...prev, 
+    setAppState(prev => ({
+      ...prev,
       userPreferences: { ...prev.userPreferences, ...preferences },
+      lastActivity: new Date()
+    }));
+  };
+
+  const updateTheme = (theme: 'light' | 'dark') => {
+    setAppState(prev => ({
+      ...prev,
+      userPreferences: { ...prev.userPreferences, theme },
       lastActivity: new Date()
     }));
   };
@@ -74,6 +96,7 @@ export const useAppPersistence = () => {
     appState,
     updateActiveTab,
     updateUserPreferences,
+    updateTheme,
     markActivity
   };
 };
