@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Octokit } from '@octokit/rest';
 import { matchesPattern } from './utils/patterns.js';
 
@@ -138,7 +137,7 @@ export function createGitHubService(token) {
         const { data: events } = await octokit.rest.activity.listRepoEvents({ owner: repo.owner, repo: repo.name, per_page: 10 });
         events.forEach(event => {
           if (event.type === 'PullRequestEvent') {
-            const payload = event.payload;
+            const payload: any = event.payload as any;
             activities.push({
               id: event.id || Date.now().toString(),
               type: payload.action === 'closed' && payload.pull_request?.merged ? 'merge' : 'pull',

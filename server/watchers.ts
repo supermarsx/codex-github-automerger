@@ -1,3 +1,4 @@
+import type { Socket } from 'socket.io';
 import { createGitHubService } from './github.js';
 import { WebhookService } from './webhooks.js';
 import { logger } from './logger.js';
@@ -6,8 +7,36 @@ import { matchesPattern } from './utils/patterns.js';
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
 
-const watchers = new Map();
-const repoCache = new Map();
+export interface WatcherConfig {
+  protectedBranches?: string[];
+  allowedUsers?: string[];
+  minAlertSeverity?: 'low' | 'medium' | 'high' | 'critical';
+  [key: string]: any;
+}
+
+export interface Watcher {
+  token: string;
+  owner: string;
+  repo: string;
+  sockets: Set<Socket>;
+  lastEvent: string | null;
+  alerts: Set<number>;
+  interval: number;
+  timer: NodeJS.Timeout | null;
+  config: WatcherConfig;
+  pullRequests: any[];
+  strayBranches: string[];
+  activityEvents: any[];
+}
+
+interface CacheEntry {
+  events: { event: string; data: any }[];
+  alerts: any[];
+  timestamp: number;
+}
+
+const watchers = new Map<string, Watcher>();
+const repoCache = new Map<string, CacheEntry>();
 
 function cleanCache() {
   const now = Date.now();
@@ -16,7 +45,22 @@ function cleanCache() {
   }
 }
 
-export function subscribeRepo(socket, { token, owner, repo, interval, config = {} }) {
+export function subscribeRepo(
+  socket: Socket,
+  {
+    token,
+    owner,
+    repo,
+    interval,
+    config = {}
+  }: {
+    token: string;
+    owner: string;
+    repo: string;
+    interval?: number;
+    config?: WatcherConfig;
+  }
+) {
   const key = `${owner}/${repo}`;
   let watcher = watchers.get(key);
   let isNew = false;
@@ -63,7 +107,10 @@ export function subscribeRepo(socket, { token, owner, repo, interval, config = {
   });
 }
 
-export function unsubscribeRepo(socket, { owner, repo }) {
+export function unsubscribeRepo(
+  socket: Socket,
+  { owner, repo }: { owner: string; repo: string }
+) {
   const key = `${owner}/${repo}`;
   const watcher = watchers.get(key);
   if (!watcher) return;
@@ -74,7 +121,7 @@ export function unsubscribeRepo(socket, { owner, repo }) {
   }
 }
 
-async function pollRepo(watcher) {
+async function pollRepo(watcher: Watcher): Promise<void> {
   const { token, owner, repo } = watcher;
   cleanCache();
   const svc = createGitHubService(token);
@@ -130,11 +177,11 @@ async function pollRepo(watcher) {
   }
 }
 
-function branchProtected(branch, patterns = []) {
+function branchProtected(branch: string, patterns: string[] = []): boolean {
   return patterns.some(p => matchesPattern(branch, p));
 }
 
-function handleEvent(watcher, event) {
+function handleEvent(watcher: Watcher, event: any): void {
   const payload = event.payload;
   if (event.type === 'PullRequestEvent') {
     const { protectedBranches = [], allowedUsers = [] } = watcher.config || {};
@@ -157,7 +204,7 @@ function handleEvent(watcher, event) {
   }
 }
 
-function broadcast(watcher, event, data) {
+function broadcast(watcher: Watcher, event: string, data: any): void {
   const repo = `${watcher.owner}/${watcher.repo}`;
   watcher.sockets.forEach(s => s.emit('repoUpdate', { event, repo, data }));
   WebhookService.triggerWebhooks(event, repo, data);
@@ -174,7 +221,7 @@ function broadcast(watcher, event, data) {
   repoCache.set(repo, cache);
 }
 
-function serveCache(watcher, entry) {
+function serveCache(watcher: Watcher, entry: CacheEntry | undefined): void {
   if (!entry || Date.now() - entry.timestamp > CACHE_TTL) return;
   const repo = `${watcher.owner}/${watcher.repo}`;
   for (const e of entry.events) {
@@ -185,7 +232,7 @@ function serveCache(watcher, entry) {
   }
 }
 
-export function getWatcher(owner, repo) {
+export function getWatcher(owner: string, repo: string): Watcher | undefined {
   return watchers.get(`${owner}/${repo}`);
 }
 

@@ -1,6 +1,12 @@
-// @ts-nocheck
 import type { Server, Socket } from 'socket.io';
 import type express from 'express';
+
+interface ExtendedSocket extends Socket {
+  subscriptions: Set<string>;
+  isPaired: boolean;
+  pairToken: string;
+  clientId: string | null;
+}
 import crypto from 'crypto';
 import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
@@ -9,11 +15,11 @@ import { getClientConfig, setClientConfig } from './config.js';
 import { matchesPattern } from './utils/patterns.js';
 
 const pairedClients = new Set<string>();
-const pendingPairings = new Map<string, { socket: Socket; clientId: string | null; expiry: number }>();
+const pendingPairings = new Map<string, { socket: ExtendedSocket; clientId: string | null; expiry: number }>();
 const TOKEN_TTL_MS = 5 * 60 * 1000;
 const PAIR_SECRET = process.env.PAIR_SECRET || 'secret';
 
-function requirePaired(socket: Socket, cb?: (arg0: any) => void) {
+function requirePaired(socket: ExtendedSocket, cb?: (arg0: any) => void): boolean {
   if (!socket.isPaired) {
     if (typeof cb === 'function') {
       cb({ ok: false, error: 'client not paired' });
@@ -23,7 +29,7 @@ function requirePaired(socket: Socket, cb?: (arg0: any) => void) {
   return true;
 }
 
-function cleanupPairings() {
+function cleanupPairings(): void {
   const now = Date.now();
   for (const [token, entry] of pendingPairings) {
     if (now > entry.expiry || entry.socket.disconnected) {
@@ -32,7 +38,7 @@ function cleanupPairings() {
   }
 }
 
-export function registerSocketHandlers(io: Server, app: express.Express) {
+export function registerSocketHandlers(io: Server, app: express.Express): void {
 
 
 app.post('/pairings/:token/approve', (req, res) => {
@@ -70,37 +76,38 @@ app.post('/pairings/:token/deny', (req, res) => {
   res.json({ ok: true });
 });
 
-io.on('connection', socket => {
-  socket.subscriptions = new Set();
-  socket.isPaired = false;
-  socket.pairToken = crypto.randomBytes(8).toString('hex');
-  socket.clientId = null;
-  pendingPairings.set(socket.pairToken, {
-    socket,
+io.on('connection', (socket: Socket) => {
+  const s = socket as ExtendedSocket;
+  s.subscriptions = new Set();
+  s.isPaired = false;
+  s.pairToken = crypto.randomBytes(8).toString('hex');
+  s.clientId = null;
+  pendingPairings.set(s.pairToken, {
+    socket: s,
     clientId: null,
     expiry: Date.now() + TOKEN_TTL_MS
   });
 
   socket.on('pair_request', ({ clientId }) => {
     cleanupPairings();
-    const entry = pendingPairings.get(socket.pairToken);
+    const entry = pendingPairings.get(s.pairToken);
     if (!entry) return;
     entry.clientId = clientId;
-    socket.clientId = clientId;
-    socket.emit('pair_token', { token: socket.pairToken });
+    s.clientId = clientId;
+    s.emit('pair_token', { token: s.pairToken });
   });
 
   socket.on('syncConfig', async (config, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
-      await setClientConfig(socket.clientId, config || {});
+      await setClientConfig(s.clientId, config || {});
       cb({ ok: true });
     } catch (err) {
       cb({ ok: false, error: err.message });
     }
   });
   socket.on('fetchRepos', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       const repos = await svc.fetchRepositories(params.owner || '');
@@ -111,7 +118,7 @@ io.on('connection', socket => {
   });
 
   socket.on('fetchPullRequests', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       const pulls = await svc.fetchPullRequests(params.owner, params.repo);
@@ -127,7 +134,7 @@ io.on('connection', socket => {
   });
 
   socket.on('mergePR', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       await svc.mergePullRequest(params.owner, params.repo, params.pullNumber);
@@ -138,7 +145,7 @@ io.on('connection', socket => {
   });
 
   socket.on('closePR', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       await svc.closePullRequest(params.owner, params.repo, params.pullNumber);
@@ -149,7 +156,7 @@ io.on('connection', socket => {
   });
 
   socket.on('deleteBranch', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     const {
       token,
       owner,
@@ -158,7 +165,7 @@ io.on('connection', socket => {
       protectedPatterns = [],
       allowedPatterns = []
     } = params;
-    const cfg = getClientConfig(socket.clientId);
+    const cfg = getClientConfig(s.clientId);
     const patterns = [
       ...(cfg.protectedBranches || []),
       ...(protectedPatterns || [])
@@ -187,11 +194,11 @@ io.on('connection', socket => {
   });
 
   socket.on('fetchStrayBranches', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       const branches = await svc.fetchStrayBranches(params.owner, params.repo);
-      const cfg = getClientConfig(socket.clientId);
+      const cfg = getClientConfig(s.clientId);
       const protectedPatterns = cfg.protectedBranches || [];
       const filtered = branches.filter(
         b => !protectedPatterns.some(p => matchesPattern(b, p))
@@ -200,7 +207,7 @@ io.on('connection', socket => {
     } catch (err) {
       const watcher = getWatcher(params.owner, params.repo);
       if (watcher && watcher.strayBranches.length) {
-        const cfg = getClientConfig(socket.clientId);
+        const cfg = getClientConfig(s.clientId);
         const protectedPatterns = cfg.protectedBranches || [];
         const filtered = watcher.strayBranches.filter(
           b => !protectedPatterns.some(p => matchesPattern(b, p))
@@ -213,7 +220,7 @@ io.on('connection', socket => {
   });
 
   socket.on('fetchRecentActivity', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       const data = await svc.fetchRecentActivity(params.repositories);
@@ -234,19 +241,19 @@ io.on('connection', socket => {
   });
 
   socket.on('subscribeRepo', params => {
-    if (!requirePaired(socket)) return;
-    subscribeRepo(socket, params);
-    socket.subscriptions.add(`${params.owner}/${params.repo}`);
+    if (!requirePaired(s)) return;
+    subscribeRepo(s, params);
+    s.subscriptions.add(`${params.owner}/${params.repo}`);
   });
 
   socket.on('unsubscribeRepo', params => {
-    if (!requirePaired(socket)) return;
-    unsubscribeRepo(socket, params);
-    socket.subscriptions.delete(`${params.owner}/${params.repo}`);
+    if (!requirePaired(s)) return;
+    unsubscribeRepo(s, params);
+    s.subscriptions.delete(`${params.owner}/${params.repo}`);
   });
 
   socket.on('checkPRMergeable', async (params, cb = () => {}) => {
-    if (!requirePaired(socket, cb)) return;
+    if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
       const ok = await svc.checkPullRequestMergeable(params.owner, params.repo, params.pullNumber);
@@ -257,14 +264,14 @@ io.on('connection', socket => {
   });
 
   socket.on('disconnect', () => {
-    for (const key of socket.subscriptions) {
+    for (const key of s.subscriptions) {
       const [owner, repo] = key.split('/');
-      unsubscribeRepo(socket, { owner, repo });
+      unsubscribeRepo(s, { owner, repo });
     }
-    if (socket.clientId) {
-      pairedClients.delete(socket.clientId);
+    if (s.clientId) {
+      pairedClients.delete(s.clientId);
     }
-    pendingPairings.delete(socket.pairToken);
+    pendingPairings.delete(s.pairToken);
   });
 });
 }
