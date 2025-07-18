@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { buttonVariants } from '@/components/ui/button';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -42,9 +43,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <AlertDialogCancel className="nb-button-secondary">
             {cancelText}
           </AlertDialogCancel>
-          <AlertDialogAction 
+          <AlertDialogAction
             onClick={onConfirm}
-            className={variant === 'destructive' ? 'nb-button bg-red-500 hover:bg-red-600' : 'nb-button'}
+            className={buttonVariants({ variant })}
           >
             {confirmText}
           </AlertDialogAction>

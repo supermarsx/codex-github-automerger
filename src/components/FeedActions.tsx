@@ -192,7 +192,6 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                     variant="destructive"
                     size="sm"
                     onClick={() => deleteAction(action.id)}
-                    className="nb-button bg-red-500 hover:bg-red-600"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

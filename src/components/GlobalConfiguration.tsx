@@ -632,12 +632,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               />
               <div className="flex justify-end">
               <Button
+                variant="destructive"
                 size="sm"
                 onClick={() => {
                   clearWatchModeState();
                   toast({ title: 'Watch mode data cleared' });
                 }}
-                className="nb-button bg-red-500 hover:bg-red-600"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear Watch Mode

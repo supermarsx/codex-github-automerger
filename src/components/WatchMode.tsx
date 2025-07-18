@@ -447,7 +447,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                     <Button
                                       onClick={() => handleClose(repo, pr.number)}
                                       size="sm"
-                                      className="nb-button nb-red"
+                                      variant="destructive"
                                     >
                                       <XCircle className="w-3 h-3 mr-1" />
                                       Close
@@ -528,7 +528,6 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                                   </span>
                                   <Button
                                     size="sm"
-                                    className="nb-button nb-red"
                                     variant="destructive"
                                     onClick={() => {
                                       if (globalConfig.confirmBranchDeletion) {
