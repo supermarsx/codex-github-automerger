@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Eye,
   GitBranch,
@@ -313,11 +312,6 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
   return (
     <>
     <div className="relative space-y-6">
-      {!isUnlocked && (
-        <div className="absolute inset-0 bg-card/80 flex items-center justify-center z-10 nb-card font-black text-xl">
-          Need authentication first
-        </div>
-      )}
       {showControlPanel && (
       <Card className="nb-card">
         <CardHeader>
@@ -393,7 +387,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                           <GitPullRequest className="w-4 h-4" />
                           Pull Requests ({pullRequests.length})
                         </h4>
-                        <ScrollArea className="h-64">
+                        <div>
                           <div className="space-y-2">
                             {pullRequests.length === 0 ? (
                               <div className="text-center py-8 text-muted-foreground">
@@ -457,7 +451,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                               ))
                             )}
                           </div>
-                        </ScrollArea>
+                        </div>
                       </div>
 
                       {/* Recent Activity */}
@@ -466,7 +460,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                           <Clock className="w-4 h-4" />
                           Recent Activity ({activities.length})
                         </h4>
-                        <ScrollArea className="h-64">
+                        <div>
                           <div className="space-y-2">
                             {activities.length === 0 ? (
                               <div className="text-center py-8 text-muted-foreground">
@@ -504,7 +498,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                               ))
                             )}
                           </div>
-                        </ScrollArea>
+                        </div>
                       </div>
 
                       {/* Stray Branches */}
@@ -513,7 +507,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                           <GitBranch className="w-4 h-4" />
                           Stray Branches ({(repoStrayBranches[repo.id] || []).length})
                         </h4>
-                        <ScrollArea className="h-64">
+                        <div>
                           <div className="space-y-2">
                             {(repoStrayBranches[repo.id] || []).length === 0 ? (
                               <div className="text-center py-8 text-muted-foreground">
@@ -545,7 +539,7 @@ export const WatchMode: React.FC<WatchModeProps> = ({ repositories, apiKeys, get
                               ))
                             )}
                           </div>
-                        </ScrollArea>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
