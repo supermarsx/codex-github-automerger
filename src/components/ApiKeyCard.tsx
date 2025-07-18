@@ -47,7 +47,7 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-lg">{apiKey.name}</h3>
+                <h3 className="font-semibold text-lg">{apiKey.name}</h3>
                 {apiKey.encrypted && (
                   <Badge variant="secondary" className="nb-card nb-purple text-black font-bold">
                     <Shield className="w-3 h-3 mr-1" />
@@ -75,7 +75,7 @@ export const ApiKeyCard: React.FC<ApiKeyCardProps> = ({
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground font-bold">
+              <p className="text-sm text-muted-foreground">
                 Created: {apiKey.created.toLocaleDateString()}
                 {apiKey.lastUsed && ` • Last used: ${apiKey.lastUsed.toLocaleDateString()}`}
               </p>

@@ -169,7 +169,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="font-black text-lg">{action.name}</h3>
+                      <h3 className="font-semibold text-lg">{action.name}</h3>
                       <Badge variant="secondary" className={`nb-card ${getEventColor(action.eventType)} text-black font-bold`}>
                         {action.eventType}
                       </Badge>
@@ -177,7 +177,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                         {action.actionType}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground font-bold truncate max-w-md">
+                    <p className="text-sm text-muted-foreground truncate max-w-md">
                       {action.endpoint}
                     </p>
                   </div>

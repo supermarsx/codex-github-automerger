@@ -64,7 +64,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
                 <FileText className="w-6 h-6" />
                 Activity Logs
               </CardTitle>
-              <CardDescription className="font-bold">
+              <CardDescription>
                 Track all system actions and events
               </CardDescription>
             </div>
@@ -120,14 +120,14 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
                     <Badge variant="secondary" className="nb-card text-white font-bold">
                       {log.category}
                     </Badge>
-                    <span className="text-sm text-muted-foreground font-bold">
+                    <span className="text-sm text-muted-foreground">
                       {log.timestamp.toLocaleString()}
                     </span>
                   </div>
-                  <p className="font-bold text-foreground">{log.message}</p>
+                  <p className="font-semibold text-foreground">{log.message}</p>
                   {log.details && (
                     <details className="mt-2">
-                      <summary className="cursor-pointer text-sm text-muted-foreground font-bold">
+                      <summary className="cursor-pointer text-sm text-muted-foreground">
                         View Details
                       </summary>
                       <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
@@ -144,7 +144,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
         {filteredLogs.length === 0 && (
           <Card className="nb-card">
             <CardContent className="p-8 text-center">
-              <p className="text-muted-foreground font-bold">No logs match your filters</p>
+              <p className="text-muted-foreground">No logs match your filters</p>
             </CardContent>
           </Card>
         )}

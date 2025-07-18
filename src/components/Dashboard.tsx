@@ -136,7 +136,7 @@ export const Dashboard: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-black text-shadow">AutoMerger Dashboard</h1>
-                <p className="text-muted-foreground font-bold">Automated pull request management system</p>
+                <p className="text-muted-foreground">Automated pull request management system</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

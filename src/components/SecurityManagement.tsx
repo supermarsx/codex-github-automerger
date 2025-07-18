@@ -217,7 +217,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="nb-card p-4 nb-purple">
-            <h4 className="font-black text-lg mb-2 text-black">Passkey Authentication</h4>
+            <h4 className="font-semibold text-lg mb-2 text-black">Passkey Authentication</h4>
             <p className="text-sm text-black font-bold mb-4">
               {passkeySupported ? 'Enable passkey authentication for enhanced security' : 'Passkeys not supported in this browser'}
             </p>
@@ -296,7 +296,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
           </div>
           
           <div className="nb-card p-4 nb-orange">
-            <h4 className="font-black text-lg mb-2 text-black">Webhook Configuration</h4>
+            <h4 className="font-semibold text-lg mb-2 text-black">Webhook Configuration</h4>
             <p className="text-sm text-black font-bold mb-4">
               Configure webhooks for real-time notifications
             </p>
@@ -396,7 +396,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
           </div>
 
           <div className="nb-card p-4 nb-green">
-            <h4 className="font-black text-lg mb-2 text-black">Encryption & Recovery</h4>
+            <h4 className="font-semibold text-lg mb-2 text-black">Encryption & Recovery</h4>
             <p className="text-sm text-black font-bold mb-4">
               Manage API key encryption and recovery options
             </p>
@@ -508,7 +508,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
         </div>
         
         <div className="nb-card p-4 nb-pink">
-          <h4 className="font-black text-lg mb-2 text-black">Security Status</h4>
+          <h4 className="font-semibold text-lg mb-2 text-black">Security Status</h4>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               {apiKeysEncrypted ? (

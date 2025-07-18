@@ -146,7 +146,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           <div className="mt-4 p-3 rounded nb-card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-sm">Latest Pull Request</p>
+                <p className="text-sm font-semibold">Latest Pull Request</p>
                 <p className="text-xs text-muted-foreground">
                   #{repo.recentPull.number} - {repo.recentPull.title}
                 </p>
@@ -208,20 +208,20 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
             {/* Repository Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <div className="nb-card p-3 nb-yellow text-center">
-                <p className="text-black font-black text-lg">{repo.stats.pendingMerges}</p>
-                <p className="text-black font-bold text-xs">Pending</p>
+                <p className="text-black font-semibold text-lg">{repo.stats.pendingMerges}</p>
+                <p className="text-black text-xs">Pending</p>
               </div>
               <div className="nb-card p-3 nb-green text-center">
-                <p className="text-black font-black text-lg">{repo.stats.successfulMerges}</p>
-                <p className="text-black font-bold text-xs">Success</p>
+                <p className="text-black font-semibold text-lg">{repo.stats.successfulMerges}</p>
+                <p className="text-black text-xs">Success</p>
               </div>
               <div className="nb-card p-3 nb-red text-center">
-                <p className="text-black font-black text-lg">{repo.stats.failedMerges}</p>
-                <p className="text-black font-bold text-xs">Failed</p>
+                <p className="text-black font-semibold text-lg">{repo.stats.failedMerges}</p>
+                <p className="text-black text-xs">Failed</p>
               </div>
               <div className="nb-card p-3 nb-purple text-center">
-                <p className="text-black font-black text-lg">{repo.stats.totalMerges}</p>
-                <p className="text-black font-bold text-xs">Total</p>
+                <p className="text-black font-semibold text-lg">{repo.stats.totalMerges}</p>
+                <p className="text-black text-xs">Total</p>
               </div>
             </div>
 
