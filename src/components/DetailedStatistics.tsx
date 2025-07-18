@@ -33,19 +33,19 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-3xl font-black text-green-600">{realStats.overall.totalMerges}</div>
-              <div className="text-sm font-bold text-muted-foreground">Total Merges</div>
+              <div className="text-sm text-muted-foreground">Total Merges</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-black text-blue-600">{realStats.overall.totalPullRequests}</div>
-              <div className="text-sm font-bold text-muted-foreground">Pull Requests</div>
+              <div className="text-sm text-muted-foreground">Pull Requests</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-black text-purple-600">{realStats.overall.avgSuccessRate.toFixed(1)}%</div>
-              <div className="text-sm font-bold text-muted-foreground">Success Rate</div>
+              <div className="text-sm text-muted-foreground">Success Rate</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-black text-orange-600">{realStats.overall.totalAlerts}</div>
-              <div className="text-sm font-bold text-muted-foreground">Alerts</div>
+              <div className="text-sm text-muted-foreground">Alerts</div>
             </div>
           </div>
         </CardContent>
@@ -118,7 +118,7 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
           {Object.entries(realStats.repositories).map(([repoId, stats]) => (
             <div key={repoId} className="neo-card p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="font-black text-lg">{stats.name}</h3>
+                <h3 className="font-semibold text-lg">{stats.name}</h3>
                 <div className="flex items-center gap-2">
                   <Badge className="neo-card neo-green text-black font-bold">
                     {getSuccessRate(stats.successes, stats.merges)}% success
@@ -131,29 +131,29 @@ export const DetailedStatistics: React.FC<DetailedStatisticsProps> = ({ reposito
               
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                 <div>
-                  <div className="font-bold text-muted-foreground">Merges</div>
+                  <div className="text-muted-foreground">Merges</div>
                   <div className="text-lg font-black">{stats.merges}</div>
                 </div>
                 <div>
-                  <div className="font-bold text-muted-foreground">Success</div>
+                  <div className="text-muted-foreground">Success</div>
                   <div className="text-lg font-black text-green-600">{stats.successes}</div>
                 </div>
                 <div>
-                  <div className="font-bold text-muted-foreground">Failures</div>
+                  <div className="text-muted-foreground">Failures</div>
                   <div className="text-lg font-black text-red-600">{stats.failures}</div>
                 </div>
                 <div>
-                  <div className="font-bold text-muted-foreground">Avg Time</div>
+                  <div className="text-muted-foreground">Avg Time</div>
                   <div className="text-lg font-black">{stats.avgMergeTime}min</div>
                 </div>
                 <div>
-                  <div className="font-bold text-muted-foreground">Alerts</div>
+                  <div className="text-muted-foreground">Alerts</div>
                   <div className="text-lg font-black text-orange-600">{stats.alerts}</div>
                 </div>
               </div>
 
               <div>
-                <div className="flex justify-between text-sm font-bold mb-2">
+                <div className="flex justify-between text-sm font-semibold mb-2">
                   <span>Success Rate</span>
                   <span>{getSuccessRate(stats.successes, stats.merges)}%</span>
                 </div>

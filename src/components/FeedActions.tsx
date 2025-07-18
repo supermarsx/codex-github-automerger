@@ -177,7 +177,7 @@ export const FeedActions: React.FC<FeedActionsProps> = ({
                         {action.actionType}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground font-bold truncate max-w-md">
+                    <p className="text-sm text-muted-foreground truncate max-w-md">
                       {action.endpoint}
                     </p>
                   </div>

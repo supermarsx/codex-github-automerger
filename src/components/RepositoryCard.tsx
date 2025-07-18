@@ -146,7 +146,7 @@ export const RepositoryCard: React.FC<RepositoryCardProps> = ({
           <div className="mt-4 p-3 rounded neo-card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-sm">Latest Pull Request</p>
+                <p className="text-sm font-semibold">Latest Pull Request</p>
                 <p className="text-xs text-muted-foreground">
                   #{repo.recentPull.number} - {repo.recentPull.title}
                 </p>

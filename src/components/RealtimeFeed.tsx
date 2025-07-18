@@ -42,8 +42,8 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
         <div className="absolute inset-0 bg-card/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
           <div className="neo-card neo-red p-6">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 text-white" />
-              <span className="font-black text-white text-lg">Authentication Required</span>
+              <AlertTriangle className="w-6 h-6" />
+              <span className="font-semibold text-white text-lg">Authentication Required</span>
             </div>
           </div>
         </div>
@@ -70,8 +70,8 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                 <div className="neo-card neo-purple p-6 mx-auto w-fit mb-6">
                   <Activity className="w-12 h-12 text-white mx-auto" />
                 </div>
-                <h3 className="font-black text-lg mb-2">No Recent Activity</h3>
-                <p className="text-muted-foreground font-bold">Enable repositories and API keys to see activity</p>
+                <h3 className="font-semibold text-lg mb-2">No Recent Activity</h3>
+                <p className="text-muted-foreground">Enable repositories and API keys to see activity</p>
               </div>
             ) : (
               activities.map((activity) => (
@@ -80,8 +80,8 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                     {getActivityIcon(activity.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-black text-foreground truncate">{activity.message}</p>
-                    <p className="text-sm text-muted-foreground font-bold truncate">{activity.repo}</p>
+                    <p className="font-semibold text-foreground truncate">{activity.message}</p>
+                    <p className="text-sm text-muted-foreground truncate">{activity.repo}</p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <Badge variant="outline" className="text-xs neo-card bg-card/50 font-bold">

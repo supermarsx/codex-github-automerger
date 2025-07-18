@@ -381,7 +381,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
       <CardContent className="space-y-6">
         {/* Approval Settings */}
         <div className="space-y-4">
-          <h4 className="font-black text-lg">Approval Settings</h4>
+          <h4 className="font-semibold text-lg">Approval Settings</h4>
           <div className="space-y-4">
             <ConfigToggle
               id="requireApproval"
@@ -406,7 +406,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Default Branch Patterns */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Default Branch Patterns</h4>
+          <h4 className="font-semibold text-lg">Default Branch Patterns</h4>
           <EditableList
             items={config.defaultBranchPatterns}
             reorderable
@@ -418,7 +418,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Default Allowed Users */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Default Allowed Users</h4>
+          <h4 className="font-semibold text-lg">Default Allowed Users</h4>
           <EditableList
             items={config.defaultAllowedUsers}
             reorderable
@@ -430,7 +430,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Protected Branches */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Protected Branches</h4>
+          <h4 className="font-semibold text-lg">Protected Branches</h4>
           <EditableList
             items={config.protectedBranches}
             reorderable
@@ -442,7 +442,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Advanced Settings */}
         <div className="space-y-4">
-          <h4 className="font-black text-lg">Advanced Settings</h4>
+          <h4 className="font-semibold text-lg">Advanced Settings</h4>
            <div className="grid grid-cols-1 gap-4">
             <ConfigToggle
                id="autoMergeOnClean"
@@ -530,7 +530,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* Alert Configuration */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">Alert Configuration</h4>
+          <h4 className="font-semibold text-lg">Alert Configuration</h4>
           <div className="space-y-4">
             <ConfigSelector
               id="alertThreshold"
@@ -553,7 +553,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
 
         {/* System Configuration */}
         <div className="space-y-3">
-          <h4 className="font-black text-lg">System Configuration</h4>
+          <h4 className="font-semibold text-lg">System Configuration</h4>
           <div className="space-y-4">
             <ConfigSelector
               id="serverCheckInterval"

@@ -193,7 +193,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Allowed Branches */}
                     <div>
-                      <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                         <GitBranch className="w-5 h-5" />
                         Allowed Branch Patterns
                       </h4>
@@ -204,7 +204,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                          placeholder="e.g., codex-feature/*"
                          itemColor="neo-yellow"
                        />
-                       <h4 className="font-black text-lg my-3 flex items-center gap-2">
+                       <h4 className="font-semibold text-lg my-3 flex items-center gap-2">
                          <GitBranch className="w-5 h-5" />
                          Protected Branches
                        </h4>
@@ -219,7 +219,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
 
                     {/* Allowed Users */}
                     <div>
-                      <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                         <Users className="w-5 h-5" />
                         Allowed Users
                         {repo.allowAllUsers && (
@@ -242,7 +242,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                   {/* Repository Configuration - Three Column Layout */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                         <Key className="w-5 h-5" />
                         API Key
                       </h4>
@@ -260,7 +260,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     </div>
 
                     <div>
-                      <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                         <GitBranch className="w-5 h-5" />
                         Fetch Mode
                       </h4>
@@ -277,7 +277,7 @@ export const RepositoryManagement: React.FC<RepositoryManagementProps> = ({
                     </div>
 
                   <div>
-                      <h4 className="font-black text-lg mb-3 flex items-center gap-2">
+                      <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
                         <Webhook className="w-5 h-5" />
                         Webhook Method
                       </h4>

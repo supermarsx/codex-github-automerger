@@ -294,7 +294,6 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
               </DialogContent>
             </Dialog>
           </div>
-          
           <div className="neo-card p-4 neo-orange">
             <h4 className="font-black text-lg mb-2 text-black">Webhook Configuration</h4>
             <p className="text-sm text-black font-bold mb-4">
@@ -394,7 +393,6 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
               </div>
             )}
           </div>
-
           <div className="neo-card p-4 neo-green">
             <h4 className="font-black text-lg mb-2 text-black">Encryption & Recovery</h4>
             <p className="text-sm text-black font-bold mb-4">
@@ -506,7 +504,6 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
             </div>
           </div>
         </div>
-        
         <div className="neo-card p-4 neo-pink">
           <h4 className="font-black text-lg mb-2 text-black">Security Status</h4>
           <div className="space-y-2">

@@ -22,7 +22,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [], 
             </div>
             <div>
               <CardTitle className="text-4xl font-black">AutoMerger Dashboard</CardTitle>
-              <p className="text-muted-foreground font-bold">Automated pull request management system</p>
+              <p className="text-muted-foreground">Automated pull request management system</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
