@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createGitHubService } from './github.js';
 import { WebhookService } from './webhooks.js';
 import { logger } from './logger.js';
