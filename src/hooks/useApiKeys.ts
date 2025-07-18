@@ -31,7 +31,7 @@ export const useApiKeys = () => {
         logError('api-key', 'Error parsing saved API keys', error);
       }
     })();
-  }, []);
+  }, [logError]);
 
   const [showApiKey, setShowApiKey] = useState<string | null>(null);
   const [deletedApiKeys, setDeletedApiKeys] = useState<Map<string, { key: ApiKey; timeout: NodeJS.Timeout }>>(new Map());
@@ -47,7 +47,7 @@ export const useApiKeys = () => {
       setItem(API_KEYS_STORAGE_KEY, apiKeys).catch(err => {
         logError('api-key', 'Error saving API keys', err);
       });
-  }, [apiKeys]);
+  }, [apiKeys, logError]);
 
   const unlock = async () => {
     setAuthInProgress(true);

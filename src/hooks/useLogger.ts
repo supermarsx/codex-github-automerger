@@ -39,21 +39,21 @@ export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
       console.warn = orig.warn;
       console.error = orig.error;
     };
-  }, []);
+  }, [addLog]);
 
   // Initialize with startup logs
   useEffect(() => {
     addLog('info', 'system', 'Logger initialized');
     addLog('info', 'system', `Log level set to: ${logLevel}`);
-  }, []);
+  }, [addLog, logLevel]);
 
-  const shouldLog = (level: LogEntry['level']): boolean => {
+  const shouldLog = useCallback((level: LogEntry['level']): boolean => {
     const levels = ['debug', 'info', 'warn', 'error', 'success'];
     const currentLevelIndex = levels.indexOf(logLevel);
     const messageLevel = levels.indexOf(level);
-    
+
     return messageLevel >= currentLevelIndex;
-  };
+  }, [logLevel]);
 
   const addLog = useCallback((
     level: LogEntry['level'],
@@ -79,7 +79,7 @@ export const useLogger = (logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
     const orig = (window as any).__origConsole || console;
     const consoleMethod = level === 'debug' ? 'log' : level === 'info' ? 'info' : level === 'warn' ? 'warn' : 'error';
     orig[consoleMethod](`[${category}] ${message}`, details ? details : '');
-  }, [logLevel]);
+  }, [shouldLog]);
 
   const logInfo = useCallback((category: string, message: string, details?: any) => {
     addLog('info', category, message, details);
