@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, RefreshCw, GitMerge, Sun, Moon } from 'lucide-react';
+import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, GitMerge, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 // Component imports
@@ -127,9 +127,9 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-card">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40" style={{ borderColor: 'hsl(var(--nb-border))' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+      <header className="border-b bg-background p-6" style={{ borderColor: 'hsl(var(--nb-border))' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="nb-card nb-green p-3">
                 <GitMerge className="w-8 h-8 text-white" />
@@ -139,7 +139,7 @@ export const Dashboard: React.FC = () => {
                 <p className="text-muted-foreground font-bold">Automated pull request management system</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Button
                 onClick={toggleTheme}
                 className="nb-button-secondary"
@@ -158,11 +158,11 @@ export const Dashboard: React.FC = () => {
         <Tabs value={appState.activeTab} onValueChange={(tab) => {
           updateActiveTab(tab);
           logInfo('dashboard', `Switched to tab: ${tab}`);
-        }} className="space-y-8">
+        }} className="space-y-6">
           
           {/* Tab Navigation */}
           <div className="nb-card p-6">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent p-0 h-auto">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-4 bg-transparent p-0 h-auto">
               {tabs.map(({ key, icon: Icon, title, color }) => (
                 <TabsTrigger
                   key={key}
@@ -176,8 +176,8 @@ export const Dashboard: React.FC = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="feed" className="space-y-8">
-            <div className="grid gap-6">
+          <TabsContent value="feed" className="space-y-6">
+            <div className="grid gap-4">
               <RealtimeFeed activities={activities} onExportReport={exportReport} isLoading={isLoading} isUnlocked={isUnlocked} />
               <WatchMode
                 repositories={repositories}
@@ -191,8 +191,8 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="repositories" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <TabsContent value="repositories" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <SelectiveRepositoryLoader
                   apiKeys={apiKeys}
@@ -224,7 +224,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="api-keys" className="space-y-8">
+          <TabsContent value="api-keys" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               <ApiKeyManagement
                 apiKeys={apiKeys}
@@ -239,7 +239,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="actions" className="space-y-8">
+          <TabsContent value="actions" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               <FeedActions
                 actions={globalConfig.feedActions}
@@ -248,7 +248,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="config" className="space-y-8">
+          <TabsContent value="config" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               <GlobalConfiguration 
                 config={globalConfig} 
@@ -261,7 +261,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="security" className="space-y-8">
+          <TabsContent value="security" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               <SecurityManagement
                 apiKeys={apiKeys}
@@ -272,7 +272,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="statistics" className="space-y-8">
+          <TabsContent value="statistics" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               <DetailedStatistics 
                 repositories={repositories} 
@@ -291,7 +291,7 @@ export const Dashboard: React.FC = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="logs" className="space-y-8">
+          <TabsContent value="logs" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               {!globalConfig.logsDisabled ? (
                 <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} />
@@ -312,21 +312,6 @@ export const Dashboard: React.FC = () => {
         </Tabs>
       </div>
 
-      {/* Quick Access Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => {
-            const currentIndex = tabs.findIndex(tab => tab.key === appState.activeTab);
-            const nextTab = tabs[(currentIndex + 1) % tabs.length];
-            updateActiveTab(nextTab.key);
-            logInfo('dashboard', `Quick switched to ${nextTab.key} tab`);
-          }}
-          className="nb-button nb-blue rounded-full w-14 h-14 shadow-lg hover:shadow-xl"
-          size="icon"
-        >
-          <RefreshCw className="w-6 h-6" />
-        </Button>
-      </div>
     </div>
   );
 };
