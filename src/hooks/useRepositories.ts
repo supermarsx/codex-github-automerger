@@ -46,7 +46,7 @@ export const useRepositories = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [logError]);
 
   // Persist repositories to IndexedDB whenever they change
   useEffect(() => {
@@ -58,7 +58,7 @@ export const useRepositories = () => {
           variant: 'destructive'
         });
       });
-  }, [repositories, toast]);
+  }, [repositories, toast, logError]);
 
   function addRepositoryActivity(
     repoId: string,

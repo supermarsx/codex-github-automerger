@@ -18,6 +18,8 @@ export const useSocket = (config: SocketConfig) => {
   const [latency, setLatency] = useState(0);
   const [lastMessage, setLastMessage] = useState<SocketMessage | null>(null);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const connectionAttemptsRef = useRef(0);
+  const connectRef = useRef<() => void>(() => {});
   
   const ws = useRef<WebSocket | null>(null);
   const pingInterval = useRef<NodeJS.Timeout | null>(null);
@@ -31,6 +33,7 @@ export const useSocket = (config: SocketConfig) => {
       setIsConnected(true);
       setLatency(Math.floor(Math.random() * 100) + 20);
       setConnectionAttempts(0);
+      connectionAttemptsRef.current = 0;
       
       // Simulate periodic latency updates
       if (pingInterval.current) clearInterval(pingInterval.current);
@@ -42,7 +45,11 @@ export const useSocket = (config: SocketConfig) => {
       console.error('Socket connection failed:', error);
       scheduleReconnect();
     }
-  }, [config]);
+  }, [config, scheduleReconnect]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   const disconnect = useCallback(() => {
     if (ws.current) {
@@ -57,20 +64,21 @@ export const useSocket = (config: SocketConfig) => {
     setIsConnected(false);
   }, []);
 
-  const scheduleReconnect = () => {
-    if (connectionAttempts >= (config.maxReconnectAttempts || 5)) {
+  const scheduleReconnect = useCallback(() => {
+    if (connectionAttemptsRef.current >= (config.maxReconnectAttempts || 5)) {
       console.log('Max reconnection attempts reached');
       return;
     }
 
-    const delay = (config.reconnectInterval || 5000) * Math.pow(2, connectionAttempts);
-    setConnectionAttempts(prev => prev + 1);
-    
+    const delay = (config.reconnectInterval || 5000) * Math.pow(2, connectionAttemptsRef.current);
+    connectionAttemptsRef.current += 1;
+    setConnectionAttempts(connectionAttemptsRef.current);
+
     reconnectTimeout.current = setTimeout(() => {
-      console.log(`Reconnecting... attempt ${connectionAttempts + 1}`);
-      connect();
+      console.log(`Reconnecting... attempt ${connectionAttemptsRef.current}`);
+      connectRef.current();
     }, delay);
-  };
+  }, [config]);
 
   const sendMessage = (type: string, data: unknown) => {
     if (isConnected && ws.current) {
