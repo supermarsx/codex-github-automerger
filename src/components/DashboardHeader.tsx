@@ -13,11 +13,11 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [], darkMode, onThemeChange }) => {
   return (
-    <Card className="nb-card">
+    <Card className="neo-card">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="nb-card nb-green p-3">
+            <div className="neo-card neo-green p-3">
               <GitMerge className="w-8 h-8 text-white" />
             </div>
             <div>

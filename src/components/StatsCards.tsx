@@ -23,37 +23,37 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
     {
       title: repositories.length > 0 ? repositories.filter(r => r.enabled).length.toString() : 'N/A',
       label: 'Active Repos',
-      color: 'nb-green',
+      color: 'neo-green',
       subtitle: repositories.length > 0 ? `${repositories.length} total` : 'No repositories'
     },
     {
       title: apiKeys.length > 0 ? apiKeys.filter(k => k.isActive).length.toString() : 'N/A',
       label: 'Active Keys',
-      color: 'nb-blue',
+      color: 'neo-blue',
       subtitle: apiKeys.length > 0 ? `${apiKeys.length} total` : 'No API keys'
     },
     {
       title: hasData ? currentStats.pending.toString() : 'N/A',
       label: 'Pending',
-      color: 'nb-yellow',
+      color: 'neo-yellow',
       subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
       title: hasData ? currentStats.merged.toString() : 'N/A',
       label: 'Merged',
-      color: 'nb-green',
+      color: 'neo-green',
       subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
       title: hasData ? currentStats.failed.toString() : 'N/A',
       label: 'Failed',
-      color: 'nb-red',
+      color: 'neo-red',
       subtitle: hasData ? (statsPeriod === 'session' ? 'This session' : 'Total') : 'No data available'
     },
     {
       title: hasData ? Math.round((currentStats.merged / (currentStats.merged + currentStats.failed)) * 100 || 0).toString() + '%' : 'N/A',
       label: 'Success Rate',
-      color: 'nb-purple',
+      color: 'neo-purple',
       subtitle: hasData ? 'Overall performance' : 'No data available'
     }
   ];
@@ -61,7 +61,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ repositories, apiKeys, m
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {stats.map((stat, index) => (
-        <Card key={index} className={`nb-card ${stat.color} p-2`}>
+        <Card key={index} className={`neo-card ${stat.color} p-2`}>
           <CardHeader className="pb-1">
             <CardTitle className="text-black dark:text-white font-black text-lg text-center">
               {stat.title}

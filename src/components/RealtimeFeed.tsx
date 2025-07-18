@@ -27,20 +27,20 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
 
   const getActivityColor = (type: string) => {
     switch (type) {
-      case 'merge': return 'nb-green';
-      case 'pull': return 'nb-blue';
-      case 'alert': return 'nb-yellow';
-      case 'success': return 'nb-green';
-      case 'failure': return 'nb-red';
-      default: return 'nb-purple';
+      case 'merge': return 'neo-green';
+      case 'pull': return 'neo-blue';
+      case 'alert': return 'neo-yellow';
+      case 'success': return 'neo-green';
+      case 'failure': return 'neo-red';
+      default: return 'neo-purple';
     }
   };
 
   return (
-    <Card className="nb-card relative">
+    <Card className="neo-card relative">
       {!isUnlocked && (
         <div className="absolute inset-0 bg-card/90 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
-          <div className="nb-card nb-red p-6">
+          <div className="neo-card neo-red p-6">
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-6 h-6" />
               <span className="font-semibold text-white text-lg">Authentication Required</span>
@@ -51,12 +51,12 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl font-black flex items-center gap-3 text-shadow">
-            <div className="nb-card nb-blue p-2">
+            <div className="neo-card neo-blue p-2">
               <Activity className="w-6 h-6 text-white" />
             </div>
             Recent Activity
           </CardTitle>
-          <Button onClick={onExportReport} size="sm" className="nb-button-secondary">
+          <Button onClick={onExportReport} size="sm" className="neo-button-secondary">
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
@@ -67,16 +67,16 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
           <div className="space-y-4">
             {activities.length === 0 ? (
               <div className="text-center py-12">
-                <div className="nb-card nb-purple p-6 mx-auto w-fit mb-6">
-                  <Activity className="w-12 h-12 mx-auto opacity-50" />
+                <div className="neo-card neo-purple p-6 mx-auto w-fit mb-6">
+                  <Activity className="w-12 h-12 text-white mx-auto" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">No Recent Activity</h3>
                 <p className="text-muted-foreground">Enable repositories and API keys to see activity</p>
               </div>
             ) : (
               activities.map((activity) => (
-                <div key={activity.id} className="flex items-center gap-4 p-4 nb-card bg-card/50 hover:bg-card/80 transition-colors">
-                  <div className={`nb-card p-3 ${getActivityColor(activity.type)} flex-shrink-0`}>
+                <div key={activity.id} className="flex items-center gap-4 p-4 neo-card bg-card/50 hover:bg-card/80 transition-colors">
+                  <div className={`neo-card p-3 ${getActivityColor(activity.type)} flex-shrink-0`}>
                     {getActivityIcon(activity.type)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -84,14 +84,14 @@ export const RealtimeFeed: React.FC<RealtimeFeedProps> = ({ activities, onExport
                     <p className="text-sm text-muted-foreground truncate">{activity.repo}</p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <Badge variant="outline" className="text-xs nb-card bg-card/50 font-bold">
+                    <Badge variant="outline" className="text-xs neo-card bg-card/50 font-bold">
                       {new Date(activity.timestamp).toLocaleString()}
                     </Badge>
                     <Button
                       onClick={() => window.open(`https://github.com/${activity.repo}`, '_blank')}
                       variant="outline"
                       size="sm"
-                      className="nb-button-secondary"
+                      className="neo-button-secondary"
                     >
                       View
                     </Button>

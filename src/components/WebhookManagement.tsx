@@ -203,7 +203,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
 
   return (
     <div className="space-y-6">
-      <Card className="nb-card">
+      <Card className="neo-card">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-black flex items-center gap-2">
@@ -212,12 +212,12 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
             </CardTitle>
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
-                <Button className="nb-button">
+                <Button className="neo-button">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Webhook
                 </Button>
               </DialogTrigger>
-              <DialogContent className="nb-card max-w-2xl">
+              <DialogContent className="neo-card max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>
                     {editingWebhook ? 'Edit Webhook' : 'Add New Webhook'}
@@ -232,7 +232,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                         value={newWebhook.name}
                         onChange={(e) => setNewWebhook({...newWebhook, name: e.target.value})}
                         placeholder="e.g., Slack Notifications"
-                        className="nb-input"
+                        className="neo-input"
                       />
                     </div>
                     <div>
@@ -242,7 +242,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                         value={newWebhook.url}
                         onChange={(e) => setNewWebhook({...newWebhook, url: e.target.value})}
                         placeholder="https://hooks.slack.com/services/..."
-                        className="nb-input"
+                        className="neo-input"
                       />
                     </div>
                   </div>
@@ -271,7 +271,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                       value={newWebhook.secret}
                       onChange={(e) => setNewWebhook({...newWebhook, secret: e.target.value})}
                       placeholder="Webhook secret for verification"
-                      className="nb-input"
+                      className="neo-input"
                     />
                   </div>
 
@@ -287,7 +287,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                   <div className="flex gap-2">
                     <Button 
                       onClick={editingWebhook ? handleUpdateWebhook : handleAddWebhook}
-                      className="nb-button"
+                      className="neo-button"
                     >
                       {editingWebhook ? 'Update' : 'Add'} Webhook
                     </Button>
@@ -298,7 +298,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                         setNewWebhook({ name: '', url: '', events: [], secret: '', headers: {}, enabled: true });
                       }}
                       variant="outline"
-                      className="nb-button-secondary"
+                      className="neo-button-secondary"
                     >
                       Cancel
                     </Button>
@@ -318,12 +318,12 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
               </div>
             ) : (
               webhooks.map(webhook => (
-                <Card key={webhook.id} className="nb-card">
+                <Card key={webhook.id} className="neo-card">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <div className={`nb-card p-2 ${webhook.enabled ? 'nb-green' : 'nb-red'}`}>
+                          <div className={`neo-card p-2 ${webhook.enabled ? 'neo-green' : 'neo-red'}`}>
                             <Webhook className="w-4 h-4 text-white" />
                           </div>
                           <div>
@@ -349,7 +349,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                           disabled={testingWebhook === webhook.id}
                           size="sm"
                           variant="outline"
-                          className="nb-button-secondary"
+                          className="neo-button-secondary"
                         >
                           <TestTube className="w-4 h-4" />
                         </Button>
@@ -357,7 +357,7 @@ export const WebhookManagement: React.FC<WebhookManagementProps> = ({
                           onClick={() => handleEditWebhook(webhook)}
                           size="sm"
                           variant="outline"
-                          className="nb-button-secondary"
+                          className="neo-button-secondary"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>

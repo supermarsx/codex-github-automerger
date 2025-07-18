@@ -136,19 +136,6 @@
            transition-all duration-150 font-black uppercase tracking-wider;
   }
 
-  /* Aliases for nb-* class names used in newer code */
-  .nb-card {@apply neo-card;}
-  .nb-card.nb-yellow {@apply neo-card neo-yellow;}
-  .nb-card.nb-pink {@apply neo-card neo-pink;}
-  .nb-card.nb-blue {@apply neo-card neo-blue;}
-  .nb-card.nb-purple {@apply neo-card neo-purple;}
-  .nb-card.nb-orange {@apply neo-card neo-orange;}
-  .nb-card.nb-green {@apply neo-card neo-green;}
-  .nb-card.nb-red {@apply neo-card neo-red;}
-
-  .nb-button {@apply neo-button;}
-  .nb-button-secondary {@apply neo-button-secondary;}
-  .nb-input {@apply neo-input;}
   
   .neo-button-secondary {
     @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_theme(colors.foreground)] 
@@ -176,5 +163,4 @@
     box-shadow: 2px 2px 0px 0px theme(colors.foreground);
   }
 
-  .nb-hover:hover {@apply neo-hover;}
 }
