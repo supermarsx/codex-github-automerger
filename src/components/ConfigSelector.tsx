@@ -46,7 +46,7 @@ export const ConfigSelector: React.FC<ConfigSelectorProps> = ({
       <div className="flex items-center gap-2">
         {type === 'select' ? (
           <Select value={value.toString()} onValueChange={handleChange}>
-            <SelectTrigger className="nb-input">
+            <SelectTrigger className="neo-input">
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -63,7 +63,7 @@ export const ConfigSelector: React.FC<ConfigSelectorProps> = ({
             type={type === 'number' ? 'number' : 'color'}
             value={value}
             onChange={(e) => handleChange(e.target.value)}
-            className="nb-input"
+            className="neo-input"
             min={min}
             max={max}
             placeholder={placeholder}

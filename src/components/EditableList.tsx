@@ -16,7 +16,7 @@ export const EditableList: React.FC<EditableListProps> = ({
   items,
   onItemsChange,
   placeholder,
-  itemColor = 'nb-blue',
+  itemColor = 'neo-blue',
   reorderable = false
 }) => {
   const [newItem, setNewItem] = useState('');
@@ -72,13 +72,13 @@ export const EditableList: React.FC<EditableListProps> = ({
                 <Input
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
-                  className="nb-input flex-1"
+                  className="neo-input flex-1"
                   onKeyPress={(e) => e.key === 'Enter' && saveEdit()}
                 />
                 <Button
                   onClick={saveEdit}
                   size="sm"
-                  className="nb-button"
+                  className="neo-button"
                 >
                   <Check className="w-4 h-4" />
                 </Button>
@@ -86,7 +86,7 @@ export const EditableList: React.FC<EditableListProps> = ({
                   onClick={cancelEdit}
                   size="sm"
                   variant="outline"
-                  className="nb-button-secondary"
+                  className="neo-button-secondary"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -96,7 +96,7 @@ export const EditableList: React.FC<EditableListProps> = ({
                 <div className="flex-1">
                   <Badge
                     variant="secondary"
-                    className={`nb-card ${itemColor} text-black dark:text-white font-bold cursor-pointer hover:opacity-80`}
+                    className={`neo-card ${itemColor} text-black dark:text-white font-bold cursor-pointer hover:opacity-80`}
                     onClick={() => startEditing(index)}
                   >
                     <Edit2 className="w-3 h-3 mr-1" />
@@ -142,10 +142,10 @@ export const EditableList: React.FC<EditableListProps> = ({
           placeholder={placeholder}
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
-          className="nb-input"
+          className="neo-input"
           onKeyPress={(e) => e.key === 'Enter' && addItem()}
         />
-        <Button onClick={addItem} className="nb-button" size="sm">
+        <Button onClick={addItem} className="neo-button" size="sm">
           <Plus className="w-4 h-4" />
         </Button>
       </div>

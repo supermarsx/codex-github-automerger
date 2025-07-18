@@ -114,24 +114,24 @@ export const Dashboard: React.FC = () => {
   };
 
   const tabs = [
-    { key: 'feed', icon: Activity, title: 'Feed', color: 'nb-blue' },
-    { key: 'repositories', icon: GitBranch, title: 'Repositories', color: 'nb-green' },
-    { key: 'api-keys', icon: Key, title: 'API Keys', color: 'nb-yellow' },
-    { key: 'actions', icon: Zap, title: 'Actions', color: 'nb-purple' },
-    { key: 'config', icon: Settings, title: 'Config', color: 'nb-orange' },
-    { key: 'security', icon: Shield, title: 'Security', color: 'nb-red' },
-    { key: 'statistics', icon: BarChart3, title: 'Statistics', color: 'nb-pink' },
-    { key: 'logs', icon: FileText, title: 'Logs', color: 'nb-blue' }
+    { key: 'feed', icon: Activity, title: 'Feed', color: 'neo-blue' },
+    { key: 'repositories', icon: GitBranch, title: 'Repositories', color: 'neo-green' },
+    { key: 'api-keys', icon: Key, title: 'API Keys', color: 'neo-yellow' },
+    { key: 'actions', icon: Zap, title: 'Actions', color: 'neo-purple' },
+    { key: 'config', icon: Settings, title: 'Config', color: 'neo-orange' },
+    { key: 'security', icon: Shield, title: 'Security', color: 'neo-red' },
+    { key: 'statistics', icon: BarChart3, title: 'Statistics', color: 'neo-pink' },
+    { key: 'logs', icon: FileText, title: 'Logs', color: 'neo-blue' }
   ];
 
   return (
     <div className="min-h-screen bg-card">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40" style={{ borderColor: 'hsl(var(--nb-border))' }}>
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40" style={{ borderColor: 'hsl(var(--neo-border))' }}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="nb-card nb-green p-3">
+              <div className="neo-card neo-green p-3">
                 <GitMerge className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -142,7 +142,7 @@ export const Dashboard: React.FC = () => {
             <div className="flex items-center gap-3">
               <Button
                 onClick={toggleTheme}
-                className="nb-button-secondary"
+                className="neo-button-secondary"
                 size="sm"
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -161,13 +161,13 @@ export const Dashboard: React.FC = () => {
         }} className="space-y-8">
           
           {/* Tab Navigation */}
-          <div className="nb-card p-6">
+          <div className="neo-card p-6">
             <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent p-0 h-auto">
               {tabs.map(({ key, icon: Icon, title, color }) => (
                 <TabsTrigger
                   key={key}
                   value={key}
-                  className={`nb-card ${color} p-4 data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--nb-border))] data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all duration-150 flex flex-col items-center gap-2 min-h-[80px] text-center`}
+                  className={`neo-card ${color} p-4 data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--neo-border))] data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all duration-150 flex flex-col items-center gap-2 min-h-[80px] text-center`}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="text-xs font-black uppercase tracking-wider">{title}</span>
@@ -296,7 +296,7 @@ export const Dashboard: React.FC = () => {
               {!globalConfig.logsDisabled ? (
                 <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} />
               ) : (
-                <Card className="nb-card">
+                <Card className="neo-card">
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <FileText className="w-12 h-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-semibold mb-2">Logs Disabled</h3>
@@ -321,7 +321,7 @@ export const Dashboard: React.FC = () => {
             updateActiveTab(nextTab.key);
             logInfo('dashboard', `Quick switched to ${nextTab.key} tab`);
           }}
-          className="nb-button nb-blue rounded-full w-14 h-14 shadow-lg hover:shadow-xl"
+          className="neo-button neo-blue rounded-full w-14 h-14 shadow-lg hover:shadow-xl"
           size="icon"
         >
           <RefreshCw className="w-6 h-6" />

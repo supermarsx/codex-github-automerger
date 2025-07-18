@@ -33,18 +33,18 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="nb-card">
+      <AlertDialogContent className="neo-card">
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="nb-button-secondary">
+          <AlertDialogCancel className="neo-button-secondary">
             {cancelText}
           </AlertDialogCancel>
           <AlertDialogAction 
             onClick={onConfirm}
-            className={variant === 'destructive' ? 'nb-button bg-red-500 hover:bg-red-600' : 'nb-button'}
+            className={variant === 'destructive' ? 'neo-button bg-red-500 hover:bg-red-600' : 'neo-button'}
           >
             {confirmText}
           </AlertDialogAction>
