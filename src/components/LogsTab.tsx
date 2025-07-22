@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Search, Filter, Trash2 } from 'lucide-react';
+import { Download, FileText, Search, Filter, Trash2, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,9 +19,10 @@ interface LogsTabProps {
   logs: LogEntry[];
   onExportLogs: () => void;
   onClearLogs: () => void;
+  onFetchServerLogs: () => void;
 }
 
-export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLogs }) => {
+export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLogs, onFetchServerLogs }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const { toast } = useToast();
@@ -77,6 +78,10 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
                 <Trash2 className="w-4 h-4 mr-2" />
 
                 Clear Logs
+              </Button>
+              <Button onClick={onFetchServerLogs} variant="outline" className="neo-button-secondary">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Sync Server
               </Button>
             </div>
           </div>

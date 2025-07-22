@@ -16,6 +16,10 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
     cors: { origin: '*' }
   });
 
+  app.get('/logs', (_req, res) => {
+    res.json({ logs: logger.getLogs() });
+  });
+
   registerSocketHandlers(io, app);
 
   httpServer.listen(port, () => {

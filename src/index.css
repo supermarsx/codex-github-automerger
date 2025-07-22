@@ -110,7 +110,7 @@
 
 @layer components {
   .neo-card {
-    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground))];
+    @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground)/0.5)];
   }
   
   .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
@@ -130,23 +130,23 @@
   .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
   
   .neo-button {
-    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
+    @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground)/0.5)]
+           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.5)]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
 
   
   .neo-button-secondary {
-    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
+    @apply bg-secondary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground)/0.5)]
+           hover:shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.5)]
            hover:translate-x-[2px] hover:translate-y-[2px]
            transition-all duration-150 font-black uppercase tracking-wider;
   }
   
   .neo-input {
-    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground))]
-           focus:shadow-[2px_2px_0px_0px_hsl(var(--foreground))]
+    @apply bg-background border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground)/0.5)]
+           focus:shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.5)]
            focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;
   }

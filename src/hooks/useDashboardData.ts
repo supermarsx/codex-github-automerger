@@ -11,7 +11,7 @@ export const useDashboardData = () => {
 
   const { clearWatchModeState } = useWatchModePersistence();
 
-  const { logs, exportLogs, clearLogs } = useLogger();
+  const { logs, exportLogs, clearLogs, fetchServerLogs } = useLogger();
 
 
   
@@ -160,6 +160,7 @@ export const useDashboardData = () => {
     updateStats,
     resetSessionStats,
     exportLogs,
+    fetchServerLogs,
     clearLogs,
     clearAllRepositories,
     clearAllApiKeys,

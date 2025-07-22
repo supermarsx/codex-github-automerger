@@ -1,4 +1,5 @@
 import { BasicSocket } from './BasicSocket';
+import { RealSocket } from './RealSocket';
 import { logger, Logger } from './Logger';
 
 export interface PairingRequest {
@@ -24,7 +25,7 @@ export interface ServerAction {
 
 export class SocketService {
   private static instance: SocketService;
-  private socket: BasicSocket | null = null;
+  private socket: BasicSocket | RealSocket | null = null;
   private logger: Logger;
   private pairedClients: Set<string> = new Set();
   private pendingPairings: Map<string, PairingRequest> = new Map();
@@ -56,12 +57,15 @@ export class SocketService {
     this.address = address;
     this.port = port;
     this.maxRetries = maxRetries;
-    const socketUrl = `ws://${address}:${port}`;
+    const socketUrl = `http://${address}:${port}`;
     this.connectionAttempts = 0;
 
     while (this.connectionAttempts <= this.maxRetries) {
       try {
-        this.socket = new BasicSocket();
+        const useReal = import.meta.env.VITE_USE_REAL_SOCKET === 'true';
+        this.socket = useReal
+          ? new RealSocket(socketUrl)
+          : new BasicSocket();
         this.socket.connect();
 
         if (!this.socket.isConnected) throw new Error('connection failed');
@@ -133,10 +137,14 @@ export class SocketService {
       this.logger.logError('socket', `Cannot send ${event} - socket not connected`);
       throw new Error('socket disconnected');
     }
-    this.socket.sendMessage(event, { ...payload, clientId: this.clientId });
-    // In this demo environment we don't have a real server, so just simulate
-    // an asynchronous response
-    return new Promise(resolve => setTimeout(() => resolve(undefined as unknown as T), 10));
+    return new Promise(resolve => {
+      if ('sendRequest' in this.socket!) {
+        (this.socket as any).sendRequest(event, { ...payload, clientId: this.clientId }, (res: T) => resolve(res));
+      } else {
+        this.socket!.sendMessage(event, { ...payload, clientId: this.clientId });
+        setTimeout(() => resolve(undefined as unknown as T), 10);
+      }
+    });
   }
 
   // Server Actions
