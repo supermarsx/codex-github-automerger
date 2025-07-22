@@ -36,6 +36,7 @@ export const useWatchModePersistence = () => {
     repoStrayBranches: {},
     repoLastFetched: {}
   });
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -62,6 +63,7 @@ export const useWatchModePersistence = () => {
           console.error('Error parsing saved watch mode state:', error);
         }
       }
+      setInitialized(true);
     })();
   }, []);
 
@@ -80,10 +82,11 @@ export const useWatchModePersistence = () => {
   // No storage events for IndexedDB; state is local to the tab
 
   useEffect(() => {
+    if (!initialized) return;
     setItem(WATCH_MODE_STORAGE_KEY, watchModeState).catch(err => {
       console.error('Error saving watch mode state:', err);
     });
-  }, [watchModeState]);
+  }, [watchModeState, initialized]);
 
   const updateRepoActivities = (repoId: string, activities: ActivityItem[]) => {
     const trimmed = activities.slice(-MAX_ITEMS);

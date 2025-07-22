@@ -12,36 +12,40 @@ export const useRepositories = () => {
   const { logInfo, logError } = useLogger();
   
   const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       const savedRepos = await getItem<Repository[]>(REPOSITORIES_STORAGE_KEY);
-      if (!mounted || !savedRepos) return;
-      try {
-        const parsed = typeof savedRepos === 'string' ? JSON.parse(savedRepos) : savedRepos;
-        const repos = parsed.map((repo: Repository) => ({
-          ...repo,
-          autoMergeOnClean: repo.autoMergeOnClean ?? true,
-          autoMergeOnUnstable: repo.autoMergeOnUnstable ?? false,
-          watchEnabled: repo.watchEnabled ?? false,
-          autoDeleteOnDirty: repo.autoDeleteOnDirty ?? false,
-          autoCloseBranch: repo.autoCloseBranch ?? false,
-          protectedBranches: repo.protectedBranches ?? ['main'],
-          lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
-          recentPull: repo.recentPull ? {
-            ...repo.recentPull,
-            timestamp: new Date(repo.recentPull.timestamp)
-          } : undefined,
-          activities: (repo.activities || []).map((activity: ActivityItem) => ({
-            ...activity,
-            timestamp: new Date(activity.timestamp)
-          }))
-        }));
-        setRepositories(repos);
-      } catch (error) {
-        logError('repository', 'Error parsing saved repositories', error);
+      if (!mounted) return;
+      if (savedRepos) {
+        try {
+          const parsed = typeof savedRepos === 'string' ? JSON.parse(savedRepos) : savedRepos;
+          const repos = parsed.map((repo: Repository) => ({
+            ...repo,
+            autoMergeOnClean: repo.autoMergeOnClean ?? true,
+            autoMergeOnUnstable: repo.autoMergeOnUnstable ?? false,
+            watchEnabled: repo.watchEnabled ?? false,
+            autoDeleteOnDirty: repo.autoDeleteOnDirty ?? false,
+            autoCloseBranch: repo.autoCloseBranch ?? false,
+            protectedBranches: repo.protectedBranches ?? ['main'],
+            lastActivity: repo.lastActivity ? new Date(repo.lastActivity) : undefined,
+            recentPull: repo.recentPull ? {
+              ...repo.recentPull,
+              timestamp: new Date(repo.recentPull.timestamp)
+            } : undefined,
+            activities: (repo.activities || []).map((activity: ActivityItem) => ({
+              ...activity,
+              timestamp: new Date(activity.timestamp)
+            }))
+          }));
+          setRepositories(repos);
+        } catch (error) {
+          logError('repository', 'Error parsing saved repositories', error);
+        }
       }
+      setInitialized(true);
     })();
     return () => {
       mounted = false;
@@ -50,15 +54,16 @@ export const useRepositories = () => {
 
   // Persist repositories to IndexedDB whenever they change
   useEffect(() => {
-      setItem(REPOSITORIES_STORAGE_KEY, repositories).catch(error => {
-        logError('repository', 'Error saving repositories', error);
-        toast({
-          title: 'Storage error',
-          description: 'Unable to save repository data to IndexedDB.',
-          variant: 'destructive'
-        });
+    if (!initialized) return;
+    setItem(REPOSITORIES_STORAGE_KEY, repositories).catch(error => {
+      logError('repository', 'Error saving repositories', error);
+      toast({
+        title: 'Storage error',
+        description: 'Unable to save repository data to IndexedDB.',
+        variant: 'destructive'
       });
-  }, [repositories, toast, logError]);
+    });
+  }, [repositories, toast, logError, initialized]);
 
   function addRepositoryActivity(
     repoId: string,

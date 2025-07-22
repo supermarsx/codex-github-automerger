@@ -28,6 +28,7 @@ export const useAppPersistence = () => {
       theme: 'light'
     },
   });
+  const [initialized, setInitialized] = useState(false);
 
   const { setTheme } = useTheme();
 
@@ -51,18 +52,21 @@ export const useAppPersistence = () => {
           console.error('Error parsing saved app state:', error);
         }
       }
+      setInitialized(true);
     })();
   }, []);
 
   useEffect(() => {
+    if (!initialized) return;
     setTheme(appState.userPreferences.theme);
-  }, [appState.userPreferences.theme, setTheme]);
+  }, [appState.userPreferences.theme, setTheme, initialized]);
 
   useEffect(() => {
+    if (!initialized) return;
     setItem(APP_STATE_STORAGE_KEY, appState).catch(err => {
       console.error('Error saving app state:', err);
     });
-  }, [appState]);
+  }, [appState, initialized]);
 
   const updateActiveTab = (tab: string) => {
     setAppState(prev => ({ 
