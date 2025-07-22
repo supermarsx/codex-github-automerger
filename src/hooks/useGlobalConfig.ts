@@ -28,6 +28,7 @@ const getDefaultConfig = (): GlobalConfig => ({
   socketMaxRetries: 5,
   logLevel: 'info',
   darkMode: true,
+  bwMode: false,
   accentColor: '#313135',
   customCss: '',
   customJs: '',
@@ -62,6 +63,9 @@ export const useGlobalConfig = () => {
           if (migrated.autoMergeOnUnstable === undefined) {
             migrated.autoMergeOnUnstable = false;
           }
+          if (migrated.bwMode === undefined) {
+            migrated.bwMode = false;
+          }
           setGlobalConfig(prev => ({ ...prev, ...migrated }));
         } catch (error) {
           console.error('Error parsing saved config:', error);
@@ -77,12 +81,12 @@ export const useGlobalConfig = () => {
     });
   }, [globalConfig]);
 
-  // Update theme when darkMode changes
+  // Update theme when darkMode or bwMode changes
   useEffect(() => {
-    const theme = globalConfig.darkMode ? 'dark' : 'light';
+    const theme = globalConfig.bwMode ? 'bw' : globalConfig.darkMode ? 'dark' : 'light';
     setItem('theme', theme);
     setTheme(theme);
-  }, [globalConfig.darkMode, setTheme]);
+  }, [globalConfig.darkMode, globalConfig.bwMode, setTheme]);
 
   // Update accent color
   useEffect(() => {

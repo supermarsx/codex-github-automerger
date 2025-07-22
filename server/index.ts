@@ -22,6 +22,10 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
     res.header('Access-Control-Allow-Headers', '*');
     next();
   });
+  app.use((req, _res, next) => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
+  });
   app.use(express.json());
 
   const httpServer = http.createServer(app);
