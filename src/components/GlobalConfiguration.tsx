@@ -28,6 +28,7 @@ interface GlobalConfigurationProps {
   onConfigChange: (config: GlobalConfig) => void;
   onExportConfig: () => void;
   onImportConfig: () => void;
+  onPurgeDatabase: () => void;
 }
 
 export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
@@ -36,7 +37,8 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   apiKeys,
   onConfigChange,
   onExportConfig,
-  onImportConfig
+  onImportConfig,
+  onPurgeDatabase
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
@@ -52,6 +54,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   const [exportPassword, setExportPassword] = useState('');
   const [importPassword, setImportPassword] = useState('');
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [showResetDialog, setShowResetDialog] = useState(false);
   const { toast } = useToast();
   const { logInfo, logError, logWarn } = useLogger('info');
   const { clearWatchModeState } = useWatchModePersistence();
@@ -213,6 +216,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   };
 
   return (
+    <>
     <Card className="neo-card">
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -669,6 +673,14 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear Watch Mode
               </Button>
+              <Button
+                size="sm"
+                onClick={() => setShowResetDialog(true)}
+                className="neo-button bg-red-600 hover:bg-red-700 ml-2"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset to Defaults
+              </Button>
             </div>
           </div>
         </div>
@@ -683,5 +695,18 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         />
       </CardContent>
     </Card>
+    <ConfirmationDialog
+      open={showResetDialog}
+      onOpenChange={setShowResetDialog}
+      title="Reset to Defaults?"
+      description="This will remove all stored data and restore default settings."
+      onConfirm={() => {
+        onPurgeDatabase();
+        toast({ title: 'Application reset to defaults' });
+      }}
+      confirmText="Reset"
+      variant="destructive"
+    />
+    </>
   );
 };

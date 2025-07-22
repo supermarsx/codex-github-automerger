@@ -70,7 +70,8 @@ export const Dashboard: React.FC = () => {
     fetchServerLogs,
     clearLogs,
     addRepositoryActivity,
-    fetchActivities
+    fetchActivities,
+    purgeDatabase
   } = useDashboardData();
 
   const { appState, updateActiveTab, updateTheme } = useAppPersistence();
@@ -259,13 +260,14 @@ export const Dashboard: React.FC = () => {
 
           <TabsContent value="config" className="space-y-6">
             <div className="max-w-4xl mx-auto">
-              <GlobalConfiguration 
-                config={globalConfig} 
+              <GlobalConfiguration
+                config={globalConfig}
                 repositories={repositories}
                 apiKeys={apiKeys}
                 onConfigChange={setGlobalConfig}
                 onExportConfig={exportReport}
                 onImportConfig={() => logInfo('dashboard', 'Import config triggered')}
+                onPurgeDatabase={purgeDatabase}
               />
             </div>
           </TabsContent>
@@ -277,6 +279,7 @@ export const Dashboard: React.FC = () => {
                 repositories={repositories}
                 config={globalConfig}
                 onAuthenticate={unlock}
+                isUnlocked={isUnlocked}
               />
             </div>
           </TabsContent>

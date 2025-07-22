@@ -1,7 +1,7 @@
-type LogEntry = { id: string; timestamp: Date; level: 'info' | 'error'; message: string };
+type LogEntry = { id: string; timestamp: Date; level: 'info' | 'error' | 'warn'; message: string };
 const logs: LogEntry[] = [];
 
-function addLog(level: 'info' | 'error', args: unknown[]) {
+function addLog(level: 'info' | 'error' | 'warn', args: unknown[]) {
   const message = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
   logs.push({ id: Date.now().toString(36), timestamp: new Date(), level, message });
 }
@@ -15,5 +15,28 @@ export const logger = {
     addLog('error', args);
     console.error('[error]', ...args);
   },
+  warn: (...args: unknown[]) => {
+    addLog('warn', args);
+    console.warn('[warn]', ...args);
+  },
   getLogs: () => logs
+};
+
+// Capture native console output so it also appears in the logs endpoint
+const origConsole = {
+  log: console.log,
+  warn: console.warn,
+  error: console.error
+};
+console.log = (...args: unknown[]) => {
+  addLog('info', args);
+  origConsole.log(...args);
+};
+console.warn = (...args: unknown[]) => {
+  addLog('warn', args);
+  origConsole.warn(...args);
+};
+console.error = (...args: unknown[]) => {
+  addLog('error', args);
+  origConsole.error(...args);
 };
