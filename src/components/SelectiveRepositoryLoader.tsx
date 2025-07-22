@@ -55,13 +55,15 @@ interface SelectiveRepositoryLoaderProps {
     language?: string;
     defaultBranch: string;
   }) => void;
+  isUnlocked: boolean;
 }
 
 export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps> = ({
   apiKeys,
   existingRepos,
   getDecryptedApiKey,
-  onAddRepository
+  onAddRepository,
+  isUnlocked
 }) => {
   const [selectedApiKey, setSelectedApiKey] = useState<string>('');
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
@@ -128,10 +130,10 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
   };
 
   useEffect(() => {
-    if (selectedApiKey) {
+    if (selectedApiKey && isUnlocked) {
       loadRepositories(selectedApiKey);
     }
-  }, [selectedApiKey]);
+  }, [selectedApiKey, isUnlocked]);
 
   useEffect(() => {
     let filtered = repositories;
