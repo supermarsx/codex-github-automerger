@@ -10,7 +10,7 @@ interface ExtendedSocket extends Socket {
 import crypto from 'crypto';
 import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
-import { logger } from './logger.js';
+import { logger, getLogs, clearLogs } from './logger.js';
 import { getClientConfig, setClientConfig } from './config.js';
 import { matchesPattern } from './utils/patterns.js';
 
@@ -112,6 +112,26 @@ io.on('connection', (socket: Socket) => {
       const svc = createGitHubService(params.token);
       const repos = await svc.fetchRepositories(params.owner || '');
       cb({ ok: true, data: repos });
+    } catch (err) {
+      cb({ ok: false, error: err.message });
+    }
+  });
+
+  socket.on('fetchLogs', (params, cb = () => {}) => {
+    if (!requirePaired(s, cb)) return;
+    try {
+      const data = getLogs();
+      cb({ ok: true, data });
+    } catch (err) {
+      cb({ ok: false, error: err.message });
+    }
+  });
+
+  socket.on('clearLogs', (params, cb = () => {}) => {
+    if (!requirePaired(s, cb)) return;
+    try {
+      clearLogs();
+      cb({ ok: true });
     } catch (err) {
       cb({ ok: false, error: err.message });
     }

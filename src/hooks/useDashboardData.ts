@@ -4,6 +4,7 @@ import { useGlobalConfig } from './useGlobalConfig';
 import { GlobalConfig } from '@/types/dashboard';
 import { useActivities } from './useActivities';
 import { useLogger } from './useLogger';
+import { useServerLogs } from './useServerLogs';
 import { useWatchModePersistence } from './useWatchModePersistence';
 
 export const useDashboardData = () => {
@@ -12,6 +13,7 @@ export const useDashboardData = () => {
   const { clearWatchModeState } = useWatchModePersistence();
 
   const { logs, exportLogs, clearLogs } = useLogger();
+  const { serverLogs, fetchServerLogs, clearServerLogs } = useServerLogs();
 
 
   
@@ -126,6 +128,7 @@ export const useDashboardData = () => {
     activities,
     mergeStats,
     logs,
+    serverLogs,
     deletedApiKeys,
     isLoading,
     toggleRepository,
@@ -161,6 +164,8 @@ export const useDashboardData = () => {
     resetSessionStats,
     exportLogs,
     clearLogs,
+    fetchServerLogs,
+    clearServerLogs,
     clearAllRepositories,
     clearAllApiKeys,
     clearWatchModeState,

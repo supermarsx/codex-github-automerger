@@ -11,8 +11,48 @@ export class GitHubService {
     });
   }
 
-  fetchRepositories(owner: string): Promise<Repository[]> {
-    return this.emit('fetchRepos', { owner });
+  async fetchRepositories(owner: string): Promise<Repository[]> {
+    try {
+      const res = await this.emit<Repository[]>('fetchRepos', { owner });
+      if (res) return res;
+    } catch {
+      // fall back to direct GitHub API below
+    }
+
+    const headers: Record<string, string> = {
+      Authorization: `token ${this.token}`,
+      'User-Agent': 'Automerger-App'
+    };
+    const url = owner
+      ? `https://api.github.com/users/${owner}/repos?per_page=100`
+      : 'https://api.github.com/user/repos?per_page=100';
+    const response = await fetch(url, { headers });
+    if (!response.ok) {
+      throw new Error('Failed to fetch repositories');
+    }
+    const data = await response.json();
+    return data.map((repo: any) => ({
+      id: repo.id.toString(),
+      name: repo.name,
+      owner: repo.owner.login,
+      enabled: false,
+      autoMergeOnClean: true,
+      autoMergeOnUnstable: false,
+      watchEnabled: false,
+      autoDeleteOnDirty: false,
+      autoCloseBranch: false,
+      allowedBranches: ['codex-*'],
+      allowedUsers: ['github-actions[bot]'],
+      alertsEnabled: true,
+      lastActivity: new Date(repo.updated_at),
+      stats: {
+        totalMerges: 0,
+        successfulMerges: 0,
+        failedMerges: 0,
+        pendingMerges: 0
+      },
+      activities: []
+    })) as Repository[];
   }
 
   fetchPullRequests(owner: string, repo: string): Promise<any[]> {

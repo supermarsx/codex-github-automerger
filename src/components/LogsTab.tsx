@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Download, FileText, Search, Filter, Trash2 } from 'lucide-react';
+import { Download, FileText, Search, Filter, Trash2, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,16 +17,25 @@ interface LogEntry {
 
 interface LogsTabProps {
   logs: LogEntry[];
+  serverLogs?: LogEntry[];
   onExportLogs: () => void;
   onClearLogs: () => void;
+  onFetchServerLogs?: () => void;
 }
 
-export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLogs }) => {
+export const LogsTab: React.FC<LogsTabProps> = ({
+  logs,
+  serverLogs = [],
+  onExportLogs,
+  onClearLogs,
+  onFetchServerLogs
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState<string>('all');
   const { toast } = useToast();
 
-  const filteredLogs = logs.filter(log => {
+  const combined = [...logs, ...serverLogs];
+  const filteredLogs = combined.filter(log => {
     const matchesSearch = log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          log.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLevel = levelFilter === 'all' || log.level === levelFilter;
@@ -69,6 +78,12 @@ export const LogsTab: React.FC<LogsTabProps> = ({ logs, onExportLogs, onClearLog
               </CardDescription>
             </div>
             <div className="flex gap-2">
+              {onFetchServerLogs && (
+                <Button onClick={onFetchServerLogs} variant="outline" className="neo-button-secondary">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh Server Logs
+                </Button>
+              )}
               <Button onClick={handleExportLogs} className="neo-button">
                 <Download className="w-4 h-4 mr-2" />
                 Export Logs

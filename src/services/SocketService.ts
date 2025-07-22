@@ -259,6 +259,14 @@ export class SocketService {
     return this.request('fetchRecentActivity', { token, repositories });
   }
 
+  async fetchLogs(): Promise<any> {
+    return this.request('fetchLogs', {});
+  }
+
+  async clearLogs(): Promise<any> {
+    return this.request('clearLogs', {});
+  }
+
   async checkPRMergeable(token: string, owner: string, repo: string, pullNumber: number): Promise<any> {
     return this.request('checkPRMergeable', { token, owner, repo, pullNumber });
   }
