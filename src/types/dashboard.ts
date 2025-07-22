@@ -174,4 +174,10 @@ export interface GlobalConfig {
   /** Archive already closed PRs when fetching */
   autoArchiveClosed: boolean;
   refreshInterval: number;
+  /** Socket server hostname or IP */
+  socketServerAddress: string;
+  /** Socket server port */
+  socketServerPort: number;
+  /** Socket reconnection attempts */
+  socketMaxRetries: number;
 }

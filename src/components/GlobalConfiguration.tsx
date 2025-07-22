@@ -573,6 +573,33 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               min={1}
               max={300}
             />
+            <div className="grid grid-cols-2 items-center gap-4">
+              <Label htmlFor="socketServerAddress" className="font-bold">Socket Server Address</Label>
+              <Input
+                id="socketServerAddress"
+                value={config.socketServerAddress}
+                onChange={(e) => onConfigChange({ ...config, socketServerAddress: e.target.value })}
+                className="neo-input"
+                placeholder="localhost"
+              />
+            </div>
+            <ConfigSelector
+              id="socketServerPort"
+              label="Socket Server Port"
+              value={config.socketServerPort}
+              onChange={(value) => onConfigChange({ ...config, socketServerPort: parseInt(value) })}
+              type="number"
+              min={1}
+              max={65535}
+            />
+            <ConfigSelector
+              id="socketMaxRetries"
+              label="Socket Max Retries"
+              value={config.socketMaxRetries}
+              onChange={(value) => onConfigChange({ ...config, socketMaxRetries: parseInt(value) })}
+              type="number"
+              min={0}
+            />
             <ConfigSelector
               id="logLevel"
               label="Log Level"

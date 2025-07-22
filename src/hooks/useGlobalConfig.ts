@@ -23,6 +23,9 @@ const getDefaultConfig = (): GlobalConfig => ({
   fetchMode: 'github-api',
   serverCheckInterval: 30000, // 30 seconds
   refreshInterval: 30000,
+  socketServerAddress: 'localhost',
+  socketServerPort: 8080,
+  socketMaxRetries: 5,
   logLevel: 'info',
   darkMode: true,
   accentColor: '#313135',
