@@ -103,11 +103,18 @@ export const Dashboard: React.FC = () => {
 
   // Log app initialization
   useEffect(() => {
-    logInfo('dashboard', 'Dashboard initialized', { 
+    logInfo('dashboard', 'Dashboard initialized', {
       sessionStart: appState.sessionStartTime,
       activeTab: appState.activeTab
     });
   }, []);
+
+  // Sync server logs whenever the Logs tab is opened
+  useEffect(() => {
+    if (appState.activeTab === 'logs') {
+      fetchServerLogs();
+    }
+  }, [appState.activeTab, fetchServerLogs]);
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';

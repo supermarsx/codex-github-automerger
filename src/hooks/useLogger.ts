@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useGlobalConfig } from './useGlobalConfig';
 
 export interface LogEntry {
   id: string;
@@ -13,6 +14,7 @@ export const useLogger = (
   logLevel: 'info' | 'warn' | 'error' | 'debug' = 'info'
 ) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const { globalConfig } = useGlobalConfig();
 
   const shouldLog = useCallback((level: LogEntry['level']): boolean => {
     const levels = ['debug', 'info', 'warn', 'error', 'success'];
@@ -88,7 +90,7 @@ export const useLogger = (
       console.warn = orig.warn;
       console.error = orig.error;
     };
-  }, [addLog]);
+  }, [addLog, globalConfig.socketServerAddress, globalConfig.socketServerPort]);
 
   useEffect(() => {
     addLog('info', 'system', 'Logger initialized');
@@ -136,7 +138,8 @@ export const useLogger = (
 
   const fetchServerLogs = useCallback(async () => {
     try {
-      const res = await fetch('/logs');
+      const url = `http://${globalConfig.socketServerAddress}:${globalConfig.socketServerPort}/logs`;
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
       if (Array.isArray(data.logs)) {
@@ -152,7 +155,7 @@ export const useLogger = (
     } catch (err) {
       addLog('error', 'logger', 'Failed to fetch server logs', err);
     }
-  }, [addLog]);
+  }, [addLog, globalConfig.socketServerAddress, globalConfig.socketServerPort]);
 
   const exportLogs = useCallback(() => {
     const logData = {
