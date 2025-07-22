@@ -4,17 +4,19 @@ import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ThemeToggleProps {
-  darkMode: boolean;
-  onThemeChange: (dark: boolean) => void;
+  theme: 'light' | 'dark' | 'bw';
+  onThemeChange: (theme: 'light' | 'dark' | 'bw') => void;
 }
 
-export const ThemeToggle = ({ darkMode, onThemeChange }: ThemeToggleProps) => {
-  const { theme, setTheme } = useTheme();
+export const ThemeToggle = ({ theme, onThemeChange }: ThemeToggleProps) => {
+  const { theme: currentTheme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    const order = ['light', 'dark', 'bw'] as const;
+    const idx = order.indexOf(currentTheme as 'light' | 'dark' | 'bw');
+    const newTheme = order[(idx + 1) % order.length];
     setTheme(newTheme);
-    onThemeChange(newTheme === 'dark');
+    onThemeChange(newTheme);
   };
 
   return (
@@ -23,7 +25,7 @@ export const ThemeToggle = ({ darkMode, onThemeChange }: ThemeToggleProps) => {
       className="neo-button-secondary"
       size="sm"
     >
-      {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </Button>
   );
 };

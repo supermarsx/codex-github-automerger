@@ -12,7 +12,7 @@ export interface AppState {
     compactMode: boolean;
     autoRefresh: boolean;
     notificationsEnabled: boolean;
-    theme: 'light' | 'dark';
+    theme: 'light' | 'dark' | 'bw';
   };
 }
 
@@ -80,7 +80,7 @@ export const useAppPersistence = () => {
     }));
   };
 
-  const updateTheme = (theme: 'light' | 'dark') => {
+  const updateTheme = (theme: 'light' | 'dark' | 'bw') => {
     setAppState(prev => ({
       ...prev,
       userPreferences: { ...prev.userPreferences, theme },

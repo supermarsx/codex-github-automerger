@@ -157,6 +157,7 @@ export interface GlobalConfig {
   serverCheckInterval: number;
   logLevel: 'info' | 'warn' | 'error' | 'debug';
   darkMode: boolean;
+  bwMode: boolean;
   accentColor: string;
   customCss: string;
   customJs: string;

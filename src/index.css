@@ -168,6 +168,13 @@
   .dark .neo-card.neo-orange { @apply text-black border-2 border-gray-600; }
   .dark .neo-card.neo-green { @apply text-white border-2 border-gray-600; }
   .dark .neo-card.neo-red { @apply text-white border-2 border-gray-600; }
+  [data-theme="bw"] .neo-card.neo-yellow { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-pink { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-blue { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-purple { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-orange { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-green { @apply text-black border-2 border-black; }
+  [data-theme="bw"] .neo-card.neo-red { @apply text-black border-2 border-black; }
   
   .neo-button {
     @apply bg-primary border-4 border-foreground shadow-[4px_4px_0px_0px_hsl(var(--foreground)/0.5)]

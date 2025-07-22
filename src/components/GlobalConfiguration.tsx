@@ -606,6 +606,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
               checked={config.darkMode}
               onCheckedChange={(checked) => onConfigChange({ ...config, darkMode: checked })}
             />
+            <ConfigToggle
+              id="bwMode"
+              label="Black & White Mode"
+              checked={config.bwMode}
+              onCheckedChange={(checked) => onConfigChange({ ...config, bwMode: checked })}
+            />
             <div className="grid grid-cols-2 items-center gap-4">
               <Label htmlFor="accentColor" className="font-bold">Accent Color</Label>
               <Select
