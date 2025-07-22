@@ -77,6 +77,7 @@ app.post('/pairings/:token/deny', (req, res) => {
 });
 
 io.on('connection', (socket: Socket) => {
+  logger.debug('socket', 'client connected', { id: socket.id });
   const s = socket as ExtendedSocket;
   s.subscriptions = new Set();
   s.isPaired = false;
@@ -89,6 +90,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('pair_request', ({ clientId }) => {
+    logger.debug('socket', 'pair_request received', { clientId });
     cleanupPairings();
     const entry = pendingPairings.get(s.pairToken);
     if (!entry) return;
@@ -98,6 +100,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('syncConfig', async (config, cb = () => {}) => {
+    logger.debug('socket', 'syncConfig received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       await setClientConfig(s.clientId, config || {});
@@ -107,6 +110,7 @@ io.on('connection', (socket: Socket) => {
     }
   });
   socket.on('fetchRepos', async (params, cb = () => {}) => {
+    logger.debug('socket', 'fetchRepos received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -118,6 +122,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('fetchPullRequests', async (params, cb = () => {}) => {
+    logger.debug('socket', 'fetchPullRequests received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -134,6 +139,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('mergePR', async (params, cb = () => {}) => {
+    logger.debug('socket', 'mergePR received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -145,6 +151,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('closePR', async (params, cb = () => {}) => {
+    logger.debug('socket', 'closePR received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -156,6 +163,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('deleteBranch', async (params, cb = () => {}) => {
+    logger.debug('socket', 'deleteBranch received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     const {
       token,
@@ -194,6 +202,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('fetchStrayBranches', async (params, cb = () => {}) => {
+    logger.debug('socket', 'fetchStrayBranches received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -220,6 +229,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('fetchRecentActivity', async (params, cb = () => {}) => {
+    logger.debug('socket', 'fetchRecentActivity received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -241,18 +251,21 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('subscribeRepo', params => {
+    logger.debug('socket', 'subscribeRepo received', { clientId: s.clientId });
     if (!requirePaired(s)) return;
     subscribeRepo(s, params);
     s.subscriptions.add(`${params.owner}/${params.repo}`);
   });
 
   socket.on('unsubscribeRepo', params => {
+    logger.debug('socket', 'unsubscribeRepo received', { clientId: s.clientId });
     if (!requirePaired(s)) return;
     unsubscribeRepo(s, params);
     s.subscriptions.delete(`${params.owner}/${params.repo}`);
   });
 
   socket.on('checkPRMergeable', async (params, cb = () => {}) => {
+    logger.debug('socket', 'checkPRMergeable received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
@@ -264,6 +277,7 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('disconnect', () => {
+    logger.debug('socket', 'client disconnected', { id: socket.id, clientId: s.clientId });
     for (const key of s.subscriptions) {
       const [owner, repo] = key.split('/');
       unsubscribeRepo(s, { owner, repo });

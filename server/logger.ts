@@ -1,7 +1,12 @@
-type LogEntry = { id: string; timestamp: Date; level: 'info' | 'error' | 'warn'; message: string };
+type LogEntry = {
+  id: string;
+  timestamp: Date;
+  level: 'info' | 'error' | 'warn' | 'debug';
+  message: string;
+};
 const logs: LogEntry[] = [];
 
-function addLog(level: 'info' | 'error' | 'warn', args: unknown[]) {
+function addLog(level: LogEntry['level'], args: unknown[]) {
   const message = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
   logs.push({ id: Date.now().toString(36), timestamp: new Date(), level, message });
 }
@@ -19,6 +24,10 @@ export const logger = {
     addLog('warn', args);
     console.warn('[warn]', ...args);
   },
+  debug: (...args: unknown[]) => {
+    addLog('debug', args);
+    console.debug('[debug]', ...args);
+  },
   getLogs: () => logs
 };
 
@@ -26,7 +35,8 @@ export const logger = {
 const origConsole = {
   log: console.log,
   warn: console.warn,
-  error: console.error
+  error: console.error,
+  debug: console.debug
 };
 console.log = (...args: unknown[]) => {
   addLog('info', args);
@@ -39,4 +49,8 @@ console.warn = (...args: unknown[]) => {
 console.error = (...args: unknown[]) => {
   addLog('error', args);
   origConsole.error(...args);
+};
+console.debug = (...args: unknown[]) => {
+  addLog('debug', args);
+  origConsole.debug(...args);
 };
