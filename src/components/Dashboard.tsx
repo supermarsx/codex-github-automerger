@@ -67,6 +67,7 @@ export const Dashboard: React.FC = () => {
     // Other functions
     exportReport,
     exportLogs,
+    fetchServerLogs,
     clearLogs,
     addRepositoryActivity,
     fetchActivities
@@ -295,7 +296,7 @@ export const Dashboard: React.FC = () => {
           <TabsContent value="logs" className="space-y-6">
             <div className="max-w-4xl mx-auto">
               {!globalConfig.logsDisabled ? (
-                <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} />
+                <LogsTab logs={logs} onExportLogs={exportLogs} onClearLogs={clearLogs} onFetchServerLogs={fetchServerLogs} />
               ) : (
                 <Card className="neo-card">
                   <CardContent className="flex flex-col items-center justify-center py-12">
@@ -313,21 +314,15 @@ export const Dashboard: React.FC = () => {
         </Tabs>
       </div>
 
-      {/* Quick Access Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => {
-            const currentIndex = tabs.findIndex(tab => tab.key === appState.activeTab);
-            const nextTab = tabs[(currentIndex + 1) % tabs.length];
-            updateActiveTab(nextTab.key);
-            logInfo('dashboard', `Quick switched to ${nextTab.key} tab`);
-          }}
-          className="neo-button neo-blue rounded-full w-14 h-14 shadow-lg hover:shadow-xl"
-          size="icon"
-        >
-          <RefreshCw className="w-6 h-6" />
-        </Button>
-      </div>
+      {!isUnlocked && !authInProgress && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button onClick={unlock} className="neo-button">
+            <Key className="w-4 h-4 mr-2" />
+            Authenticate
+          </Button>
+        </div>
+      )}
+
     </div>
   );
 };

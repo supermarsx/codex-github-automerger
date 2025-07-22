@@ -21,6 +21,15 @@ export class BasicSocket {
     return true;
   }
 
+  sendRequest(type: string, data: unknown, cb: MessageCallback): boolean {
+    if (!this.isConnected) return false;
+    setTimeout(() => {
+      this.emitMessage(type, data);
+      cb(undefined);
+    }, 10);
+    return true;
+  }
+
   onMessage(type: string, cb: MessageCallback): () => void {
     let set = this.listeners.get(type);
     if (!set) {

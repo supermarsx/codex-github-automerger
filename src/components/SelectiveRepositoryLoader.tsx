@@ -89,6 +89,9 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
       }
       const service = createGitHubService(token);
       const repos = await service.fetchRepositories('');
+      if (!repos) {
+        throw new Error('no repositories');
+      }
       
       // Convert to our format and filter out already added repos
       const githubRepos: GitHubRepository[] = repos.map(repo => ({

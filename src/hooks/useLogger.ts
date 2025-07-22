@@ -134,6 +134,26 @@ export const useLogger = (
     setLogs([]);
   }, []);
 
+  const fetchServerLogs = useCallback(async () => {
+    try {
+      const res = await fetch('/logs');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data.logs)) {
+        const serverEntries = data.logs.map((l: any) => ({
+          id: `srv-${l.id}`,
+          timestamp: new Date(l.timestamp),
+          level: l.level || 'info',
+          category: 'server',
+          message: l.message,
+        }));
+        setLogs(prev => [...serverEntries, ...prev]);
+      }
+    } catch (err) {
+      addLog('error', 'logger', 'Failed to fetch server logs', err);
+    }
+  }, [addLog]);
+
   const exportLogs = useCallback(() => {
     const logData = {
       exported: new Date().toISOString(),
@@ -163,7 +183,8 @@ export const useLogger = (
     logDebug,
     logSuccess,
     clearLogs,
-    exportLogs
+    exportLogs,
+    fetchServerLogs
   };
 };
 
