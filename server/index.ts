@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import { registerSocketHandlers } from './socketHandlers.js';
@@ -9,6 +10,7 @@ import { fileURLToPath } from 'url';
 export async function startServer(port: number = Number(process.env.PORT) || 3001) {
   await loadPromise;
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   const httpServer = http.createServer(app);
