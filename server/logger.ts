@@ -8,7 +8,8 @@ const logs: LogEntry[] = [];
 
 function addLog(level: LogEntry['level'], args: unknown[]) {
   const message = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
-  logs.push({ id: Date.now().toString(36), timestamp: new Date(), level, message });
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  logs.push({ id, timestamp: new Date(), level, message });
 }
 
 export const logger = {
