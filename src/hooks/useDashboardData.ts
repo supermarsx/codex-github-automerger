@@ -117,6 +117,15 @@ export const useDashboardData = () => {
     fetchActivities
   } = useActivities();
 
+  const purgeDatabase = () => {
+    resetConfig();
+    clearAllRepositories();
+    clearAllApiKeys();
+    clearWatchModeState();
+    resetSessionStats();
+    clearLogs();
+  };
+
   return {
     repositories,
     apiKeys,
@@ -165,6 +174,7 @@ export const useDashboardData = () => {
     clearAllRepositories,
     clearAllApiKeys,
     clearWatchModeState,
+    purgeDatabase,
     unlock,
     authInProgress,
     showLockedModal,

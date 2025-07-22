@@ -10,7 +10,8 @@ import { fileURLToPath } from 'url';
 export async function startServer(port: number = Number(process.env.PORT) || 3001) {
   await loadPromise;
   const app = express();
-  app.use(cors());
+  app.use(cors({ origin: '*' }));
+  app.options('*', cors({ origin: '*' }));
   app.use(express.json());
 
   const httpServer = http.createServer(app);
@@ -19,6 +20,7 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   });
 
   app.get('/logs', (_req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ logs: logger.getLogs() });
   });
 

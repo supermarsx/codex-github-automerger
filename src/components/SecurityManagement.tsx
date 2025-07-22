@@ -19,9 +19,10 @@ interface SecurityManagementProps {
   repositories: Repository[];
   config: GlobalConfig;
   onAuthenticate: () => void;
+  isUnlocked: boolean;
 }
 
-export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys, repositories, config, onAuthenticate }) => {
+export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys, repositories, config, onAuthenticate, isUnlocked }) => {
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [credentials, setCredentials] = useState<PasskeyCredential[]>([]);
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([]);
@@ -223,9 +224,13 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
             </p>
             <div className="space-y-2">
               {credentials.length > 0 && (
-                <Button onClick={handleAuthenticatePasskey} className="neo-button bg-black text-white w-full">
+                <Button
+                  onClick={handleAuthenticatePasskey}
+                  disabled={isUnlocked}
+                  className={`neo-button bg-black text-white w-full ${isUnlocked ? 'opacity-50 cursor-default' : ''}`}
+                >
                   <Lock className="w-4 h-4 mr-2" />
-                  Authenticate
+                  {isUnlocked ? 'Authenticated' : 'Authenticate'}
                 </Button>
               )}
               <Dialog open={showPasskeyDialog} onOpenChange={setShowPasskeyDialog}>
