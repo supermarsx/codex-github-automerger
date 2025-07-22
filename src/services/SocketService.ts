@@ -31,6 +31,10 @@ export class SocketService {
   private pairToken: string | null = null;
   private clientId: string;
   private configSupplier: (() => any) | null = null;
+  private address = 'localhost';
+  private port = 8080;
+  private maxRetries = 5;
+  private connectionAttempts = 0;
 
   constructor() {
     this.clientId = this.generateClientId();
@@ -48,36 +52,58 @@ export class SocketService {
     return `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  initialize(socketUrl: string = 'ws://localhost:8080') {
-    try {
-      this.socket = new BasicSocket();
-      this.socket.connect();
+  initialize(address: string = 'localhost', port: number = 8080, maxRetries: number = 5): boolean {
+    this.address = address;
+    this.port = port;
+    this.maxRetries = maxRetries;
+    const socketUrl = `ws://${address}:${port}`;
+    this.connectionAttempts = 0;
 
-      this.logger.logInfo('socket', 'Socket service initialized', { clientId: this.clientId });
+    while (this.connectionAttempts <= this.maxRetries) {
+      try {
+        this.socket = new BasicSocket();
+        this.socket.connect();
 
-      this.socket.onMessage('pair_token', ({ token }) => {
-        this.pairToken = token;
-        this.logger.logInfo('socket', 'Received pairing token', { token });
-      });
+        if (!this.socket.isConnected) throw new Error('connection failed');
 
-      this.socket.onMessage('pair_result', ({ success }) => {
-        if (success) {
-          this.pairedClients.add(this.clientId);
-          this.logger.logInfo('socket', 'Pairing successful');
-          this.syncConfig();
-        } else {
-          this.logger.logError('socket', 'Pairing denied');
-        }
-      });
+        this.logger.logInfo('socket', 'Socket service initialized', {
+          clientId: this.clientId,
+          url: socketUrl
+        });
 
-      // Send pairing request on connection
-      this.requestPairing();
-      
-      return true;
-    } catch (error) {
-      this.logger.logError('socket', 'Failed to initialize socket service', { error });
-      return false;
+        this.socket.onMessage('pair_token', ({ token }) => {
+          this.pairToken = token;
+          this.logger.logInfo('socket', 'Received pairing token', { token });
+        });
+
+        this.socket.onMessage('pair_result', ({ success }) => {
+          if (success) {
+            this.pairedClients.add(this.clientId);
+            this.logger.logInfo('socket', 'Pairing successful');
+            this.syncConfig();
+          } else {
+            this.logger.logError('socket', 'Pairing denied');
+          }
+        });
+
+        // Send pairing request on connection
+        this.requestPairing();
+
+        return true;
+      } catch (error) {
+        this.connectionAttempts += 1;
+        this.logger.logError('socket', 'Connection attempt failed', {
+          attempt: this.connectionAttempts,
+          error
+        });
+      }
     }
+
+    this.socket = null;
+    this.logger.logError('socket', 'Failed to initialize socket service', {
+      retries: this.maxRetries
+    });
+    return false;
   }
 
   private requestPairing(): void {
@@ -278,10 +304,7 @@ export class SocketService {
   }
 
   reconnect(): void {
-    if (this.socket) {
-      this.socket.connect();
-      this.requestPairing();
-    }
+    this.initialize(this.address, this.port, this.maxRetries);
   }
 }
 

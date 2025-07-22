@@ -101,6 +101,18 @@ export const useGlobalConfig = () => {
     getSocketService().setConfigSupplier(() => globalConfig);
   }, [globalConfig]);
 
+  useEffect(() => {
+    getSocketService().initialize(
+      globalConfig.socketServerAddress,
+      globalConfig.socketServerPort,
+      globalConfig.socketMaxRetries
+    );
+  }, [
+    globalConfig.socketServerAddress,
+    globalConfig.socketServerPort,
+    globalConfig.socketMaxRetries
+  ]);
+
   const resetConfig = () => {
     const defaultConfig = getDefaultConfig();
     setGlobalConfig(defaultConfig);
