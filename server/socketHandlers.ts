@@ -263,6 +263,10 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  socket.on('ping', data => {
+    socket.emit('pong', data);
+  });
+
   socket.on('disconnect', () => {
     for (const key of s.subscriptions) {
       const [owner, repo] = key.split('/');

@@ -17,6 +17,14 @@ export class BasicSocket {
 
   sendMessage(type: string, data: unknown): boolean {
     if (!this.isConnected) return false;
+    if (type === 'ping') {
+      const delay = Math.floor(Math.random() * 50) + 10;
+      setTimeout(() => {
+        this.latency = Date.now() - (data as any).timestamp;
+        this.emitMessage('pong', data);
+      }, delay);
+      return true;
+    }
     setTimeout(() => this.emitMessage(type, data), 0);
     return true;
   }

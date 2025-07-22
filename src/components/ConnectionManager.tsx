@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Github, Server, Key } from 'lucide-react';
 import { useLogger } from '@/hooks/useLogger';
+import { getSocketService } from '@/services/SocketService';
 
 import { ApiKey } from '@/types/dashboard';
 
@@ -25,13 +26,13 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    
+
     try {
-      // In this demo we simply mark the services as connected when an API key exists
+      const svc = getSocketService();
       setGithubConnected(activeApiKeys > 0);
       setPublicApiConnected(activeApiKeys > 0);
-      setSocketConnected(activeApiKeys > 0);
-      setLatency(0);
+      setSocketConnected(svc.isConnected);
+      setLatency(svc.latency);
     } catch (error) {
       console.error('Connection check failed:', error);
       setGithubConnected(false);
@@ -53,6 +54,16 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
     
     return () => clearInterval(interval);
   }, [checkInterval, activeApiKeys, handleRefresh]);
+
+  // update latency regularly
+  useEffect(() => {
+    const svc = getSocketService();
+    const interval = setInterval(() => {
+      setSocketConnected(svc.isConnected);
+      setLatency(svc.latency);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (compact) {
     return (

@@ -18,9 +18,6 @@ export class RealSocket {
     this.socket.on('disconnect', () => {
       this.isConnected = false;
     });
-    this.socket.on('pong', ms => {
-      this.latency = ms as number;
-    });
   }
 
   disconnect(): void {
