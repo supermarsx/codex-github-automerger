@@ -11,25 +11,28 @@ const API_KEYS_STORAGE_KEY = 'automerger-api-keys';
 export const useApiKeys = () => {
   const { toast } = useToast();
   const { logInfo, logError } = useLogger();
-  
+
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     (async () => {
       const savedKeys = await getItem<any>(API_KEYS_STORAGE_KEY);
-      if (!savedKeys) return;
-      try {
-        const parsed = typeof savedKeys === 'string' ? JSON.parse(savedKeys) : savedKeys;
-        setApiKeys(
-          parsed.map((key: any) => ({
-            ...key,
-            created: new Date(key.created),
-            lastUsed: key.lastUsed ? new Date(key.lastUsed) : undefined,
-          }))
-        );
-      } catch (error) {
-        logError('api-key', 'Error parsing saved API keys', error);
+      if (savedKeys) {
+        try {
+          const parsed = typeof savedKeys === 'string' ? JSON.parse(savedKeys) : savedKeys;
+          setApiKeys(
+            parsed.map((key: any) => ({
+              ...key,
+              created: new Date(key.created),
+              lastUsed: key.lastUsed ? new Date(key.lastUsed) : undefined,
+            }))
+          );
+        } catch (error) {
+          logError('api-key', 'Error parsing saved API keys', error);
+        }
       }
+      setInitialized(true);
     })();
   }, [logError]);
 
@@ -44,10 +47,11 @@ export const useApiKeys = () => {
 
   // Persist API keys to IndexedDB whenever they change
   useEffect(() => {
-      setItem(API_KEYS_STORAGE_KEY, apiKeys).catch(err => {
-        logError('api-key', 'Error saving API keys', err);
-      });
-  }, [apiKeys, logError]);
+    if (!initialized) return;
+    setItem(API_KEYS_STORAGE_KEY, apiKeys).catch(err => {
+      logError('api-key', 'Error saving API keys', err);
+    });
+  }, [apiKeys, logError, initialized]);
 
   const unlock = async () => {
     setAuthInProgress(true);

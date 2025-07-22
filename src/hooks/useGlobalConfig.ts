@@ -45,6 +45,7 @@ const getDefaultConfig = (): GlobalConfig => ({
 
 export const useGlobalConfig = () => {
   const [globalConfig, setGlobalConfig] = useState<GlobalConfig>(getDefaultConfig());
+  const [initialized, setInitialized] = useState(false);
   const { setTheme } = useTheme();
 
   useEffect(() => {
@@ -71,30 +72,34 @@ export const useGlobalConfig = () => {
           console.error('Error parsing saved config:', error);
         }
       }
+      setInitialized(true);
     })();
   }, []);
 
   // Persist config to IndexedDB whenever it changes
   useEffect(() => {
+    if (!initialized) return;
     setItem(GLOBAL_CONFIG_STORAGE_KEY, globalConfig).catch(err => {
       console.error('Error saving global config:', err);
     });
-  }, [globalConfig]);
+  }, [globalConfig, initialized]);
 
   // Update theme when darkMode or bwMode changes
   useEffect(() => {
+    if (!initialized) return;
     const theme = globalConfig.bwMode ? 'bw' : globalConfig.darkMode ? 'dark' : 'light';
     setItem('theme', theme);
     setTheme(theme);
-  }, [globalConfig.darkMode, globalConfig.bwMode, setTheme]);
+  }, [globalConfig.darkMode, globalConfig.bwMode, setTheme, initialized]);
 
   // Update accent color
   useEffect(() => {
+    if (!initialized) return;
     const hsl = hexToHSL(globalConfig.accentColor);
     document.documentElement.style.setProperty('--accent', hsl);
     document.documentElement.style.setProperty('--sidebar-accent', hsl);
     document.documentElement.style.setProperty('--primary', hsl);
-  }, [globalConfig.accentColor]);
+  }, [globalConfig.accentColor, initialized]);
 
   const updateConfig = (updates: Partial<GlobalConfig>) => {
     setGlobalConfig(prev => ({ ...prev, ...updates }));

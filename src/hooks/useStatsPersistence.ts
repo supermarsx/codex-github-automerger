@@ -9,6 +9,7 @@ export const useStatsPersistence = () => {
     session: { pending: 0, merged: 0, failed: 0 },
     total: { pending: 0, merged: 0, failed: 0 }
   });
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -21,15 +22,17 @@ export const useStatsPersistence = () => {
           console.error('Error parsing saved stats:', error);
         }
       }
+      setInitialized(true);
     })();
   }, []);
 
 
   useEffect(() => {
+    if (!initialized) return;
     setItem(STATS_STORAGE_KEY, mergeStats).catch(err => {
       console.error('Error saving stats:', err);
     });
-  }, [mergeStats]);
+  }, [mergeStats, initialized]);
 
   const updateStats = (newStats: Partial<MergeStats>) => {
     setMergeStats(prev => ({
