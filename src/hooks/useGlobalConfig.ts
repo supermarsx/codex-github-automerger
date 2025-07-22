@@ -38,7 +38,6 @@ const getDefaultConfig = (): GlobalConfig => ({
   logsDisabled: false,
   protectedBranches: ['main'],
   confirmBranchDeletion: true,
-  checkUserscriptUpdates: true,
   autoArchiveClose: false,
   autoArchiveClosed: false
 });

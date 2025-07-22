@@ -95,6 +95,46 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  [data-theme="bw"] {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 0% 0%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
+    --radius: 0.5rem;
+
+    --neo-yellow: 0 0% 70%;
+    --neo-pink: 0 0% 60%;
+    --neo-blue: 0 0% 80%;
+    --neo-purple: 0 0% 70%;
+    --neo-orange: 0 0% 60%;
+    --neo-green: 0 0% 60%;
+    --neo-red: 0 0% 40%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 0 0% 0%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 100%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 0%;
+    --sidebar-ring: 0 0% 40%;
+  }
 }
 
 @layer base {
@@ -155,7 +195,7 @@
 
 @layer utilities {
   .text-shadow {
-    text-shadow: 2px 2px 0px hsl(var(--foreground));
+    text-shadow: 2px 2px 0px hsl(var(--foreground)/0.5);
   }
   
   .neo-hover:hover {

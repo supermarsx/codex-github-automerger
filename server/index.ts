@@ -10,8 +10,18 @@ import { fileURLToPath } from 'url';
 export async function startServer(port: number = Number(process.env.PORT) || 3001) {
   await loadPromise;
   const app = express();
-  app.use(cors({ origin: '*' }));
-  app.options('*', cors({ origin: '*' }));
+  const corsOptions = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: '*'
+  };
+  app.use(cors(corsOptions));
+  app.options('*', cors(corsOptions));
+  app.use((_, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+  });
   app.use(express.json());
 
   const httpServer = http.createServer(app);

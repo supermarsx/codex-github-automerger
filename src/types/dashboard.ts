@@ -167,8 +167,6 @@ export interface GlobalConfig {
   logsDisabled: boolean;
   protectedBranches: string[];
   confirmBranchDeletion: boolean;
-  /** Check for userscript updates automatically */
-  checkUserscriptUpdates: boolean;
   /** Archive PRs automatically when closing */
   autoArchiveClose: boolean;
   /** Archive already closed PRs when fetching */

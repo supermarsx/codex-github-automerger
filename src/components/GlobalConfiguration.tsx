@@ -19,7 +19,6 @@ import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
 import { useLogger } from '@/hooks/useLogger';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
-import { checkUserscriptUpdates } from '@/utils/updateChecker';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -203,17 +202,6 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
     }
   };
 
-  const handleCheckUpdates = async () => {
-    const result = await checkUserscriptUpdates();
-    if (result.hasUpdate) {
-      toast({
-        title: 'Update available',
-        description: `Latest version ${result.latestVersion}`
-      });
-    } else {
-      toast({ title: 'No updates found' });
-    }
-  };
 
   return (
     <>
@@ -373,11 +361,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                   </div>
                 </div>
               </DialogContent>
-              </Dialog>
-              <Button onClick={handleCheckUpdates} className="neo-button-secondary" size="sm">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Check Updates
-              </Button>
+            </Dialog>
             </div>
           </div>
         </div>
@@ -654,12 +638,6 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
                 label="Disable Logs"
                 checked={config.logsDisabled}
                 onCheckedChange={(checked) => onConfigChange({ ...config, logsDisabled: checked })}
-              />
-              <ConfigToggle
-                id="checkUserscriptUpdates"
-                label="Check Userscript Updates"
-                checked={config.checkUserscriptUpdates}
-                onCheckedChange={(checked) => onConfigChange({ ...config, checkUserscriptUpdates: checked })}
               />
               <div className="flex justify-end">
               <Button

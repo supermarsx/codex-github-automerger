@@ -3,8 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, GitMerge, Sun, Moon, RefreshCw } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, GitMerge, RefreshCw } from 'lucide-react';
 
 // Component imports
 import { RealtimeFeed } from '@/components/RealtimeFeed';
@@ -18,7 +17,6 @@ import { FeedActions } from '@/components/FeedActions';
 import { WatchMode } from '@/components/WatchMode';
 import { SelectiveRepositoryLoader } from '@/components/SelectiveRepositoryLoader';
 import { ConnectionManager } from '@/components/ConnectionManager';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 // Hook imports
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -76,7 +74,6 @@ export const Dashboard: React.FC = () => {
 
   const { appState, updateActiveTab, updateTheme } = useAppPersistence();
   const { logInfo } = useLogger();
-  const { theme, setTheme } = useTheme();
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
@@ -117,11 +114,6 @@ export const Dashboard: React.FC = () => {
     }
   }, [appState.activeTab, fetchServerLogs]);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    updateTheme(newTheme);
-  };
 
   const tabs = [
     { key: 'feed', icon: Activity, title: 'Feed', color: 'neo-blue' },
@@ -150,13 +142,6 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button
-                onClick={toggleTheme}
-                className="neo-button-secondary"
-                size="sm"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
               <ConnectionManager apiKeys={apiKeys} compact={true} />
             </div>
           </div>
@@ -211,6 +196,7 @@ export const Dashboard: React.FC = () => {
                   onAddRepository={(repoData) => {
                     addRepository(repoData.name, repoData.owner);
                   }}
+                  isUnlocked={isUnlocked}
                 />
               </div>
               <div className="space-y-6">
