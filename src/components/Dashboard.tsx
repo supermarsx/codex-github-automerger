@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, GitMerge, Sun, Moon } from 'lucide-react';
+import { Activity, GitBranch, Key, Settings, Shield, BarChart3, FileText, Zap, GitMerge, Sun, Moon, RefreshCw } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 // Component imports
