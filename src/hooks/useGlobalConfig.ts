@@ -110,6 +110,11 @@ export const useGlobalConfig = () => {
   }, [globalConfig]);
 
   useEffect(() => {
+    if (!initialized) return;
+    getSocketService().syncConfigWithServer();
+  }, [globalConfig, initialized]);
+
+  useEffect(() => {
     getSocketService().initialize(
       globalConfig.socketServerAddress,
       globalConfig.socketServerPort,

@@ -491,7 +491,7 @@ export const SecurityManagement: React.FC<SecurityManagementProps> = ({ apiKeys,
                           </p>
                           <div className="p-4 bg-muted rounded max-w-full">
                             {showRecoveryPhrase ? (
-                              <div className="font-mono text-sm break-words whitespace-pre-wrap max-h-32 overflow-y-auto">
+                              <div className="font-mono text-sm break-words whitespace-pre-wrap max-h-32 overflow-y-auto overflow-x-auto">
                                 {recoveryPhrase}
                               </div>
                             ) : (
