@@ -223,7 +223,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
         <div className="flex gap-4 items-center">
           <div className="flex-1">
             <Select value={selectedApiKey} onValueChange={setSelectedApiKey}>
-              <SelectTrigger>
+              <SelectTrigger className="neo-input">
                 <SelectValue placeholder="Select an API key" />
               </SelectTrigger>
               <SelectContent>
@@ -276,7 +276,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
                 </div>
               </div>
               <Select value={filterType} onValueChange={(value: 'all' | 'public' | 'private') => setFilterType(value)}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32 neo-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -286,7 +286,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={(value: 'name' | 'updated' | 'stars') => setSortBy(value)}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-32 neo-input">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

@@ -123,6 +123,10 @@ export class SocketService {
     this.configSupplier = fn;
   }
 
+  syncConfigWithServer() {
+    this.syncConfig();
+  }
+
   private syncConfig(): void {
     if (!this.socket?.isConnected || !this.pairedClients.has(this.clientId)) return;
     const cfg = this.configSupplier ? this.configSupplier() : null;

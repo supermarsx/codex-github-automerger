@@ -197,6 +197,19 @@
            focus:translate-x-[2px] focus:translate-y-[2px]
            transition-all duration-150 font-bold;
   }
+
+  .neo-switch {
+    @apply border-4 border-foreground shadow-[2px_2px_0px_0px_hsl(var(--foreground)/0.5)]
+           data-[state=checked]:bg-primary data-[state=unchecked]:bg-input;
+  }
+
+  .neo-switch-thumb {
+    @apply bg-background border-2 border-foreground shadow;
+  }
+
+  .neo-toast {
+    @apply neo-card;
+  }
   
 }
 
