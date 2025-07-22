@@ -36,6 +36,8 @@ export class SocketService {
   private port = 8080;
   private maxRetries = 5;
   private connectionAttempts = 0;
+  private pingInterval: NodeJS.Timeout | null = null;
+  private lastPing = 0;
 
   constructor() {
     this.clientId = this.generateClientId();
@@ -89,6 +91,27 @@ export class SocketService {
             this.logger.logError('socket', 'Pairing denied');
           }
         });
+
+        this.socket.onMessage('pong', payload => {
+          const ts = (payload as any)?.timestamp;
+          const now = Date.now();
+          if (typeof ts === 'number') {
+            this.socket!.latency = now - ts;
+          } else if (this.lastPing) {
+            this.socket!.latency = now - this.lastPing;
+          }
+        });
+
+        if (this.pingInterval) clearInterval(this.pingInterval);
+        this.pingInterval = setInterval(() => {
+          if (this.socket?.isConnected) {
+            this.lastPing = Date.now();
+            this.socket.sendMessage('ping', { timestamp: this.lastPing });
+          }
+        }, 5000);
+
+        this.lastPing = Date.now();
+        this.socket.sendMessage('ping', { timestamp: this.lastPing });
 
         // Send pairing request on connection
         this.requestPairing();
@@ -310,6 +333,10 @@ export class SocketService {
     if (this.socket) {
       this.socket.disconnect();
       this.logger.logInfo('socket', 'Socket disconnected');
+    }
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+      this.pingInterval = null;
     }
     this.pairedClients.clear();
     this.pendingPairings.clear();
