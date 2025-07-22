@@ -146,11 +146,21 @@ export const useLogger = (
         const serverEntries = data.logs.map((l: any) => ({
           id: `srv-${l.id}`,
           timestamp: new Date(l.timestamp),
-          level: l.level || 'info',
+          level: (l.level || 'info') as LogEntry['level'],
           category: 'server',
           message: l.message,
         }));
-        setLogs(prev => [...serverEntries, ...prev]);
+        const seen = new Set<string>();
+        const deduped = serverEntries.filter(e => {
+          if (seen.has(e.id)) return false;
+          seen.add(e.id);
+          return true;
+        });
+        setLogs(prev => {
+          const existingIds = new Set(prev.map(e => e.id));
+          const unique = deduped.filter(e => !existingIds.has(e.id));
+          return [...unique, ...prev];
+        });
       }
     } catch (err) {
       addLog('error', 'logger', 'Failed to fetch server logs', err);
