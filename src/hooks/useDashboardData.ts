@@ -36,6 +36,14 @@ export const useDashboardData = () => {
   } = useRepositories();
 
   const {
+    globalConfig,
+    setGlobalConfig: baseSetGlobalConfig,
+    resetConfig,
+    exportConfig,
+    importConfig
+  } = useGlobalConfig();
+
+  const {
     apiKeys,
     isUnlocked,
     showApiKey,
@@ -53,15 +61,7 @@ export const useDashboardData = () => {
     unlock,
     showLockedModal,
     setShowLockedModal
-  } = useApiKeys();
-
-  const {
-    globalConfig,
-    setGlobalConfig: baseSetGlobalConfig,
-    resetConfig,
-    exportConfig,
-    importConfig
-  } = useGlobalConfig();
+  } = useApiKeys(globalConfig.encryptionEnabled);
 
   const setGlobalConfig = (updates: Partial<GlobalConfig>) => {
     const prev = globalConfig;

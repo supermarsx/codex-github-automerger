@@ -142,7 +142,7 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <ConnectionManager apiKeys={apiKeys} compact={true} />
+              <ConnectionManager apiKeys={apiKeys} compact={true} checkInterval={globalConfig.serverCheckInterval} />
             </div>
           </div>
         </div>
@@ -250,6 +250,7 @@ export const Dashboard: React.FC = () => {
                 config={globalConfig}
                 repositories={repositories}
                 apiKeys={apiKeys}
+                isUnlocked={isUnlocked}
                 onConfigChange={setGlobalConfig}
                 onExportConfig={exportReport}
                 onImportConfig={() => logInfo('dashboard', 'Import config triggered')}

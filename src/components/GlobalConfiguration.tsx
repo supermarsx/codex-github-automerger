@@ -19,11 +19,13 @@ import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
 import { useLogger } from '@/hooks/useLogger';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
+import { ConnectionManager } from '@/components/ConnectionManager';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
   repositories: Repository[];
   apiKeys: ApiKey[];
+  isUnlocked: boolean;
   onConfigChange: (config: GlobalConfig) => void;
   onExportConfig: () => void;
   onImportConfig: () => void;
@@ -34,6 +36,7 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   config,
   repositories,
   apiKeys,
+  isUnlocked,
   onConfigChange,
   onExportConfig,
   onImportConfig,
@@ -367,6 +370,12 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div className="flex items-center justify-between">
+          <ConnectionManager apiKeys={apiKeys} compact checkInterval={config.serverCheckInterval} />
+          <Badge variant="secondary" className={`neo-card ${isUnlocked ? 'neo-green' : 'neo-red'} text-white text-xs px-2 py-1`}>
+            {isUnlocked ? 'Authenticated' : 'Locked'}
+          </Badge>
+        </div>
         {/* Approval Settings */}
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">Approval Settings</h4>
