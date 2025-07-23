@@ -2,6 +2,8 @@ export type MessageCallback = (data: unknown) => void;
 
 export class BasicSocket {
   private listeners: Map<string, Set<MessageCallback>> = new Map();
+  private connectListeners: Set<() => void> = new Set();
+  private disconnectListeners: Set<() => void> = new Set();
   isConnected = false;
   latency = 0;
 
@@ -9,10 +11,12 @@ export class BasicSocket {
     this.isConnected = true;
     // simulate latency update
     this.latency = Math.floor(Math.random() * 100) + 20;
+    this.connectListeners.forEach(cb => cb());
   }
 
   disconnect(): void {
     this.isConnected = false;
+    this.disconnectListeners.forEach(cb => cb());
   }
 
   sendMessage(type: string, data: unknown): boolean {
@@ -46,6 +50,16 @@ export class BasicSocket {
     }
     set.add(cb);
     return () => set!.delete(cb);
+  }
+
+  onConnect(cb: () => void): () => void {
+    this.connectListeners.add(cb);
+    return () => this.connectListeners.delete(cb);
+  }
+
+  onDisconnect(cb: () => void): () => void {
+    this.disconnectListeners.add(cb);
+    return () => this.disconnectListeners.delete(cb);
   }
 
   emitMessage(type: string, data: unknown): void {
