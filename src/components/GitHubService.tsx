@@ -15,6 +15,10 @@ export class GitHubService {
     return this.emit('fetchRepos', { owner });
   }
 
+  fetchRepositoriesByKey(owner: string): Promise<Repository[]> {
+    return this.emit('fetchReposByKey', { owner });
+  }
+
   fetchPullRequests(owner: string, repo: string): Promise<any[]> {
     return this.emit('fetchPullRequests', { owner, repo });
   }
