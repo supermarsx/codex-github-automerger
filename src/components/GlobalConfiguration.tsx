@@ -19,6 +19,7 @@ import { ConfigSelector } from '@/components/ConfigSelector';
 import { EditableList } from '@/components/EditableList';
 import { useLogger } from '@/hooks/useLogger';
 import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
+import { ConnectionManager } from '@/components/ConnectionManager';
 
 interface GlobalConfigurationProps {
   config: GlobalConfig;
@@ -28,6 +29,8 @@ interface GlobalConfigurationProps {
   onExportConfig: () => void;
   onImportConfig: () => void;
   onPurgeDatabase: () => void;
+  isUnlocked?: boolean;
+  authInProgress?: boolean;
 }
 
 export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
@@ -37,7 +40,9 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
   onConfigChange,
   onExportConfig,
   onImportConfig,
-  onPurgeDatabase
+  onPurgeDatabase,
+  isUnlocked = false,
+  authInProgress = false
 }) => {
   const [newPattern, setNewPattern] = useState('');
   const [newUser, setNewUser] = useState('');
@@ -367,6 +372,14 @@ export const GlobalConfiguration: React.FC<GlobalConfigurationProps> = ({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <h4 className="font-semibold text-lg">Connection Status</h4>
+          <ConnectionManager
+            apiKeys={apiKeys}
+            isUnlocked={isUnlocked}
+            authInProgress={authInProgress}
+          />
+        </div>
         {/* Approval Settings */}
         <div className="space-y-4">
           <h4 className="font-semibold text-lg">Approval Settings</h4>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Wifi, WifiOff, RefreshCw, Github, Server, Key } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, Github, Server, Key, Lock } from 'lucide-react';
 import { useLogger } from '@/hooks/useLogger';
 import { getSocketService } from '@/services/SocketService';
 
@@ -11,9 +11,17 @@ interface ConnectionManagerProps {
   apiKeys: ApiKey[];
   compact?: boolean;
   checkInterval?: number;
+  isUnlocked?: boolean;
+  authInProgress?: boolean;
 }
 
-export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, compact = false, checkInterval = 10000 }) => {
+export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
+  apiKeys,
+  compact = false,
+  checkInterval = 10000,
+  isUnlocked = false,
+  authInProgress = false
+}) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [githubConnected, setGithubConnected] = useState(false);
   const [publicApiConnected, setPublicApiConnected] = useState(false);
@@ -110,6 +118,13 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({ apiKeys, c
       <Badge variant="secondary" className={`neo-card ${activeApiKeys > 0 ? 'neo-purple' : 'neo-red'} text-white font-bold`}>
         <Key className="w-4 h-4 mr-2" />
         {activeApiKeys} Keys Active
+      </Badge>
+      <Badge
+        variant="secondary"
+        className={`neo-card ${authInProgress ? 'neo-yellow' : isUnlocked ? 'neo-green' : 'neo-red'} text-white font-bold`}
+      >
+        <Lock className="w-4 h-4 mr-2" />
+        {authInProgress ? 'Authenticating' : isUnlocked ? 'Authenticated' : 'Locked'}
       </Badge>
     </div>
   );

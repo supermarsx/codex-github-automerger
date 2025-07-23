@@ -142,7 +142,12 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <ConnectionManager apiKeys={apiKeys} compact={true} />
+              <ConnectionManager
+                apiKeys={apiKeys}
+                compact={true}
+                isUnlocked={isUnlocked}
+                authInProgress={authInProgress}
+              />
             </div>
           </div>
         </div>
@@ -254,6 +259,8 @@ export const Dashboard: React.FC = () => {
                 onExportConfig={exportReport}
                 onImportConfig={() => logInfo('dashboard', 'Import config triggered')}
                 onPurgeDatabase={purgeDatabase}
+                isUnlocked={isUnlocked}
+                authInProgress={authInProgress}
               />
             </div>
           </TabsContent>

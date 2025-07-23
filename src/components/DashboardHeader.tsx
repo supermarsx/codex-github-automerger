@@ -6,9 +6,15 @@ import { ApiKey } from '@/types/dashboard';
 
 interface DashboardHeaderProps {
   apiKeys?: ApiKey[];
+  isUnlocked?: boolean;
+  authInProgress?: boolean;
 }
 
-export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [] }) => {
+export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+  apiKeys = [],
+  isUnlocked = false,
+  authInProgress = false
+}) => {
   return (
     <Card className="neo-card">
       <CardHeader>
@@ -23,7 +29,12 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ apiKeys = [] }
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <ConnectionManager apiKeys={apiKeys} compact={true} />
+            <ConnectionManager
+              apiKeys={apiKeys}
+              compact={true}
+              isUnlocked={false}
+              authInProgress={false}
+            />
           </div>
         </div>
       </CardHeader>
