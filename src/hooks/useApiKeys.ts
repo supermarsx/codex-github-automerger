@@ -4,6 +4,7 @@ import { ApiKey } from '@/types/dashboard';
 import { useToast } from './use-toast';
 import { useLogger } from './useLogger';
 import { EncryptionService } from '@/utils/encryption';
+import { useGlobalConfig } from './useGlobalConfig';
 import { PasskeyService } from '@/utils/passkeyAuth';
 
 const API_KEYS_STORAGE_KEY = 'automerger-api-keys';
@@ -11,6 +12,7 @@ const API_KEYS_STORAGE_KEY = 'automerger-api-keys';
 export const useApiKeys = () => {
   const { toast } = useToast();
   const { logInfo, logError } = useLogger();
+  const { globalConfig } = useGlobalConfig();
 
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [initialized, setInitialized] = useState(false);
@@ -45,6 +47,17 @@ export const useApiKeys = () => {
   const [authInProgress, setAuthInProgress] = useState(false);
   const lockedShownRef = useRef(false);
 
+  const encodeKey = (key: string): string =>
+    globalConfig.encryptionEnabled ? btoa(key) : key;
+
+  const decodeKey = (val: string, encrypted: boolean): string => {
+    try {
+      return encrypted ? atob(val) : val;
+    } catch {
+      return val;
+    }
+  };
+
   // Persist API keys to IndexedDB whenever they change
   useEffect(() => {
     if (!initialized) return;
@@ -52,6 +65,22 @@ export const useApiKeys = () => {
       logError('api-key', 'Error saving API keys', err);
     });
   }, [apiKeys, logError, initialized]);
+
+  // Re-encode or decode keys when encryption setting changes
+  useEffect(() => {
+    if (!initialized) return;
+    setApiKeys(keys =>
+      keys.map(k => {
+        if (globalConfig.encryptionEnabled && !k.encrypted) {
+          return { ...k, key: encodeKey(k.key), encrypted: true };
+        }
+        if (!globalConfig.encryptionEnabled && k.encrypted) {
+          return { ...k, key: decodeKey(k.key, true), encrypted: false };
+        }
+        return k;
+      })
+    );
+  }, [globalConfig.encryptionEnabled, initialized]);
 
   const unlock = async () => {
     setAuthInProgress(true);
@@ -61,11 +90,7 @@ export const useApiKeys = () => {
         logInfo('api-key', 'No passkey registered, skipping unlock');
         const map: Record<string, string> = {};
         apiKeys.forEach(k => {
-          try {
-            map[k.id] = atob(k.key);
-          } catch (err) {
-            // ignore decoding errors
-          }
+          map[k.id] = decodeKey(k.key, k.encrypted);
         });
         setDecryptedKeys(map);
         setUnlocked(true);
@@ -79,11 +104,7 @@ export const useApiKeys = () => {
       if (result.success) {
         const map: Record<string, string> = {};
         apiKeys.forEach(k => {
-          try {
-            map[k.id] = atob(k.key);
-          } catch (err) {
-            // ignore decoding errors
-          }
+          map[k.id] = decodeKey(k.key, k.encrypted);
         });
         setDecryptedKeys(map);
         setUnlocked(true);
@@ -142,7 +163,7 @@ export const useApiKeys = () => {
     // Check if API key already exists (compare original key)
     const existingKey = apiKeys.find(k => {
       try {
-        return atob(k.key) === key;
+        return decodeKey(k.key, k.encrypted) === key;
       } catch {
         return false;
       }
@@ -162,7 +183,7 @@ export const useApiKeys = () => {
     
     // For now, store API keys in a simple obfuscated form
     // In a real app, you'd use proper encryption with a master password
-    const obfuscatedKey = btoa(key); // Simple base64 encoding
+    const obfuscatedKey = encodeKey(key);
     
     const newKey: ApiKey = {
       id: Date.now().toString(),
@@ -170,7 +191,7 @@ export const useApiKeys = () => {
       key: obfuscatedKey,
       created: new Date(),
       isActive: isValid,
-      encrypted: true,
+      encrypted: globalConfig.encryptionEnabled,
       connectionStatus: isValid ? 'connected' : 'disconnected'
     };
 
@@ -249,7 +270,10 @@ export const useApiKeys = () => {
       clearTimeout(deleted.timeout);
       setApiKeys(keys => [...keys, deleted.key]);
       if (unlocked) {
-        setDecryptedKeys(prev => ({ ...prev, [deleted.key.id]: atob(deleted.key.key) }));
+        setDecryptedKeys(prev => ({
+          ...prev,
+          [deleted.key.id]: decodeKey(deleted.key.key, deleted.key.encrypted)
+        }));
       }
       setDeletedApiKeys(prev => {
         const newMap = new Map(prev);
