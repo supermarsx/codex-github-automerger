@@ -39,13 +39,11 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
       const svc = getSocketService();
       setGithubConnected(activeApiKeys > 0);
       setPublicApiConnected(activeApiKeys > 0);
-      setSocketConnected(svc.isConnected);
       setLatency(svc.latency);
     } catch (error) {
       console.error('Connection check failed:', error);
       setGithubConnected(false);
       setPublicApiConnected(false);
-      setSocketConnected(false);
       setLatency(0);
     } finally {
       setIsRefreshing(false);
@@ -63,11 +61,31 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     return () => clearInterval(interval);
   }, [checkInterval, activeApiKeys, handleRefresh]);
 
+  // subscribe to socket events
+  useEffect(() => {
+    const svc = getSocketService();
+    setSocketConnected(svc.isConnected);
+    setLatency(svc.latency);
+
+    const unsubConnect = svc.onConnect(() => {
+      setSocketConnected(true);
+      setLatency(svc.latency);
+    });
+    const unsubDisconnect = svc.onDisconnect(() => {
+      setSocketConnected(false);
+      setLatency(svc.latency);
+    });
+
+    return () => {
+      unsubConnect();
+      unsubDisconnect();
+    };
+  }, []);
+
   // update latency regularly
   useEffect(() => {
     const svc = getSocketService();
     const interval = setInterval(() => {
-      setSocketConnected(svc.isConnected);
       setLatency(svc.latency);
     }, 1000);
     return () => clearInterval(interval);

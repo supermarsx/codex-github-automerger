@@ -38,11 +38,21 @@ export class SocketService {
   private connectionAttempts = 0;
   private pingInterval: NodeJS.Timeout | null = null;
   private lastPing = 0;
+  private connectListeners: Set<() => void> = new Set();
+  private disconnectListeners: Set<() => void> = new Set();
 
   constructor() {
     this.clientId = this.generateClientId();
     this.logger = logger;
   }
+
+  private handleSocketConnect = () => {
+    this.connectListeners.forEach(cb => cb());
+  };
+
+  private handleSocketDisconnect = () => {
+    this.disconnectListeners.forEach(cb => cb());
+  };
 
   static getInstance(): SocketService {
     if (!SocketService.instance) {
@@ -68,6 +78,14 @@ export class SocketService {
         this.socket = useReal
           ? new RealSocket(socketUrl)
           : new BasicSocket();
+
+        if ('onConnect' in this.socket) {
+          (this.socket as any).onConnect(this.handleSocketConnect);
+        }
+        if ('onDisconnect' in this.socket) {
+          (this.socket as any).onDisconnect(this.handleSocketDisconnect);
+        }
+
         this.socket.connect();
 
         if (!this.socket.isConnected) throw new Error('connection failed');
@@ -323,6 +341,16 @@ export class SocketService {
 
   get latency(): number {
     return this.socket?.latency || 0;
+  }
+
+  onConnect(cb: () => void): () => void {
+    this.connectListeners.add(cb);
+    return () => this.connectListeners.delete(cb);
+  }
+
+  onDisconnect(cb: () => void): () => void {
+    this.disconnectListeners.add(cb);
+    return () => this.disconnectListeners.delete(cb);
   }
 
   get isPaired(): boolean {
