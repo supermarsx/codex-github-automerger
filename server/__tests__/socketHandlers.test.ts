@@ -135,4 +135,13 @@ describe('socket handlers', () => {
     });
     expect(resp).toEqual({ ok: true, data: ['remove'] });
   });
+
+  it('responds to ping with pong', async () => {
+    const payload = { hello: 'world' };
+    const resp = await new Promise(resolve => {
+      client.once('pong', resolve);
+      client.emit('ping', payload);
+    });
+    expect(resp).toEqual(payload);
+  });
 });
