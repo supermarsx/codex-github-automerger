@@ -264,6 +264,10 @@ export class SocketService {
     return this.request('fetchRepos', { token, owner });
   }
 
+  async fetchRepositoriesByKey(token: string, owner: string): Promise<any> {
+    return this.request('fetchReposByKey', { token, owner });
+  }
+
   async fetchPullRequests(token: string, owner: string, repo: string): Promise<any> {
     return this.request('fetchPullRequests', { token, owner, repo });
   }

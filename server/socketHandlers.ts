@@ -121,6 +121,18 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  socket.on('fetchReposByKey', async (params, cb = () => {}) => {
+    logger.debug('socket', 'fetchReposByKey received', { clientId: s.clientId });
+    if (!requirePaired(s, cb)) return;
+    try {
+      const svc = createGitHubService(params.token);
+      const repos = await svc.fetchRepositories(params.owner || '');
+      cb({ ok: true, data: repos });
+    } catch (err) {
+      cb({ ok: false, error: err.message });
+    }
+  });
+
   socket.on('fetchPullRequests', async (params, cb = () => {}) => {
     logger.debug('socket', 'fetchPullRequests received', { clientId: s.clientId });
     if (!requirePaired(s, cb)) return;
