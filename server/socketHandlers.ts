@@ -33,6 +33,10 @@ function cleanupPairings(): void {
   const now = Date.now();
   for (const [token, entry] of pendingPairings) {
     if (now > entry.expiry || entry.socket.disconnected) {
+      logger.debug('pairing', 'cleaning expired token', {
+        token,
+        clientId: entry.clientId
+      });
       pendingPairings.delete(token);
     }
   }
@@ -52,6 +56,10 @@ app.post('/pairings/:token/approve', (req, res) => {
     res.status(404).json({ error: 'not found' });
     return;
   }
+  logger.debug('pairing', 'approving client', {
+    token: req.params.token,
+    clientId: entry.clientId
+  });
   entry.socket.isPaired = true;
   entry.socket.clientId = entry.clientId;
   pairedClients.add(entry.clientId);
@@ -71,6 +79,10 @@ app.post('/pairings/:token/deny', (req, res) => {
     res.status(404).json({ error: 'not found' });
     return;
   }
+  logger.debug('pairing', 'denying client', {
+    token: req.params.token,
+    clientId: entry.clientId
+  });
   entry.socket.emit('pair_result', { success: false });
   pendingPairings.delete(req.params.token);
   res.json({ ok: true });
@@ -87,6 +99,10 @@ io.on('connection', (socket: Socket) => {
     socket: s,
     clientId: null,
     expiry: Date.now() + TOKEN_TTL_MS
+  });
+  logger.debug('pairing', 'created pairing token', {
+    token: s.pairToken,
+    socketId: s.id
   });
 
   socket.on('pair_request', ({ clientId }) => {

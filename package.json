@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run build:server && concurrently --raw \"vite\" \"node server/dist/index.js\"",
+    "dev:debug": "npm run build:server && DEBUG=*,vite:* concurrently --raw \"vite\" \"node server/dist/index.js\"",
     "build": "vite build && npm run build:server",
     "build:dev": "vite build --mode development && npm run build:server",
     "lint": "eslint .",
