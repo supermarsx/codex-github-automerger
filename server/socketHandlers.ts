@@ -114,7 +114,11 @@ io.on('connection', (socket: Socket) => {
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
-      const repos = await svc.fetchRepositories(params.owner || '');
+      const repos = await svc.fetchRepositories({
+        owner: params.owner || '',
+        visibility: params.visibility,
+        affiliation: params.affiliation
+      });
       cb({ ok: true, data: repos });
     } catch (err) {
       cb({ ok: false, error: err.message });
@@ -126,7 +130,11 @@ io.on('connection', (socket: Socket) => {
     if (!requirePaired(s, cb)) return;
     try {
       const svc = createGitHubService(params.token);
-      const repos = await svc.fetchRepositories(params.owner || '');
+      const repos = await svc.fetchRepositories({
+        owner: params.owner || '',
+        visibility: params.visibility,
+        affiliation: params.affiliation
+      });
       cb({ ok: true, data: repos });
     } catch (err) {
       cb({ ok: false, error: err.message });

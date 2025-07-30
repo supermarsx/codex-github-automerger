@@ -278,12 +278,22 @@ export class SocketService {
   }
 
   // GitHub Requests
-  async fetchRepositories(token: string, owner: string): Promise<any> {
-    return this.request('fetchRepos', { token, owner });
+  async fetchRepositories(
+    token: string,
+    owner: string,
+    visibility = 'all',
+    affiliation = 'owner,collaborator,organization_member'
+  ): Promise<any> {
+    return this.request('fetchRepos', { token, owner, visibility, affiliation });
   }
 
-  async fetchRepositoriesByKey(token: string, owner: string): Promise<any> {
-    return this.request('fetchReposByKey', { token, owner });
+  async fetchRepositoriesByKey(
+    token: string,
+    owner: string,
+    visibility = 'all',
+    affiliation = 'owner,collaborator,organization_member'
+  ): Promise<any> {
+    return this.request('fetchReposByKey', { token, owner, visibility, affiliation });
   }
 
   async fetchPullRequests(token: string, owner: string, repo: string): Promise<any> {

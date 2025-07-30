@@ -24,13 +24,38 @@ export function createGitHubService(token) {
 
   return {
     octokit,
-    async fetchRepositories(owner) {
+    async fetchRepositories({ owner = '', visibility = 'all', affiliation = 'owner,collaborator,organization_member' } = {}) {
       let data;
       if (owner) {
-        const res = await octokit.rest.repos.listForUser({ username: owner, per_page: 100 });
-        data = res.data;
+        let ownerType = 'User';
+        try {
+          const { data: user } = await octokit.rest.users.getByUsername({ username: owner });
+          ownerType = user.type;
+        } catch {
+          // default to user
+        }
+
+        if (ownerType === 'Organization') {
+          const res = await octokit.rest.repos.listForOrg({
+            org: owner,
+            type: visibility,
+            per_page: 100
+          });
+          data = res.data;
+        } else {
+          const res = await octokit.rest.repos.listForUser({
+            username: owner,
+            type: visibility,
+            per_page: 100
+          });
+          data = res.data;
+        }
       } else {
-        const res = await octokit.rest.repos.listForAuthenticatedUser({ type: 'all', per_page: 100 });
+        const res = await octokit.rest.repos.listForAuthenticatedUser({
+          visibility,
+          affiliation,
+          per_page: 100
+        });
         data = res.data;
       }
       return data.map(repo => ({
