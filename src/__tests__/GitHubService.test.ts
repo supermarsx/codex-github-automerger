@@ -46,7 +46,9 @@ describe('GitHubService', () => {
     const res = await service.fetchRepositories('o');
     expect(socketService.request).toHaveBeenCalledWith('fetchRepos', {
       token: 'token',
-      owner: 'o'
+      owner: 'o',
+      visibility: 'all',
+      affiliation: 'owner,collaborator,organization_member'
     });
     expect(res).toEqual(['repo']);
   });
@@ -56,7 +58,9 @@ describe('GitHubService', () => {
     const res = await service.fetchRepositoriesByKey('o');
     expect(socketService.request).toHaveBeenCalledWith('fetchReposByKey', {
       token: 'token',
-      owner: 'o'
+      owner: 'o',
+      visibility: 'all',
+      affiliation: 'owner,collaborator,organization_member'
     });
     expect(res).toEqual(['repo']);
   });

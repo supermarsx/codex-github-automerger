@@ -11,12 +11,20 @@ export class GitHubService {
     });
   }
 
-  fetchRepositories(owner: string): Promise<Repository[]> {
-    return this.emit('fetchRepos', { owner });
+  fetchRepositories(
+    owner: string,
+    visibility = 'all',
+    affiliation = 'owner,collaborator,organization_member'
+  ): Promise<Repository[]> {
+    return this.emit('fetchRepos', { owner, visibility, affiliation });
   }
 
-  fetchRepositoriesByKey(owner: string): Promise<Repository[]> {
-    return this.emit('fetchReposByKey', { owner });
+  fetchRepositoriesByKey(
+    owner: string,
+    visibility = 'all',
+    affiliation = 'owner,collaborator,organization_member'
+  ): Promise<Repository[]> {
+    return this.emit('fetchReposByKey', { owner, visibility, affiliation });
   }
 
   fetchPullRequests(owner: string, repo: string): Promise<any[]> {
