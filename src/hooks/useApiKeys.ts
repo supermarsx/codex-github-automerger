@@ -94,6 +94,7 @@ export const useApiKeys = () => {
         });
         setDecryptedKeys(map);
         setUnlocked(true);
+        sessionStorage.setItem('unlocked', 'true');
         setShowLockedModal(false);
         setAuthInProgress(false);
         return;
@@ -108,6 +109,7 @@ export const useApiKeys = () => {
         });
         setDecryptedKeys(map);
         setUnlocked(true);
+        sessionStorage.setItem('unlocked', 'true');
         setShowLockedModal(false);
         logInfo('api-key', 'API keys unlocked');
       } else {
@@ -131,16 +133,27 @@ export const useApiKeys = () => {
   const lock = () => {
     setDecryptedKeys({});
     setUnlocked(false);
+    sessionStorage.removeItem('unlocked');
     if (typeof (PasskeyService as any).resetAuth === 'function') {
       (PasskeyService as any).resetAuth();
     }
   };
 
   useEffect(() => {
-    unlock();
-    // intentionally run once on mount
+    if (!initialized) return;
+    const wasUnlocked = sessionStorage.getItem('unlocked') === 'true';
+    if (wasUnlocked) {
+      const map: Record<string, string> = {};
+      apiKeys.forEach(k => {
+        map[k.id] = decodeKey(k.key, k.encrypted);
+      });
+      setDecryptedKeys(map);
+      setUnlocked(true);
+    } else {
+      unlock();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialized]);
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
