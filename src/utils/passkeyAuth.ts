@@ -190,6 +190,11 @@ export class PasskeyService {
     await setItem('passkey_credentials', filtered);
   }
 
+  static resetAuth(): void {
+    this.isAuthenticated = false;
+    this.lastCredentialId = null;
+  }
+
   private static arrayBufferToBase64(buffer: ArrayBuffer): string {
     const bytes = new Uint8Array(buffer);
     let binary = '';
