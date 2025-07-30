@@ -40,7 +40,9 @@ const getDefaultConfig = (): GlobalConfig => ({
   protectedBranches: ['main'],
   confirmBranchDeletion: true,
   autoArchiveClose: false,
-  autoArchiveClosed: false
+  autoArchiveClosed: false,
+  socketConnected: false,
+  latencyMs: 0
 });
 
 export const useGlobalConfig = () => {
@@ -79,7 +81,8 @@ export const useGlobalConfig = () => {
   // Persist config to IndexedDB whenever it changes
   useEffect(() => {
     if (!initialized) return;
-    setItem(GLOBAL_CONFIG_STORAGE_KEY, globalConfig).catch(err => {
+    const { socketConnected, latencyMs, ...persistable } = globalConfig as any;
+    setItem(GLOBAL_CONFIG_STORAGE_KEY, persistable).catch(err => {
       console.error('Error saving global config:', err);
     });
   }, [globalConfig, initialized]);
@@ -126,19 +129,44 @@ export const useGlobalConfig = () => {
     globalConfig.socketMaxRetries
   ]);
 
+  useEffect(() => {
+    const svc = getSocketService();
+    setGlobalConfig(prev => ({
+      ...prev,
+      socketConnected: svc.isConnected,
+      latencyMs: svc.latency
+    }));
+    const unsubConnect = svc.onConnect(() => {
+      setGlobalConfig(prev => ({ ...prev, socketConnected: true, latencyMs: svc.latency }));
+    });
+    const unsubDisconnect = svc.onDisconnect(() => {
+      setGlobalConfig(prev => ({ ...prev, socketConnected: false, latencyMs: svc.latency }));
+    });
+    const unsubPing = svc.onPing(lat => {
+      setGlobalConfig(prev => ({ ...prev, latencyMs: lat, socketConnected: svc.isConnected }));
+    });
+    return () => {
+      unsubConnect();
+      unsubDisconnect();
+      unsubPing();
+    };
+  }, []);
+
   const resetConfig = () => {
     const defaultConfig = getDefaultConfig();
     setGlobalConfig(defaultConfig);
-    setItem(GLOBAL_CONFIG_STORAGE_KEY, defaultConfig).catch(err => {
+    const { socketConnected, latencyMs, ...persistable } = defaultConfig as any;
+    setItem(GLOBAL_CONFIG_STORAGE_KEY, persistable).catch(err => {
       console.error('Error resetting config:', err);
     });
   };
 
   const exportConfig = () => {
+    const { socketConnected, latencyMs, ...persistable } = globalConfig as any;
     const configData = {
       exported: new Date().toISOString(),
       version: '1.0',
-      config: globalConfig
+      config: persistable
     };
     
     const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });

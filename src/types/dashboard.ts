@@ -179,4 +179,8 @@ export interface GlobalConfig {
   socketServerPort: number;
   /** Socket reconnection attempts */
   socketMaxRetries: number;
+  /** Current socket connection status */
+  socketConnected: boolean;
+  /** Measured socket latency in milliseconds */
+  latencyMs: number;
 }
