@@ -62,6 +62,7 @@ export const Dashboard: React.FC = () => {
     setGlobalConfig,
     // Auth functions
     unlock,
+    lock,
     // Other functions
     exportReport,
     exportLogs,
@@ -272,6 +273,7 @@ export const Dashboard: React.FC = () => {
                 repositories={repositories}
                 config={globalConfig}
                 onAuthenticate={unlock}
+                onLock={lock}
                 isUnlocked={isUnlocked}
               />
             </div>

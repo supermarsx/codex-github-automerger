@@ -51,6 +51,7 @@ export const useDashboardData = () => {
     refreshApiKeyStatus,
     clearAllApiKeys,
     unlock,
+    lock,
     showLockedModal,
     setShowLockedModal
   } = useApiKeys();
@@ -176,6 +177,7 @@ export const useDashboardData = () => {
     clearWatchModeState,
     purgeDatabase,
     unlock,
+    lock,
     authInProgress,
     showLockedModal,
     setShowLockedModal

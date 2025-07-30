@@ -128,6 +128,14 @@ export const useApiKeys = () => {
     }
   };
 
+  const lock = () => {
+    setDecryptedKeys({});
+    setUnlocked(false);
+    if (typeof (PasskeyService as any).resetAuth === 'function') {
+      (PasskeyService as any).resetAuth();
+    }
+  };
+
   useEffect(() => {
     unlock();
     // intentionally run once on mount
@@ -337,6 +345,7 @@ export const useApiKeys = () => {
     refreshApiKeyStatus,
     clearAllApiKeys,
     unlock,
+    lock,
     authInProgress
   };
 };
