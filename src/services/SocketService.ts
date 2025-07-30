@@ -40,6 +40,8 @@ export class SocketService {
   private lastPing = 0;
   private connectListeners: Set<() => void> = new Set();
   private disconnectListeners: Set<() => void> = new Set();
+  private pairTokenListeners: Set<(token: string) => void> = new Set();
+  private pairResultListeners: Set<(success: boolean) => void> = new Set();
 
   constructor() {
     this.clientId = this.generateClientId();
@@ -98,6 +100,7 @@ export class SocketService {
         this.socket.onMessage('pair_token', ({ token }) => {
           this.pairToken = token;
           this.logger.logInfo('socket', 'Received pairing token', { token });
+          this.pairTokenListeners.forEach(cb => cb(token));
         });
 
         this.socket.onMessage('pair_result', ({ success }) => {
@@ -105,7 +108,9 @@ export class SocketService {
             this.pairedClients.add(this.clientId);
             this.logger.logInfo('socket', 'Pairing successful');
             this.syncConfig();
-          } else {
+          }
+          this.pairResultListeners.forEach(cb => cb(success));
+          if (!success) {
             this.logger.logError('socket', 'Pairing denied');
           }
         });
@@ -351,6 +356,20 @@ export class SocketService {
   onDisconnect(cb: () => void): () => void {
     this.disconnectListeners.add(cb);
     return () => this.disconnectListeners.delete(cb);
+  }
+
+  onPairToken(cb: (token: string) => void): () => void {
+    this.pairTokenListeners.add(cb);
+    return () => this.pairTokenListeners.delete(cb);
+  }
+
+  onPairResult(cb: (success: boolean) => void): () => void {
+    this.pairResultListeners.add(cb);
+    return () => this.pairResultListeners.delete(cb);
+  }
+
+  get currentPairToken(): string | null {
+    return this.pairToken;
   }
 
   get isPaired(): boolean {

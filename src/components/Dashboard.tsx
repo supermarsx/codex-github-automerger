@@ -17,6 +17,7 @@ import { FeedActions } from '@/components/FeedActions';
 import { WatchMode } from '@/components/WatchMode';
 import { SelectiveRepositoryLoader } from '@/components/SelectiveRepositoryLoader';
 import { ConnectionManager } from '@/components/ConnectionManager';
+import PairingDialog from '@/components/PairingDialog';
 
 // Hook imports
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -129,6 +130,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-card">
+      <PairingDialog />
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40" style={{ borderColor: 'hsl(var(--neo-border))' }}>
         <div className="max-w-7xl mx-auto px-6 py-4">
