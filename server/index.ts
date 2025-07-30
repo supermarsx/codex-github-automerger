@@ -8,6 +8,7 @@ import { loadPromise } from './config.js';
 import { fileURLToPath } from 'url';
 
 export async function startServer(port: number = Number(process.env.PORT) || 3001) {
+  logger.debug('server', 'Starting server', { port });
   await loadPromise;
   const app = express();
   const corsOptions = {
@@ -28,6 +29,7 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   });
   app.use(express.json());
 
+  logger.debug('server', 'Creating HTTP server');
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
     cors: { origin: '*' }
@@ -38,8 +40,10 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
     res.json({ logs: logger.getLogs() });
   });
 
+  logger.debug('server', 'Registering socket handlers');
   registerSocketHandlers(io, app);
 
+  logger.debug('server', 'Starting HTTP server listen', { port });
   httpServer.listen(port, () => {
     logger.info(`Server listening on ${port}`);
   });

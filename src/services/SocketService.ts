@@ -47,10 +47,12 @@ export class SocketService {
   }
 
   private handleSocketConnect = () => {
+    this.logger.logDebug('socket', 'Connected to server');
     this.connectListeners.forEach(cb => cb());
   };
 
   private handleSocketDisconnect = () => {
+    this.logger.logDebug('socket', 'Disconnected from server');
     this.disconnectListeners.forEach(cb => cb());
   };
 

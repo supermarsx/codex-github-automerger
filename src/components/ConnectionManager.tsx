@@ -34,6 +34,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
+    logInfo('system', 'Checking connection status');
 
     try {
       const svc = getSocketService();
@@ -45,6 +46,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
       setGithubConnected(false);
       setPublicApiConnected(false);
       setLatency(0);
+      logInfo('socket', 'Connection check failed');
     } finally {
       setIsRefreshing(false);
     }
@@ -70,10 +72,12 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     const unsubConnect = svc.onConnect(() => {
       setSocketConnected(true);
       setLatency(svc.latency);
+      logInfo('socket', 'Connected to server');
     });
     const unsubDisconnect = svc.onDisconnect(() => {
       setSocketConnected(false);
       setLatency(svc.latency);
+      logInfo('socket', 'Disconnected from server');
     });
 
     return () => {
