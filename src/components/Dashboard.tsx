@@ -144,14 +144,7 @@ export const Dashboard: React.FC = () => {
                 <p className="text-muted-foreground">Automated pull request management system</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <ConnectionManager
-                apiKeys={apiKeys}
-                compact={true}
-                isUnlocked={isUnlocked}
-                authInProgress={authInProgress}
-              />
-            </div>
+            {/* Connection status moved to Global Configuration panel */}
           </div>
         </div>
       </header>

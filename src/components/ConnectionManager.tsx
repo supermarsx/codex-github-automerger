@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Github, Server, Key, Lock } from 'lucide-react';
 import { useLogger } from '@/hooks/useLogger';
-import { getSocketService } from '@/services/SocketService';
+import { useGlobalConfig } from '@/hooks/useGlobalConfig';
 
 import { ApiKey } from '@/types/dashboard';
 
@@ -22,10 +22,11 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
   isUnlocked = false,
   authInProgress = false
 }) => {
-  const [socketConnected, setSocketConnected] = useState(false);
+  const { globalConfig } = useGlobalConfig();
+  const socketConnected = globalConfig.socketConnected;
+  const latency = globalConfig.latencyMs;
   const [githubConnected, setGithubConnected] = useState(false);
   const [publicApiConnected, setPublicApiConnected] = useState(false);
-  const [latency, setLatency] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { logInfo } = useLogger();
@@ -37,15 +38,12 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     logInfo('system', 'Checking connection status');
 
     try {
-      const svc = getSocketService();
       setGithubConnected(activeApiKeys > 0);
       setPublicApiConnected(activeApiKeys > 0);
-      setLatency(svc.latency);
     } catch (error) {
       console.error('Connection check failed:', error);
       setGithubConnected(false);
       setPublicApiConnected(false);
-      setLatency(0);
       logInfo('socket', 'Connection check failed');
     } finally {
       setIsRefreshing(false);
@@ -63,37 +61,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     return () => clearInterval(interval);
   }, [checkInterval, activeApiKeys, handleRefresh]);
 
-  // subscribe to socket events
-  useEffect(() => {
-    const svc = getSocketService();
-    setSocketConnected(svc.isConnected);
-    setLatency(svc.latency);
-
-    const unsubConnect = svc.onConnect(() => {
-      setSocketConnected(true);
-      setLatency(svc.latency);
-      logInfo('socket', 'Connected to server');
-    });
-    const unsubDisconnect = svc.onDisconnect(() => {
-      setSocketConnected(false);
-      setLatency(svc.latency);
-      logInfo('socket', 'Disconnected from server');
-    });
-
-    return () => {
-      unsubConnect();
-      unsubDisconnect();
-    };
-  }, []);
-
-  // update latency regularly
-  useEffect(() => {
-    const svc = getSocketService();
-    const interval = setInterval(() => {
-      setLatency(svc.latency);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  // No local socket listeners - status comes from global config
 
   if (compact) {
     return (

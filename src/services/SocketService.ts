@@ -42,6 +42,7 @@ export class SocketService {
   private disconnectListeners: Set<() => void> = new Set();
   private pairTokenListeners: Set<(token: string) => void> = new Set();
   private pairResultListeners: Set<(success: boolean) => void> = new Set();
+  private pingListeners: Set<(latency: number) => void> = new Set();
 
   constructor() {
     this.clientId = this.generateClientId();
@@ -125,6 +126,7 @@ export class SocketService {
           } else if (this.lastPing) {
             this.socket!.latency = now - this.lastPing;
           }
+          this.pingListeners.forEach(cb => cb(this.socket!.latency));
         });
 
         if (this.pingInterval) clearInterval(this.pingInterval);
@@ -378,6 +380,11 @@ export class SocketService {
   onPairResult(cb: (success: boolean) => void): () => void {
     this.pairResultListeners.add(cb);
     return () => this.pairResultListeners.delete(cb);
+  }
+
+  onPing(cb: (latency: number) => void): () => void {
+    this.pingListeners.add(cb);
+    return () => this.pingListeners.delete(cb);
   }
 
   get currentPairToken(): string | null {
