@@ -47,4 +47,23 @@ describe('SocketService initialization', () => {
     expect(ok).toBe(false);
     expect(connectMock).toHaveBeenCalledTimes(3);
   });
+
+  it('uses defaults from config supplier when params omitted', async () => {
+    const { SocketService } = await import('../services/SocketService.ts');
+    const { logger } = await import('../services/Logger');
+    const debugSpy = vi.spyOn(logger, 'logDebug').mockImplementation(() => {});
+    const svc = new SocketService();
+    svc.setConfigSupplier(() => ({
+      socketServerAddress: 'cfg.host',
+      socketServerPort: 9876,
+      socketMaxRetries: 0
+    }));
+    svc.initialize();
+    expect(debugSpy).toHaveBeenCalledWith(
+      'socket',
+      'attempting connection',
+      expect.objectContaining({ url: 'http://cfg.host:9876' })
+    );
+    svc.disconnect();
+  });
 });
