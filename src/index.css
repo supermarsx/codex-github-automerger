@@ -152,6 +152,11 @@
   .neo-card {
     @apply bg-card border-4 border-foreground shadow-[8px_8px_0px_0px_hsl(var(--foreground)/0.5)];
   }
+
+  /* Ensure text color matches theme when a neo-card is used as an active TabsTrigger */
+  .neo-card[data-state="active"] {
+    @apply text-foreground;
+  }
   
   .neo-card.neo-yellow { @apply bg-[hsl(var(--neo-yellow))] text-black border-foreground; }
   .neo-card.neo-pink { @apply bg-[hsl(var(--neo-pink))] text-black border-foreground; }
