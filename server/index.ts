@@ -9,7 +9,9 @@ import { fileURLToPath } from 'url';
 
 export async function startServer(port: number = Number(process.env.PORT) || 3001) {
   logger.debug('server', 'Starting server', { port });
+  logger.debug('server', 'Waiting for config load');
   await loadPromise;
+  logger.debug('server', 'Config loaded');
   const app = express();
   const corsOptions = {
     origin: '*',
@@ -36,6 +38,7 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   });
 
   app.get('/logs', (_req, res) => {
+    logger.debug('server', 'GET /logs');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({ logs: logger.getLogs() });
   });
@@ -45,6 +48,7 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
 
   logger.debug('server', 'Starting HTTP server listen', { port });
   httpServer.listen(port, () => {
+    logger.debug('server', 'HTTP server listening', { port });
     logger.info(`Server listening on ${port}`);
   });
 
