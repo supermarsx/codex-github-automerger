@@ -70,11 +70,12 @@ export class SocketService {
     return `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  initialize(address: string = 'localhost', port: number = 8080, maxRetries: number = 5): boolean {
-    this.address = address;
-    this.port = port;
-    this.maxRetries = maxRetries;
-    const socketUrl = `http://${address}:${port}`;
+  initialize(address?: string, port?: number, maxRetries?: number): boolean {
+    const cfg = this.configSupplier ? this.configSupplier() : null;
+    this.address = address ?? cfg?.socketServerAddress ?? 'localhost';
+    this.port = port ?? cfg?.socketServerPort ?? 8080;
+    this.maxRetries = maxRetries ?? cfg?.socketMaxRetries ?? 5;
+    const socketUrl = `http://${this.address}:${this.port}`;
     this.connectionAttempts = 0;
 
     while (this.connectionAttempts <= this.maxRetries) {
@@ -83,7 +84,7 @@ export class SocketService {
           attempt: this.connectionAttempts + 1,
           url: socketUrl
         });
-        const useReal = import.meta.env.VITE_USE_REAL_SOCKET === 'true';
+        const useReal = (import.meta as any).env?.VITE_USE_REAL_SOCKET === 'true';
         this.socket = useReal
           ? new RealSocket(socketUrl)
           : new BasicSocket();
