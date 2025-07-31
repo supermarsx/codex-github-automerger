@@ -30,6 +30,7 @@ function requirePaired(socket: ExtendedSocket, cb?: (arg0: any) => void): boolea
 }
 
 function cleanupPairings(): void {
+  logger.debug('pairing', 'running cleanup');
   const now = Date.now();
   for (const [token, entry] of pendingPairings) {
     if (now > entry.expiry || entry.socket.disconnected) {
@@ -46,6 +47,7 @@ export function registerSocketHandlers(io: Server, app: express.Express): void {
 
 
 app.post('/pairings/:token/approve', (req, res) => {
+  logger.debug('pairing', 'approve endpoint hit', { token: req.params.token });
   if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
     res.status(403).json({ error: 'forbidden' });
     return;
@@ -64,11 +66,17 @@ app.post('/pairings/:token/approve', (req, res) => {
   entry.socket.clientId = entry.clientId;
   pairedClients.add(entry.clientId);
   entry.socket.emit('pair_result', { success: true });
+  logger.debug('pairing', 'pair_result emitted', {
+    token: req.params.token,
+    success: true,
+    clientId: entry.clientId
+  });
   pendingPairings.delete(req.params.token);
   res.json({ ok: true });
 });
 
 app.post('/pairings/:token/deny', (req, res) => {
+  logger.debug('pairing', 'deny endpoint hit', { token: req.params.token });
   if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
     res.status(403).json({ error: 'forbidden' });
     return;
@@ -84,6 +92,11 @@ app.post('/pairings/:token/deny', (req, res) => {
     clientId: entry.clientId
   });
   entry.socket.emit('pair_result', { success: false });
+  logger.debug('pairing', 'pair_result emitted', {
+    token: req.params.token,
+    success: false,
+    clientId: entry.clientId
+  });
   pendingPairings.delete(req.params.token);
   res.json({ ok: true });
 });
@@ -100,6 +113,10 @@ io.on('connection', (socket: Socket) => {
     clientId: null,
     expiry: Date.now() + TOKEN_TTL_MS
   });
+  logger.debug('pairing', 'pending pairing stored', {
+    token: s.pairToken,
+    socketId: s.id
+  });
   logger.debug('pairing', 'created pairing token', {
     token: s.pairToken,
     socketId: s.id
@@ -113,6 +130,10 @@ io.on('connection', (socket: Socket) => {
     entry.clientId = clientId;
     s.clientId = clientId;
     s.emit('pair_token', { token: s.pairToken });
+    logger.debug('pairing', 'pair_token sent', {
+      token: s.pairToken,
+      clientId
+    });
   });
 
   socket.on('syncConfig', async (config, cb = () => {}) => {
@@ -291,6 +312,10 @@ io.on('connection', (socket: Socket) => {
     if (!requirePaired(s)) return;
     subscribeRepo(s, params);
     s.subscriptions.add(`${params.owner}/${params.repo}`);
+    logger.debug('socket', 'subscribed to repo', {
+      repo: `${params.owner}/${params.repo}`,
+      clientId: s.clientId
+    });
   });
 
   socket.on('unsubscribeRepo', params => {
@@ -298,6 +323,10 @@ io.on('connection', (socket: Socket) => {
     if (!requirePaired(s)) return;
     unsubscribeRepo(s, params);
     s.subscriptions.delete(`${params.owner}/${params.repo}`);
+    logger.debug('socket', 'unsubscribed from repo', {
+      repo: `${params.owner}/${params.repo}`,
+      clientId: s.clientId
+    });
   });
 
   socket.on('checkPRMergeable', async (params, cb = () => {}) => {
@@ -322,10 +351,12 @@ io.on('connection', (socket: Socket) => {
       const [owner, repo] = key.split('/');
       unsubscribeRepo(s, { owner, repo });
     }
+    logger.debug('socket', 'cleared subscriptions', { count: s.subscriptions.size });
     if (s.clientId) {
       pairedClients.delete(s.clientId);
     }
     pendingPairings.delete(s.pairToken);
+    logger.debug('pairing', 'removed pending token', { token: s.pairToken });
   });
 });
 }

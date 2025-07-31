@@ -79,6 +79,10 @@ export class SocketService {
 
     while (this.connectionAttempts <= this.maxRetries) {
       try {
+        this.logger.logDebug('socket', 'attempting connection', {
+          attempt: this.connectionAttempts + 1,
+          url: socketUrl
+        });
         const useReal = import.meta.env.VITE_USE_REAL_SOCKET === 'true';
         this.socket = useReal
           ? new RealSocket(socketUrl)
@@ -401,6 +405,7 @@ export class SocketService {
 
   disconnect(): void {
     if (this.socket) {
+      this.logger.logDebug('socket', 'disconnect called');
       this.socket.disconnect();
       this.logger.logInfo('socket', 'Socket disconnected');
     }
@@ -413,6 +418,7 @@ export class SocketService {
   }
 
   reconnect(): void {
+    this.logger.logDebug('socket', 'reconnect called');
     this.initialize(this.address, this.port, this.maxRetries);
   }
 }

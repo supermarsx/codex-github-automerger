@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useGlobalConfig } from './useGlobalConfig';
+import { getSocketService } from '@/services/SocketService';
 
 export interface LogEntry {
   id: string;
@@ -96,6 +97,20 @@ export const useLogger = (
     addLog('info', 'system', 'Logger initialized');
     addLog('info', 'system', `Log level set to: ${logLevel}`);
   }, [addLog, logLevel]);
+
+  useEffect(() => {
+    const svc = getSocketService();
+    const offConnect = svc.onConnect(() =>
+      addLog('debug', 'socket', 'connected')
+    );
+    const offDisconnect = svc.onDisconnect(() =>
+      addLog('debug', 'socket', 'disconnected')
+    );
+    return () => {
+      offConnect();
+      offDisconnect();
+    };
+  }, [addLog]);
 
   const logInfo = useCallback(
     (category: string, message: string, details?: any) => {
