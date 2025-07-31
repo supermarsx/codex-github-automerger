@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -150,27 +150,12 @@ export const Dashboard: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 pb-24">
         <Tabs value={appState.activeTab} onValueChange={(tab) => {
           updateActiveTab(tab);
           logInfo('dashboard', `Switched to tab: ${tab}`);
         }} className="space-y-6">
           
-          {/* Tab Navigation */}
-          <div className="neo-card p-6">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent p-0 h-auto">
-              {tabs.map(({ key, icon: Icon, title, color }) => (
-                <TabsTrigger
-                  key={key}
-                  value={key}
-                  className={`neo-card ${color} p-4 data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--neo-border))] data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all duration-150 flex flex-col items-center gap-2 min-h-[80px] text-center`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-black uppercase tracking-wider">{title}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
 
           <TabsContent value="feed" className="space-y-6">
             <div className="grid gap-4">
@@ -312,6 +297,24 @@ export const Dashboard: React.FC = () => {
           </TabsContent>
 
         </Tabs>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+        <div className="neo-card p-4">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent p-0 h-auto">
+            {tabs.map(({ key, icon: Icon, title, color }) => (
+              <TabsTrigger
+                key={key}
+                value={key}
+                className={`neo-card ${color} p-4 hover:bg-black/10 dark:hover:bg-white/10 data-[state=active]:bg-black/20 dark:data-[state=active]:bg-white/20 data-[state=active]:shadow-[2px_2px_0px_0px_hsl(var(--neo-border))] data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all duration-150 flex flex-col items-center gap-2 min-h-[80px] text-center`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-black uppercase tracking-wider">{title}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </div>
 
       {!isUnlocked && !authInProgress && (
