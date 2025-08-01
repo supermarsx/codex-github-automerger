@@ -23,6 +23,7 @@ export interface Watcher {
   alerts: Set<number>;
   interval: number;
   timer: NodeJS.Timeout | null;
+  isPolling: boolean;
   config: WatcherConfig;
   pullRequests: any[];
   strayBranches: string[];
@@ -74,6 +75,7 @@ export function subscribeRepo(
       alerts: new Set(),
       interval: interval || DEFAULT_INTERVAL,
       timer: null,
+      isPolling: false,
       config: { ...config },
       pullRequests: [],
       strayBranches: [],
@@ -87,14 +89,18 @@ export function subscribeRepo(
     if (interval && interval !== watcher.interval) {
       clearInterval(watcher.timer);
       watcher.interval = interval;
-      watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
+      watcher.timer = setInterval(() => {
+        if (!watcher.isPolling) pollRepo(watcher);
+      }, watcher.interval);
     }
     pollRepo(watcher);
   }
   watcher.sockets.add(socket);
   if (isNew) {
     pollRepo(watcher);
-    watcher.timer = setInterval(() => pollRepo(watcher), watcher.interval);
+    watcher.timer = setInterval(() => {
+      if (!watcher.isPolling) pollRepo(watcher);
+    }, watcher.interval);
   }
   const cache = repoCache.get(key) || { events: [], alerts: [] };
   socket.emit('repoCache', {
@@ -122,6 +128,8 @@ export function unsubscribeRepo(
 }
 
 async function pollRepo(watcher: Watcher): Promise<void> {
+  if (watcher.isPolling) return;
+  watcher.isPolling = true;
   const { token, owner, repo } = watcher;
   cleanCache();
   const svc = createGitHubService(token);
@@ -174,6 +182,8 @@ async function pollRepo(watcher: Watcher): Promise<void> {
   } catch (err: any) {
     logger.error('Polling error for', repoKey, err?.message);
     serveCache(watcher, cacheEntry);
+  } finally {
+    watcher.isPolling = false;
   }
 }
 
