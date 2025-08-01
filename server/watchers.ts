@@ -6,6 +6,7 @@ import { matchesPattern } from './utils/patterns.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
+const ALERT_HISTORY_LIMIT = parseInt(process.env.ALERT_HISTORY_LIMIT || '100', 10);
 
 export interface WatcherConfig {
   protectedBranches?: string[];
@@ -158,6 +159,10 @@ async function pollRepo(watcher: Watcher): Promise<void> {
       }
       if (!watcher.alerts.has(alert.number)) {
         watcher.alerts.add(alert.number);
+        while (watcher.alerts.size > ALERT_HISTORY_LIMIT) {
+          const oldest = watcher.alerts.values().next().value;
+          watcher.alerts.delete(oldest);
+        }
         broadcast(watcher, 'security.alert', alert);
       }
     }
@@ -246,4 +251,4 @@ export function getWatcher(owner: string, repo: string): Watcher | undefined {
   return watchers.get(`${owner}/${repo}`);
 }
 
-export const __test = { repoCache, pollRepo };
+export const __test = { repoCache, pollRepo, ALERT_HISTORY_LIMIT };

@@ -108,6 +108,22 @@ describe('watchers cache', () => {
     await __test.pollRepo(watcher);
     expect(eventsMock).toHaveBeenCalledTimes(2);
   });
+
+  it('evicts old alerts when limit exceeded', async () => {
+    const limit = __test.ALERT_HISTORY_LIMIT;
+    const alerts = Array.from({ length: limit + 1 }, (_, i) => ({
+      number: i + 1,
+      security_vulnerability: { severity: 'high' }
+    }));
+    eventsMock.mockResolvedValue({ data: [] });
+    alertsMock.mockResolvedValue({ data: alerts });
+
+    await __test.pollRepo(watcher);
+
+    expect(watcher.alerts.size).toBe(limit);
+    expect(watcher.alerts.has(1)).toBe(false);
+    expect(watcher.alerts.has(limit + 1)).toBe(true);
+  });
 });
 
 describe('subscribeRepo', () => {
