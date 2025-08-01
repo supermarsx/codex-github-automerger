@@ -44,7 +44,11 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   });
 
   logger.debug('server', 'Registering socket handlers');
-  registerSocketHandlers(io, app);
+  const cleanupTimer = registerSocketHandlers(io, app);
+  httpServer.on('close', () => {
+    clearInterval(cleanupTimer);
+    logger.debug('server', 'Cleanup timer cleared');
+  });
 
   logger.debug('server', 'Starting HTTP server listen', { port });
   httpServer.listen(port, () => {

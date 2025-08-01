@@ -18,6 +18,15 @@ const pairedClients = new Set<string>();
 const pendingPairings = new Map<string, { socket: ExtendedSocket; clientId: string | null; expiry: number }>();
 const TOKEN_TTL_MS = 5 * 60 * 1000;
 const PAIR_SECRET = process.env.PAIR_SECRET || 'secret';
+const CLEANUP_INTERVAL_MS = parseInt(
+  process.env.PAIRING_CLEANUP_INTERVAL_MS || '60000',
+  10
+);
+
+export interface TestExports {
+  pendingPairings: typeof pendingPairings;
+  cleanupPairings: typeof cleanupPairings;
+}
 
 function requirePaired(socket: ExtendedSocket, cb?: (arg0: any) => void): boolean {
   if (!socket.isPaired) {
@@ -43,10 +52,13 @@ function cleanupPairings(): void {
   }
 }
 
-export function registerSocketHandlers(io: Server, app: express.Express): void {
+export let cleanupTimer: NodeJS.Timeout;
+
+export function registerSocketHandlers(io: Server, app: express.Express): NodeJS.Timeout {
+  cleanupTimer = setInterval(cleanupPairings, CLEANUP_INTERVAL_MS);
 
 
-app.post('/pairings/:token/approve', (req, res) => {
+  app.post('/pairings/:token/approve', (req, res) => {
   logger.debug('pairing', 'approve endpoint hit', { token: req.params.token });
   if ((req.query.secret || req.body.secret) !== PAIR_SECRET) {
     res.status(403).json({ error: 'forbidden' });
@@ -361,4 +373,7 @@ io.on('connection', (socket: Socket) => {
     logger.debug('pairing', 'removed pending token', { token: s.pairToken });
   });
 });
+  return cleanupTimer;
 }
+
+export const __test: TestExports = { pendingPairings, cleanupPairings };
