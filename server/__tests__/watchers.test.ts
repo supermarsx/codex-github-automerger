@@ -35,6 +35,7 @@ describe('watchers cache', () => {
       sockets: new Set([{ emit }]),
       lastEvent: null,
       alerts: new Set(),
+      isPolling: false,
       config: {}
     };
     __test.repoCache.clear();
@@ -87,6 +88,26 @@ describe('watchers cache', () => {
 
     expect(emit).toHaveBeenCalledTimes(0);
   });
+
+  it('skips concurrent polls', async () => {
+    let resolveEvents: (v: any) => void;
+    eventsMock.mockReturnValue(new Promise(r => { resolveEvents = r; }));
+    alertsMock.mockResolvedValue({ data: [] });
+
+    const first = __test.pollRepo(watcher);
+    await Promise.resolve();
+    expect(eventsMock).toHaveBeenCalledTimes(1);
+
+    await __test.pollRepo(watcher);
+    expect(eventsMock).toHaveBeenCalledTimes(1);
+
+    resolveEvents({ data: [] });
+    await first;
+
+    eventsMock.mockResolvedValue({ data: [] });
+    await __test.pollRepo(watcher);
+    expect(eventsMock).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('subscribeRepo', () => {
@@ -120,6 +141,10 @@ describe('subscribeRepo', () => {
 
     subscribeRepo(socket, { token: 't1', owner: 'o', repo: 'r' });
     await Promise.resolve();
+    const w = getWatcher('o', 'r')!;
+    while (w.isPolling) {
+      await Promise.resolve();
+    }
 
     expect(eventsMock).toHaveBeenCalledTimes(1);
 
