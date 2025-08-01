@@ -3,7 +3,7 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 import { registerSocketHandlers } from './socketHandlers.js';
-import { logger } from './logger.js';
+import { logger, onLog } from './logger.js';
 import { loadPromise } from './config.js';
 import { fileURLToPath } from 'url';
 
@@ -12,6 +12,9 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   logger.debug('server', 'Waiting for config load');
   await loadPromise;
   logger.debug('server', 'Config loaded');
+  if (process.env.NODE_ENV !== 'production') {
+    onLog(entry => process.stdout.write(`[${entry.level}] ${entry.message}\n`));
+  }
   const app = express();
   const corsOptions = {
     origin: '*',
@@ -36,6 +39,10 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
   const io = new Server(httpServer, {
     cors: { origin: '*' }
   });
+
+  if (process.env.NODE_ENV !== 'production') {
+    onLog(entry => io.emit('server_log', entry));
+  }
 
   app.get('/logs', (_req, res) => {
     logger.debug('server', 'GET /logs');

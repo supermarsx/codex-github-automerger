@@ -392,6 +392,11 @@ export class SocketService {
     return () => this.pingListeners.delete(cb);
   }
 
+  on(event: string, cb: (data: any) => void): () => void {
+    if (!this.socket) return () => {};
+    return (this.socket as any).onMessage(event, cb);
+  }
+
   get currentPairToken(): string | null {
     return this.pairToken;
   }
