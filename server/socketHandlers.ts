@@ -252,6 +252,8 @@ io.on('connection', (socket: Socket) => {
         cb({ ok: false, error: 'branch not in stray list' });
       } else if (err.message === 'branch not allowed') {
         cb({ ok: false, error: 'branch not allowed' });
+      } else if (err.message === 'branch not found') {
+        cb({ ok: false, error: 'branch not found' });
       } else {
         cb({ ok: false, error: err.message });
       }

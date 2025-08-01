@@ -104,7 +104,15 @@ export function createGitHubService(token) {
         throw new Error('branch not allowed');
       }
 
-      const { data } = await octokit.rest.repos.getBranch({ owner, repo, branch });
+      let data;
+      try {
+        ({ data } = await octokit.rest.repos.getBranch({ owner, repo, branch }));
+      } catch (err: any) {
+        if (err.status === 404) {
+          throw new Error('branch not found');
+        }
+        throw err;
+      }
       if (data.protected) {
         throw new Error('branch protected');
       }

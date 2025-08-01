@@ -1,13 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const listAuth = vi.fn();
+const getBranch = vi.fn();
+const deleteRef = vi.fn();
 
 vi.mock('@octokit/rest', () => ({
   Octokit: vi.fn().mockImplementation(() => ({
     rest: {
       repos: {
-        listForAuthenticatedUser: listAuth
-      }
+        listForAuthenticatedUser: listAuth,
+        getBranch
+      },
+      git: { deleteRef }
     }
   }))
 }));
@@ -76,5 +80,21 @@ describe('fetchRepositories', () => {
     expect(listAuth).toHaveBeenCalledWith({ visibility: 'all', affiliation: 'owner,collaborator,organization_member', per_page: 100 });
     expect(repos).toHaveLength(1);
     expect(repos[0]).toMatchObject({ id: '3', owner: 'org' });
+  });
+});
+
+describe('deleteBranch', () => {
+  beforeEach(() => {
+    strayBranchCache.clear();
+    getBranch.mockReset();
+    deleteRef.mockReset();
+  });
+
+  it('throws branch not found on 404', async () => {
+    strayBranchCache.set('o/r', { branches: ['b'], timestamp: Date.now() });
+    getBranch.mockRejectedValue({ status: 404 });
+    const svc = createGitHubService('t');
+    await expect(svc.deleteBranch('o', 'r', 'b')).rejects.toThrow('branch not found');
+    expect(deleteRef).not.toHaveBeenCalled();
   });
 });

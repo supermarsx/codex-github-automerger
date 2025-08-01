@@ -157,4 +157,19 @@ describe('socket handlers', () => {
     });
     expect(resp).toEqual(payload);
   });
+
+  it('maps branch not found error', async () => {
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
+
+    svcMock.deleteBranch.mockRejectedValue(new Error('branch not found'));
+
+    const resp = await new Promise<any>(resolve => {
+      client.emit('deleteBranch', { token: 't', owner: 'o', repo: 'r', branch: 'b' }, resolve);
+    });
+    expect(resp).toEqual({ ok: false, error: 'branch not found' });
+  });
 });
