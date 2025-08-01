@@ -38,6 +38,7 @@ interface CacheEntry {
 
 const watchers = new Map<string, Watcher>();
 const repoCache = new Map<string, CacheEntry>();
+let cleanupTimer: NodeJS.Timeout | null = null;
 
 function cleanCache() {
   const now = Date.now();
@@ -62,6 +63,10 @@ export function subscribeRepo(
     config?: WatcherConfig;
   }
 ) {
+  if (cleanupTimer) {
+    clearInterval(cleanupTimer);
+    cleanupTimer = null;
+  }
   const key = `${owner}/${repo}`;
   let watcher = watchers.get(key);
   let isNew = false;
@@ -124,6 +129,10 @@ export function unsubscribeRepo(
   if (watcher.sockets.size === 0) {
     clearInterval(watcher.timer);
     watchers.delete(key);
+    cleanCache();
+    if (watchers.size === 0 && !cleanupTimer) {
+      cleanupTimer = setInterval(cleanCache, CACHE_TTL);
+    }
   }
 }
 
@@ -246,4 +255,12 @@ export function getWatcher(owner: string, repo: string): Watcher | undefined {
   return watchers.get(`${owner}/${repo}`);
 }
 
-export const __test = { repoCache, pollRepo };
+export const __test = {
+  repoCache,
+  pollRepo,
+  cleanCache,
+  get cleanupTimer() {
+    return cleanupTimer;
+  },
+  CACHE_TTL
+};
