@@ -33,9 +33,19 @@ export function createGitHubService(token) {
 
   return {
     octokit,
-    async fetchRepositories({ owner = '', visibility = 'all', affiliation = 'owner,collaborator,organization_member' } = {}) {
+    async fetchRepositories(
+      {
+        owner = '',
+        visibility = 'all',
+        affiliation = 'owner,collaborator,organization_member'
+      }: {
+        owner?: string;
+        visibility?: 'all' | 'public' | 'private';
+        affiliation?: string;
+      } = {}
+    ) {
       const res = await octokit.rest.repos.listForAuthenticatedUser({
-        visibility: visibility as 'all' | 'public' | 'private',
+        visibility,
         affiliation,
         per_page: 100
       });
