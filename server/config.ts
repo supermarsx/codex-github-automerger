@@ -1,32 +1,41 @@
 import fs from 'fs/promises';
 import path from 'path';
+import type { WatcherConfig } from './watchers.js';
 
-const STORAGE_PATH = process.env.CONFIG_STORAGE_PATH ||
+const STORAGE_PATH =
+  process.env.CONFIG_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'config.json');
 
-let configs: Record<string, any> = {};
+export interface ConfigFile {
+  [clientId: string]: WatcherConfig;
+}
 
-export async function load() {
+let configs: ConfigFile = {};
+
+export async function load(): Promise<void> {
   try {
     const data = await fs.readFile(STORAGE_PATH, 'utf8');
-    configs = JSON.parse(data);
+    configs = JSON.parse(data) as ConfigFile;
   } catch {
     configs = {};
   }
 }
 
-export const loadPromise = load();
+export const loadPromise: Promise<void> = load();
 
-async function save() {
+async function save(): Promise<void> {
   await fs.writeFile(STORAGE_PATH, JSON.stringify(configs, null, 2));
 }
 
-export function getClientConfig(clientId: string) {
+export function getClientConfig(clientId: string): WatcherConfig {
   return configs[clientId] || {};
 }
 
-export async function setClientConfig(clientId: string, cfg: any) {
-  configs[clientId] = { ...configs[clientId], ...cfg };
+export async function setClientConfig(
+  clientId: string,
+  cfg: WatcherConfig
+): Promise<void> {
+  configs[clientId] = { ...configs[clientId], ...cfg } as WatcherConfig;
   await save();
 }
 
