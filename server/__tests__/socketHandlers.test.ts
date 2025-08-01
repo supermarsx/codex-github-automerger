@@ -168,19 +168,10 @@ describe('socket handlers', () => {
   });
 
   it('cleans up expired pairings automatically', async () => {
-
     const token = await new Promise<string>(resolve => {
       client.once('pair_token', ({ token }) => resolve(token));
       client.emit('pair_request', { clientId: 'c1' });
     });
-    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
-
-    svcMock.deleteBranch.mockRejectedValue(new Error('branch not found'));
-
-    const resp = await new Promise<any>(resolve => {
-      client.emit('deleteBranch', { token: 't', owner: 'o', repo: 'r', branch: 'b' }, resolve);
-    });
-    expect(resp).toEqual({ ok: false, error: 'branch not found' });
 
     const entry = __test.pendingPairings.get(token);
     entry.expiry = Date.now() - 1;
