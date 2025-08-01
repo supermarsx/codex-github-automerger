@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const listAuth = vi.fn();
 const getBranch = vi.fn();
 const deleteRef = vi.fn();
+const pullGet = vi.fn();
 
 vi.mock('@octokit/rest', () => ({
   Octokit: vi.fn().mockImplementation(() => ({
@@ -11,6 +12,7 @@ vi.mock('@octokit/rest', () => ({
         listForAuthenticatedUser: listAuth,
         getBranch
       },
+      pulls: { get: pullGet },
       git: { deleteRef }
     }
   }))

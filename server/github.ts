@@ -19,6 +19,15 @@ function cleanupStrayCache() {
 
 setInterval(cleanupStrayCache, STRAY_CACHE_TTL);
 
+const MERGEABLE_POLL_INTERVAL_MS = parseInt(
+  process.env.MERGEABLE_POLL_INTERVAL_MS || '200',
+  10
+);
+const MERGEABLE_TIMEOUT_MS = parseInt(
+  process.env.MERGEABLE_TIMEOUT_MS || '2000',
+  10
+);
+
 export function createGitHubService(token) {
   const octokit = new Octokit({ auth: token });
 
@@ -162,8 +171,15 @@ export function createGitHubService(token) {
     },
 
   async checkPullRequestMergeable(owner, repo, pullNumber) {
-      const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber });
-      return data.mergeable === true && data.mergeable_state === 'clean';
+      const start = Date.now();
+      while (true) {
+        const { data } = await octokit.rest.pulls.get({ owner, repo, pull_number: pullNumber });
+        if (data.mergeable !== null) {
+          return data.mergeable === true && data.mergeable_state === 'clean';
+        }
+        if (Date.now() - start > MERGEABLE_TIMEOUT_MS) return false;
+        await new Promise(res => setTimeout(res, MERGEABLE_POLL_INTERVAL_MS));
+      }
     }
   };
 }
@@ -171,5 +187,7 @@ export function createGitHubService(token) {
 export const __test = {
   strayBranchCache,
   cleanupStrayCache,
-  STRAY_CACHE_TTL
+  STRAY_CACHE_TTL,
+  MERGEABLE_POLL_INTERVAL_MS,
+  MERGEABLE_TIMEOUT_MS
 };
