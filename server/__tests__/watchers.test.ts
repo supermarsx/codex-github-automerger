@@ -176,3 +176,48 @@ describe('subscribeRepo', () => {
     expect(createGitHubServiceMock).toHaveBeenLastCalledWith('t2');
   });
 });
+
+describe('cache cleanup', () => {
+  let socket: any;
+
+  beforeEach(() => {
+    socket = { emit: vi.fn() };
+    eventsMock = vi.fn();
+    alertsMock = vi.fn();
+    createGitHubServiceMock = vi.fn(() => ({
+      octokit: {
+        rest: {
+          activity: { listRepoEvents: (...args: any[]) => eventsMock(...args) },
+          dependabot: { listAlertsForRepo: (...args: any[]) => alertsMock(...args) }
+        }
+      },
+      fetchPullRequests: vi.fn(async () => []),
+      fetchStrayBranches: vi.fn(async () => []),
+      fetchRecentActivity: vi.fn(async () => [])
+    }));
+    __test.repoCache.clear();
+  });
+
+  afterEach(() => {
+    unsubscribeRepo(socket, { owner: 'o', repo: 'r' });
+  });
+
+  it('cleans expired entries when last watcher unsubscribes', async () => {
+    eventsMock.mockResolvedValue({ data: [] });
+    alertsMock.mockResolvedValue({ data: [] });
+
+    subscribeRepo(socket, { token: 't', owner: 'o', repo: 'r' });
+    await Promise.resolve();
+    const w = getWatcher('o', 'r')!;
+    while (w.isPolling) {
+      await Promise.resolve();
+    }
+
+    const entry = __test.repoCache.get('o/r')!;
+    entry.timestamp = Date.now() - (__test.CACHE_TTL + 1000);
+
+    unsubscribeRepo(socket, { owner: 'o', repo: 'r' });
+
+    expect(__test.repoCache.has('o/r')).toBe(false);
+  });
+});

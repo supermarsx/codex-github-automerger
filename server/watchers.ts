@@ -40,6 +40,17 @@ interface CacheEntry {
 const watchers = new Map<string, Watcher>();
 const repoCache = new Map<string, CacheEntry>();
 
+const CACHE_CLEANUP_INTERVAL = parseInt(
+  process.env.CACHE_CLEANUP_INTERVAL_MS || '60000',
+  10
+);
+
+setInterval(() => {
+  if (watchers.size === 0) {
+    cleanCache();
+  }
+}, CACHE_CLEANUP_INTERVAL);
+
 function cleanCache() {
   const now = Date.now();
   for (const [key, entry] of repoCache) {
@@ -125,6 +136,7 @@ export function unsubscribeRepo(
   if (watcher.sockets.size === 0) {
     clearInterval(watcher.timer);
     watchers.delete(key);
+    cleanCache();
   }
 }
 
@@ -251,4 +263,11 @@ export function getWatcher(owner: string, repo: string): Watcher | undefined {
   return watchers.get(`${owner}/${repo}`);
 }
 
-export const __test = { repoCache, pollRepo, ALERT_HISTORY_LIMIT };
+export const __test = {
+  repoCache,
+  pollRepo,
+  ALERT_HISTORY_LIMIT,
+  cleanCache,
+  CACHE_TTL,
+  CACHE_CLEANUP_INTERVAL
+};
