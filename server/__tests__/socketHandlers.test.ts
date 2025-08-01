@@ -8,7 +8,9 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-import { registerSocketHandlers } from '../socketHandlers.ts';
+let registerSocketHandlers: any;
+let __test: any;
+let cleanupTimer: NodeJS.Timeout;
 
 let svcMock: any;
 
@@ -24,18 +26,23 @@ let tmpDir: string;
 let configPath: string;
 
 beforeEach(async () => {
+  vi.resetModules();
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfg-'));
   configPath = path.join(tmpDir, 'config.json');
   fs.writeFileSync(configPath, '{}');
   process.env.CONFIG_STORAGE_PATH = configPath;
+  process.env.PAIRING_CLEANUP_INTERVAL_MS = '10';
   const cfgMod = await import('../config.ts');
   await cfgMod.loadPromise;
+  const sockMod = await import('../socketHandlers.ts');
+  registerSocketHandlers = sockMod.registerSocketHandlers;
+  __test = sockMod.__test;
 
   const app = express();
   app.use(express.json());
   httpServer = http.createServer(app);
   ioServer = new Server(httpServer, { cors: { origin: '*' } });
-  registerSocketHandlers(ioServer, app);
+  cleanupTimer = registerSocketHandlers(ioServer, app);
   await new Promise<void>(resolve => httpServer.listen(0, resolve));
   const port = (httpServer.address() as any).port;
   request = supertest(app);
@@ -52,7 +59,9 @@ afterEach(() => {
   client.disconnect();
   ioServer.close();
   httpServer.close();
+  clearInterval(cleanupTimer);
   delete process.env.CONFIG_STORAGE_PATH;
+  delete process.env.PAIRING_CLEANUP_INTERVAL_MS;
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
@@ -133,7 +142,7 @@ describe('socket handlers', () => {
   it('loads config before handlers run', async () => {
     fs.writeFileSync(configPath, JSON.stringify({ c1: { protectedBranches: ['keep'] } }, null, 2));
     const cfgMod = await import('../config.ts');
-    await cfgMod.loadPromise;
+    await cfgMod.__test.load();
 
     svcMock.fetchStrayBranches.mockResolvedValue(['keep', 'remove']);
 
@@ -156,5 +165,17 @@ describe('socket handlers', () => {
       client.emit('ping', payload);
     });
     expect(resp).toEqual(payload);
+  });
+
+  it('cleans up expired pairings automatically', async () => {
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+
+    const entry = __test.pendingPairings.get(token);
+    entry.expiry = Date.now() - 1;
+    await new Promise(res => setTimeout(res, 20));
+    expect(__test.pendingPairings.size).toBe(0);
   });
 });
