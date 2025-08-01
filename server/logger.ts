@@ -1,15 +1,21 @@
-type LogEntry = {
+import { EventEmitter } from 'events';
+
+export type LogEntry = {
   id: string;
   timestamp: Date;
   level: 'info' | 'error' | 'warn' | 'debug';
   message: string;
 };
+
+export const logEmitter = new EventEmitter();
 const logs: LogEntry[] = [];
 
 function addLog(level: LogEntry['level'], args: unknown[]) {
   const message = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  logs.push({ id, timestamp: new Date(), level, message });
+  const entry = { id, timestamp: new Date(), level, message };
+  logs.push(entry);
+  logEmitter.emit('log', entry);
 }
 
 export const logger = {
@@ -31,6 +37,11 @@ export const logger = {
   },
   getLogs: () => logs
 };
+
+export function onLog(cb: (entry: LogEntry) => void): () => void {
+  logEmitter.on('log', cb);
+  return () => logEmitter.off('log', cb);
+}
 
 // Capture native console output so it also appears in the logs endpoint
 const origConsole = {

@@ -26,7 +26,7 @@ export function createGitHubService(token) {
     octokit,
     async fetchRepositories({ owner = '', visibility = 'all', affiliation = 'owner,collaborator,organization_member' } = {}) {
       const res = await octokit.rest.repos.listForAuthenticatedUser({
-        visibility,
+        visibility: visibility as 'all' | 'public' | 'private',
         affiliation,
         per_page: 100
       });

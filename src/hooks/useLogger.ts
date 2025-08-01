@@ -106,9 +106,22 @@ export const useLogger = (
     const offDisconnect = svc.onDisconnect(() =>
       addLog('debug', 'socket', 'disconnected')
     );
+    const offLog = svc.on('server_log', (entry: any) => {
+      setLogs(prev => [
+        {
+          id: `srv-${entry.id}`,
+          timestamp: new Date(entry.timestamp),
+          level: (entry.level || 'info') as LogEntry['level'],
+          category: 'server',
+          message: entry.message
+        },
+        ...prev
+      ].slice(0, 1000));
+    });
     return () => {
       offConnect();
       offDisconnect();
+      offLog();
     };
   }, [addLog]);
 
