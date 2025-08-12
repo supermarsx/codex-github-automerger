@@ -173,11 +173,11 @@ export interface GlobalConfig {
   /** Archive already closed PRs when fetching */
   autoArchiveClosed: boolean;
   refreshInterval: number;
-  /** Socket server hostname or IP */
+  /** Socket server hostname or IP (defaults to 'localhost') */
   socketServerAddress: string;
-  /** Socket server port */
+  /** Socket server port (defaults to 8080) */
   socketServerPort: number;
-  /** Socket reconnection attempts */
+  /** Socket reconnection attempts (defaults to 5) */
   socketMaxRetries: number;
   /** Current socket connection status */
   socketConnected: boolean;
