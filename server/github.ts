@@ -44,15 +44,26 @@ export function createGitHubService(token) {
         affiliation?: string;
       } = {}
     ) {
-      const res = await octokit.rest.repos.listForAuthenticatedUser({
-        visibility,
-        affiliation,
-        per_page: 100
-      });
-      let data = res.data;
+      const results = [] as any[];
+      let page = 1;
+      let response;
+
+      do {
+        response = await octokit.rest.repos.listForAuthenticatedUser({
+          visibility,
+          affiliation,
+          per_page: 100,
+          ...(page > 1 ? { page } : {})
+        });
+        results.push(...response.data);
+        page += 1;
+      } while (response.headers?.link && response.headers.link.includes('rel="next"'));
+
+      let data = results;
       if (owner) {
         data = data.filter(r => r.owner.login.toLowerCase() === owner.toLowerCase());
       }
+
       return data.map(repo => ({
         id: repo.id.toString(),
         name: repo.name,
