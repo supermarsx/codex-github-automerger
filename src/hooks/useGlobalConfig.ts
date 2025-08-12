@@ -24,7 +24,8 @@ const getDefaultConfig = (): GlobalConfig => ({
   serverCheckInterval: 30000, // 30 seconds
   refreshInterval: 30000,
   socketServerAddress: 'localhost',
-  socketServerPort: 3001,
+  // Default socket server port for local development
+  socketServerPort: 8080,
   socketMaxRetries: 5,
   logLevel: 'info',
   darkMode: true,
