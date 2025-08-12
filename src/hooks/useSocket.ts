@@ -29,23 +29,37 @@ export const useSocket = (config: SocketConfig) => {
 
   const connect = useCallback(() => {
     try {
-      // Simulate WebSocket connection for demo
-      setIsConnected(true);
-      setLatency(Math.floor(Math.random() * 100) + 20);
-      setConnectionAttempts(0);
-      connectionAttemptsRef.current = 0;
-      
-      // Simulate periodic latency updates
-      if (pingInterval.current) clearInterval(pingInterval.current);
-      pingInterval.current = setInterval(() => {
-        setLatency(Math.floor(Math.random() * 100) + 20);
-      }, config.checkInterval || 10000);
-      
+      if (ws.current) ws.current.close();
+      ws.current = new WebSocket(config.url);
+
+      ws.current.onopen = () => {
+        setIsConnected(true);
+        setConnectionAttempts(0);
+        connectionAttemptsRef.current = 0;
+
+        sendPing();
+        if (pingInterval.current) clearInterval(pingInterval.current);
+        pingInterval.current = setInterval(() => sendPing(), config.checkInterval || 10000);
+      };
+
+      ws.current.onclose = () => {
+        setIsConnected(false);
+        scheduleReconnect();
+      };
+
+      ws.current.onmessage = evt => {
+        try {
+          const msg = JSON.parse(evt.data);
+          emitMessage(msg.type, msg.data);
+        } catch (err) {
+          console.error('Invalid message', err);
+        }
+      };
     } catch (error) {
       console.error('Socket connection failed:', error);
       scheduleReconnect();
     }
-  }, [config, scheduleReconnect]);
+  }, [config.url, config.checkInterval, scheduleReconnect]);
 
   useEffect(() => {
     connectRef.current = connect;
@@ -85,17 +99,29 @@ export const useSocket = (config: SocketConfig) => {
       const message = {
         type,
         data,
-        timestamp: new Date().toISOString()
+        timestamp: Date.now()
       };
-      // Simulate sending message
-      console.log('Sending message:', message);
-      return true;
+      try {
+        ws.current.send(JSON.stringify(message));
+        return true;
+      } catch (err) {
+        console.error('Failed to send message', err);
+      }
     }
     return false;
   };
 
   const emitMessage = (type: string, data: unknown) => {
     setLastMessage({ type, data, timestamp: new Date() });
+    if (type === 'pong') {
+      const ts = (data as any)?.timestamp;
+      const now = Date.now();
+      if (typeof ts === 'number') {
+        setLatency(now - ts);
+      } else if (lastPingTime.current) {
+        setLatency(now - lastPingTime.current);
+      }
+    }
     const setListeners = listeners.current.get(type);
     if (setListeners) {
       for (const cb of setListeners) cb(data);
@@ -114,7 +140,7 @@ export const useSocket = (config: SocketConfig) => {
 
   const sendPing = () => {
     lastPingTime.current = Date.now();
-    return sendMessage('ping', {});
+    return sendMessage('ping', { timestamp: lastPingTime.current });
   };
 
   useEffect(() => {
