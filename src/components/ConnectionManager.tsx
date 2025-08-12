@@ -92,7 +92,9 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
       
       <Badge variant="secondary" className={`neo-card ${socketConnected ? 'neo-green' : 'neo-red'} text-white font-bold`}>
         {socketConnected ? <Server className="w-4 h-4 mr-2" /> : <WifiOff className="w-4 h-4 mr-2" />}
-        Server {socketConnected ? `Connected (${latency}ms)` : 'Disconnected'}
+        {socketConnected
+          ? `Server Connected${latency > 0 ? ` (${latency}ms)` : ''}`
+          : 'Server Disconnected'}
       </Badge>
       
       <Badge variant="secondary" className={`neo-card ${githubConnected ? 'neo-blue' : 'neo-red'} text-white font-bold`}>

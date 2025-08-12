@@ -355,7 +355,10 @@ io.on('connection', (socket: Socket) => {
     }
   });
 
+  // Simple health check/latency measurement. Echoes the payload back so
+  // the client can calculate round-trip time.
   socket.on('ping', data => {
+    logger.debug('socket', 'ping received');
     socket.emit('pong', data);
   });
 
