@@ -83,6 +83,49 @@ describe('fetchRepositories', () => {
     expect(repos).toHaveLength(1);
     expect(repos[0]).toMatchObject({ id: '3', owner: 'org' });
   });
+
+  it('fetches all pages when link header has next', async () => {
+    listAuth
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 4,
+            name: 'repo1',
+            owner: { login: 'org' },
+            updated_at: '2020-01-04T00:00:00Z'
+          }
+        ],
+        headers: { link: '<https://api.github.com/?page=2>; rel="next"' }
+      })
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 5,
+            name: 'repo2',
+            owner: { login: 'org' },
+            updated_at: '2020-01-05T00:00:00Z'
+          }
+        ],
+        headers: {}
+      });
+    const svc = createGitHubService('t');
+    const repos = await svc.fetchRepositories({ owner: 'org' });
+    expect(listAuth).toHaveBeenCalledTimes(2);
+    expect(listAuth).toHaveBeenNthCalledWith(1, {
+      visibility: 'all',
+      affiliation: 'owner,collaborator,organization_member',
+      per_page: 100
+    });
+    expect(listAuth).toHaveBeenNthCalledWith(2, {
+      visibility: 'all',
+      affiliation: 'owner,collaborator,organization_member',
+      per_page: 100,
+      page: 2
+    });
+    expect(repos).toHaveLength(2);
+    expect(repos[0]).toMatchObject({ id: '4', owner: 'org' });
+    expect(repos[1]).toMatchObject({ id: '5', owner: 'org' });
+  });
 });
 
 describe('deleteBranch', () => {
