@@ -50,6 +50,13 @@ export async function startServer(port: number = Number(process.env.PORT) || 300
     res.json({ logs: logger.getLogs() });
   });
 
+  app.delete('/logs', (_req, res) => {
+    logger.debug('server', 'DELETE /logs');
+    logger.clearLogs();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(204).send();
+  });
+
   logger.debug('server', 'Registering socket handlers');
   const cleanupTimer = registerSocketHandlers(io, app);
   httpServer.on('close', () => {
