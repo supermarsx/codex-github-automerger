@@ -8,14 +8,25 @@ export type LogEntry = {
 };
 
 export const logEmitter = new EventEmitter();
+
+export const MAX_LOGS = 1000;
 const logs: LogEntry[] = [];
 
 function addLog(level: LogEntry['level'], args: unknown[]) {
-  const message = args.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).join(' ');
+  const message = args
+    .map(a => (typeof a === 'string' ? a : JSON.stringify(a)))
+    .join(' ');
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const entry = { id, timestamp: new Date(), level, message };
   logs.push(entry);
+  if (logs.length > MAX_LOGS) {
+    logs.shift();
+  }
   logEmitter.emit('log', entry);
+}
+
+function clearLogs() {
+  logs.length = 0;
 }
 
 export const logger = {
@@ -35,7 +46,8 @@ export const logger = {
     addLog('debug', args);
     console.debug('[debug]', ...args);
   },
-  getLogs: () => logs
+  getLogs: () => logs,
+  clearLogs
 };
 
 export function onLog(cb: (entry: LogEntry) => void): () => void {

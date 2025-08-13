@@ -162,7 +162,11 @@ export const useLogger = (
 
   const clearLogs = useCallback(() => {
     setLogs([]);
-  }, []);
+    const url = `http://${globalConfig.socketServerAddress}:${globalConfig.socketServerPort}/logs`;
+    fetch(url, { method: 'DELETE' }).catch(err => {
+      addLog('error', 'logger', 'Failed to clear server logs', err);
+    });
+  }, [addLog, globalConfig.socketServerAddress, globalConfig.socketServerPort]);
 
   const fetchServerLogs = useCallback(async () => {
     try {
