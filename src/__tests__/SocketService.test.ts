@@ -14,7 +14,7 @@ describe('SocketService initialization', () => {
     const { SocketService } = await import('../services/SocketService.ts');
     const { logger } = await import('../services/Logger');
     const infoSpy = vi.spyOn(logger, 'logInfo').mockImplementation(() => {});
-    const svc = new SocketService();
+    const svc = new SocketService(false);
     const ok = await svc.initialize('example.com', 1234, 1);
     expect(ok).toBe(true);
     expect(infoSpy).toHaveBeenCalledWith(
@@ -44,7 +44,7 @@ describe('SocketService initialization', () => {
     });
     const { SocketService } = await import('../services/SocketService.ts');
     const { logger } = await import('../services/Logger');
-    const svc = new SocketService();
+    const svc = new SocketService(false);
     const ok = await svc.initialize('host', 1111, 2);
     expect(ok).toBe(false);
     expect(connectMock).toHaveBeenCalledTimes(3);
@@ -54,7 +54,7 @@ describe('SocketService initialization', () => {
     const { SocketService } = await import('../services/SocketService.ts');
     const { logger } = await import('../services/Logger');
     const debugSpy = vi.spyOn(logger, 'logDebug').mockImplementation(() => {});
-    const svc = new SocketService();
+    const svc = new SocketService(false);
     svc.setConfigSupplier(() => ({
       socketServerAddress: 'cfg.host',
       socketServerPort: 9876,
