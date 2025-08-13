@@ -94,7 +94,9 @@ If polling fails repeatedly the server now applies an exponential backoff,
 doubling the interval up to `POLL_MAX_INTERVAL_MS` (default: `300000` ms). The
 backoff factor can be controlled with `POLL_BACKOFF_MULTIPLIER`.
 Webhook configurations are stored in `server/webhooks.json`. Set the
-`WEBHOOK_STORAGE_PATH` variable to change this location.
+`WEBHOOK_STORAGE_PATH` variable to change this location. If
+`WEBHOOK_SECRET_KEY` is provided, webhook secrets are encrypted on disk using
+this key and transparently decrypted when loaded.
 
 When a pull request is opened, closed, merged or a security alert appears,
 socket clients subscribed via the `subscribeRepo` message receive a `repoUpdate`
@@ -131,6 +133,7 @@ npm run dev
 The script builds the server and then starts it on `PORT` (default `3001`) while
 launching the Vite dev server concurrently. You can still customise
 `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `STRAY_BRANCH_CACHE_TTL_MS`,
-`POLL_MAX_INTERVAL_MS`, `POLL_BACKOFF_MULTIPLIER`, `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET` using environment variables. GitHub
+`POLL_MAX_INTERVAL_MS`, `POLL_BACKOFF_MULTIPLIER`, `WEBHOOK_STORAGE_PATH`,
+`WEBHOOK_SECRET_KEY` and `PAIR_SECRET` using environment variables. GitHub
 Personal Access Tokens can be provided through the UI itself or by setting the
 `GITHUB_TOKEN` environment variable before starting the server.

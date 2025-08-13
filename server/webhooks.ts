@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import { logger } from './logger.js';
+import { encryptSecret, decryptSecret } from './utils/encryption.js';
 
 export interface StoredWebhook {
   id: string;
@@ -40,19 +41,39 @@ await loadCache();
 async function readConfigs(): Promise<WebhookFile> {
   try {
     const data = await fs.readFile(STORAGE_PATH, 'utf8');
-    return JSON.parse(data) as WebhookFile;
+    const parsed = JSON.parse(data) as WebhookFile;
+    let needsMigration = false;
+    const decrypted = parsed.map(w => {
+      if (process.env.WEBHOOK_SECRET_KEY) {
+        if (w.secret.startsWith('enc:')) {
+          return { ...w, secret: decryptSecret(w.secret) };
+        } else {
+          needsMigration = true;
+          return { ...w };
+        }
+      }
+      return { ...w };
+    });
+    if (needsMigration && process.env.WEBHOOK_SECRET_KEY) {
+      await writeConfigs(decrypted);
+    }
+    return decrypted;
   } catch {
     return [];
   }
 }
 
 async function writeConfigs(list: WebhookFile): Promise<void> {
-  await fs.writeFile(STORAGE_PATH, JSON.stringify(list, null, 2));
+  const toWrite = process.env.WEBHOOK_SECRET_KEY
+    ? list.map(w => ({ ...w, secret: encryptSecret(w.secret) }))
+    : list;
+  await fs.writeFile(STORAGE_PATH, JSON.stringify(toWrite, null, 2));
 }
 
 export class WebhookService {
   static async getWebhooks(): Promise<WebhookFile> {
-    return loadCache();
+    const hooks = await loadCache();
+    return hooks.map(w => ({ ...w, secret: decryptSecret(w.secret) }));
   }
 
   static async reload(): Promise<WebhookFile> {
@@ -93,7 +114,8 @@ export class WebhookService {
     payload: WebhookPayload
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const signature = this.generateSignature(JSON.stringify(payload), webhook.secret);
+      const secret = decryptSecret(webhook.secret);
+      const signature = this.generateSignature(JSON.stringify(payload), secret);
       const res = await fetch(webhook.url, {
         method: 'POST',
         headers: {
