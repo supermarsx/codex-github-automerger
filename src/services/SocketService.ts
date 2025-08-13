@@ -36,6 +36,9 @@ export class SocketService {
   private port = 8080;
   private maxRetries = 5;
   private connectionAttempts = 0;
+  private readonly baseRetryDelay = 500;
+  private readonly maxRetryDelay = 8000;
+  private currentRetryDelay = this.baseRetryDelay;
   private pingInterval: NodeJS.Timeout | null = null;
   private lastPing = 0;
   private connectListeners: Set<() => void> = new Set();
@@ -112,6 +115,7 @@ export class SocketService {
     const socketUrl = `http://${this.address}:${this.port}`;
     const CONNECT_TIMEOUT_MS = 500;
     this.connectionAttempts = 0;
+    this.currentRetryDelay = this.baseRetryDelay;
 
     while (this.connectionAttempts <= this.maxRetries) {
       try {
@@ -143,6 +147,10 @@ export class SocketService {
           clientId: this.clientId,
           url: socketUrl
         });
+
+        // Reset retry tracking on successful connection
+        this.connectionAttempts = 0;
+        this.currentRetryDelay = this.baseRetryDelay;
 
         this.socket.onMessage('pair_token', ({ token }) => {
           this.pairToken = token;
@@ -195,6 +203,16 @@ export class SocketService {
           attempt: this.connectionAttempts,
           error
         });
+        if (this.connectionAttempts <= this.maxRetries) {
+          this.logger.logDebug('socket', 'Waiting before retrying connection', {
+            delay: this.currentRetryDelay
+          });
+          await new Promise(resolve => setTimeout(resolve, this.currentRetryDelay));
+          this.currentRetryDelay = Math.min(
+            this.currentRetryDelay * 2,
+            this.maxRetryDelay
+          );
+        }
       }
     }
 
