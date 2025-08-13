@@ -7,6 +7,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.clearAllMocks();
   vi.unmock('../services/BasicSocket.ts');
+  vi.useRealTimers();
 });
 
 describe('SocketService initialization', () => {
@@ -25,7 +26,8 @@ describe('SocketService initialization', () => {
     svc.disconnect();
   });
 
-  it('respects retry limit on failed connections', async () => {
+  it('respects retry limit and backoff timing on failed connections', async () => {
+    vi.useFakeTimers();
     const connectMock = vi.fn();
     vi.doMock('../services/BasicSocket.ts', () => {
       return {
@@ -43,9 +45,25 @@ describe('SocketService initialization', () => {
       };
     });
     const { SocketService } = await import('../services/SocketService.ts');
-    const { logger } = await import('../services/Logger');
     const svc = new SocketService(false);
-    const ok = await svc.initialize('host', 1111, 2);
+    const initPromise = svc.initialize('host', 1111, 2);
+
+    expect(connectMock).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(500); // connection timeout
+    await vi.advanceTimersByTimeAsync(499); // before backoff completes
+    expect(connectMock).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1); // first backoff done
+    expect(connectMock).toHaveBeenCalledTimes(2);
+
+    await vi.advanceTimersByTimeAsync(500); // second connection timeout
+    await vi.advanceTimersByTimeAsync(999); // before second backoff completes
+    expect(connectMock).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(1); // second backoff done
+    expect(connectMock).toHaveBeenCalledTimes(3);
+
+    await vi.advanceTimersByTimeAsync(500); // third connection timeout
+    const ok = await initPromise;
     expect(ok).toBe(false);
     expect(connectMock).toHaveBeenCalledTimes(3);
   });
