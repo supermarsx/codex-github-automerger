@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import crypto from 'crypto';
+import crypto, { timingSafeEqual } from 'crypto';
 import { logger } from './logger.js';
 
 export interface StoredWebhook {
@@ -80,7 +80,12 @@ export class WebhookService {
 
   static validateSignature(payload: string, signature: string, secret: string): boolean {
     const expected = this.generateSignature(payload, secret);
-    return `sha256=${expected}` === signature;
+    const expectedBuffer = Buffer.from(`sha256=${expected}`);
+    const receivedBuffer = Buffer.from(signature);
+    if (expectedBuffer.length !== receivedBuffer.length) {
+      return false;
+    }
+    return timingSafeEqual(expectedBuffer, receivedBuffer);
   }
 
   static async triggerWebhook(
