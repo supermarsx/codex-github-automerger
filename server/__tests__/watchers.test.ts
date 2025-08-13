@@ -36,7 +36,11 @@ describe('watchers cache', () => {
       sockets: new Set([{ emit }]),
       lastEvent: null,
       alerts: new Set(),
+      interval: 1000,
+      baseInterval: 1000,
+      timer: null,
       isPolling: false,
+      failureCount: 0,
       config: {}
     };
     __test.repoCache.clear();
@@ -124,6 +128,25 @@ describe('watchers cache', () => {
     expect(watcher.alerts.size).toBe(limit);
     expect(watcher.alerts.has(1)).toBe(false);
     expect(watcher.alerts.has(limit + 1)).toBe(true);
+  });
+
+  it('backs off interval on failures and resets on success', async () => {
+    eventsMock.mockRejectedValueOnce(new Error('fail'));
+    alertsMock.mockResolvedValue({ data: [] });
+
+    await __test.pollRepo(watcher);
+
+    expect(watcher.failureCount).toBe(1);
+    expect(watcher.interval).toBe(
+      Math.min(1000 * __test.BACKOFF_MULTIPLIER, __test.MAX_INTERVAL)
+    );
+
+    eventsMock.mockResolvedValue({ data: [] });
+
+    await __test.pollRepo(watcher);
+
+    expect(watcher.failureCount).toBe(0);
+    expect(watcher.interval).toBe(1000);
   });
 });
 
