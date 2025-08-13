@@ -2,7 +2,7 @@ import type { Socket } from 'socket.io';
 import { createGitHubService, RateLimitError } from './github.js';
 import { WebhookService } from './webhooks.js';
 import { logger } from './logger.js';
-import { matchesPattern } from './utils/patterns.js';
+import { matchesPattern } from './shared/matchesPattern.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
 const MAX_INTERVAL = parseInt(process.env.POLL_MAX_INTERVAL_MS || '300000', 10);

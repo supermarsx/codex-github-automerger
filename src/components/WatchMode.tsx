@@ -23,7 +23,7 @@ import { useWatchModePersistence } from '@/hooks/useWatchModePersistence';
 import { useLogger } from '@/hooks/useLogger';
 import { useToast } from '@/hooks/use-toast';
 import { abbreviate } from '@/utils/text';
-import { matchesPattern } from '@/lib/utils';
+import { matchesPattern } from '../../shared/matchesPattern';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 
 const MIN_FETCH_INTERVAL = 60 * 1000; // 1 minute
