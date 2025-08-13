@@ -313,15 +313,6 @@ export class SocketService {
     return this.request('fetchRepos', { token, owner, visibility, affiliation });
   }
 
-  async fetchRepositoriesByKey(
-    token: string,
-    owner: string,
-    visibility = 'all',
-    affiliation = 'owner,collaborator,organization_member'
-  ): Promise<any> {
-    return this.request('fetchReposByKey', { token, owner, visibility, affiliation });
-  }
-
   async fetchPullRequests(token: string, owner: string, repo: string): Promise<any> {
     return this.request('fetchPullRequests', { token, owner, repo });
   }

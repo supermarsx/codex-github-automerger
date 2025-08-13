@@ -90,7 +90,7 @@ export const SelectiveRepositoryLoader: React.FC<SelectiveRepositoryLoaderProps>
         return;
       }
       const service = createGitHubService(token);
-      const repos = await service.fetchRepositoriesByKey('');
+      const repos = await service.fetchRepositories('');
       if (!repos) {
         throw new Error('no repositories');
       }

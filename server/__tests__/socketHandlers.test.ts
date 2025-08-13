@@ -97,19 +97,6 @@ describe('socket handlers', () => {
     expect(resp2).toEqual({ ok: true, data: ['repo'] });
   });
 
-  it('fetches repositories via fetchReposByKey', async () => {
-    const token = await new Promise<string>(resolve => {
-      client.once('pair_token', ({ token }) => resolve(token));
-      client.emit('pair_request', { clientId: 'c1' });
-    });
-    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
-
-    const resp = await new Promise<any>(resolve => {
-      client.emit('fetchReposByKey', { token: 't', owner: '' }, resolve);
-    });
-    expect(resp).toEqual({ ok: true, data: ['repo'] });
-  });
-
   it('honours synced protected branches', async () => {
     svcMock.fetchStrayBranches.mockResolvedValue(['keep', 'remove']);
     const token = await new Promise<string>(resolve => {
