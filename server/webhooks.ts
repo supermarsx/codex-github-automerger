@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import crypto, { timingSafeEqual } from 'crypto';
+import crypto from 'crypto';
 import { logger } from './logger.js';
 
 export interface StoredWebhook {
@@ -85,7 +85,7 @@ export class WebhookService {
     if (expectedBuffer.length !== receivedBuffer.length) {
       return false;
     }
-    return timingSafeEqual(expectedBuffer, receivedBuffer);
+    return crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
   }
 
   static async triggerWebhook(
