@@ -155,6 +155,32 @@ describe('WebhookService triggerWebhook', () => {
     await WebhookService.deleteWebhook(hook.id);
   });
 
+  it('aborts fetch and logs error on timeout', async () => {
+    const hook = makeHook('t1');
+    await WebhookService.saveWebhook(hook);
+
+    vi.useFakeTimers();
+    const fetchMock = vi.fn((_url, opts) => new Promise((_, reject) => {
+      opts?.signal?.addEventListener('abort', () => {
+        const err = new Error('aborted');
+        (err as any).name = 'AbortError';
+        reject(err);
+      });
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+    const logSpy = vi.spyOn(logger, 'error');
+
+    const resPromise = WebhookService.triggerWebhook(hook, payload);
+    await vi.advanceTimersByTimeAsync(5000);
+    const res = await resPromise;
+
+    expect(res).toEqual({ success: false, error: 'Request timed out' });
+    expect(logSpy).toHaveBeenCalled();
+
+    vi.useRealTimers();
+    await WebhookService.deleteWebhook(hook.id);
+  });
+
   it('uses decrypted secret when triggering', async () => {
     const hook = makeHook('enc1');
     const encHook = { ...hook, secret: encryptSecret(hook.secret) };

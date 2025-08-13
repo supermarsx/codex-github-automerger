@@ -27,6 +27,8 @@ export interface WebhookPayload {
 const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'webhooks.json');
 
+const FETCH_TIMEOUT_MS = 5000;
+
 let cache: WebhookFile | null = null;
 
 export async function loadCache(force = false): Promise<WebhookFile> {
@@ -113,6 +115,8 @@ export class WebhookService {
     webhook: StoredWebhook,
     payload: WebhookPayload
   ): Promise<{ success: boolean; error?: string }> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
       const secret = decryptSecret(webhook.secret);
       const signature = this.generateSignature(JSON.stringify(payload), secret);
@@ -123,12 +127,19 @@ export class WebhookService {
           'X-Hub-Signature-256': `sha256=${signature}`,
           'User-Agent': 'AutoMerger-Webhook/1.0'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
+      clearTimeout(timeout);
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       await this.saveWebhook({ ...webhook, lastTriggered: new Date().toISOString() });
       return { success: true };
     } catch (err: any) {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') {
+        logger.error('Webhook trigger timeout');
+        return { success: false, error: 'Request timed out' };
+      }
       logger.error('Webhook trigger error:', err);
       return { success: false, error: err.message };
     }
