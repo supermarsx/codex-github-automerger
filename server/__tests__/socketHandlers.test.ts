@@ -141,6 +141,42 @@ describe('socket handlers', () => {
     expect(resp).toEqual({ ok: false, error: 'branch not found' });
   });
 
+  it('honours protectedPatterns passed with deleteBranch', async () => {
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
+
+    const resp = await new Promise<any>(resolve => {
+      client.emit(
+        'deleteBranch',
+        { token: 't', owner: 'o', repo: 'r', branch: 'main', protectedPatterns: ['main'] },
+        resolve
+      );
+    });
+    expect(resp).toEqual({ ok: false, error: 'branch protected' });
+    expect(svcMock.deleteBranch).not.toHaveBeenCalled();
+  });
+
+  it('forwards allowedPatterns to GitHub service', async () => {
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
+
+    const resp = await new Promise<any>(resolve => {
+      client.emit(
+        'deleteBranch',
+        { token: 't', owner: 'o', repo: 'r', branch: 'feature-x', allowedPatterns: ['feature-x'] },
+        resolve
+      );
+    });
+    expect(resp).toEqual({ ok: true });
+    expect(svcMock.deleteBranch).toHaveBeenCalledWith('o', 'r', 'feature-x', ['feature-x']);
+  });
+
   it('loads config before handlers run', async () => {
     fs.writeFileSync(configPath, JSON.stringify({ c1: { protectedBranches: ['keep'] } }, null, 2));
     const cfgMod = await import('../config.ts');

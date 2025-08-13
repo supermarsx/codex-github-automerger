@@ -52,4 +52,18 @@ describe('GitHubService', () => {
     });
     expect(res).toEqual(['repo']);
   });
+
+  it('emits deleteBranch event with patterns', async () => {
+    (socketService.request as any).mockResolvedValue({ ok: true });
+    const res = await service.deleteBranch('o', 'r', 'b', ['p'], ['a']);
+    expect(socketService.request).toHaveBeenCalledWith('deleteBranch', {
+      token: 'token',
+      owner: 'o',
+      repo: 'r',
+      branch: 'b',
+      protectedPatterns: ['p'],
+      allowedPatterns: ['a']
+    });
+    expect(res).toEqual({ ok: true });
+  });
 });
