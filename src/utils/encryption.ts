@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js';
+import wordlist from './bip39-english.json';
 
 export interface EncryptionResult {
   encrypted: string;
@@ -92,25 +93,18 @@ export class EncryptionService {
     }
   }
 
+  // Generate a 12-word recovery phrase using the BIP39 English word list
   static generateRecoveryPhrase(): string[] {
-    const words = [
-      'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract',
-      'absurd', 'abuse', 'access', 'accident', 'account', 'accuse', 'achieve', 'acid',
-      'acoustic', 'acquire', 'across', 'act', 'action', 'actor', 'actress', 'actual',
-      'adapt', 'add', 'addict', 'address', 'adjust', 'admit', 'adult', 'advance',
-      'advice', 'aerobic', 'affair', 'afford', 'afraid', 'again', 'against', 'age',
-      'agent', 'agree', 'ahead', 'aim', 'air', 'airport', 'aisle', 'alarm',
-      'album', 'alcohol', 'alert', 'alien', 'all', 'alley', 'allow', 'almost',
-      'alone', 'alpha', 'already', 'also', 'alter', 'always', 'amateur', 'amazing',
-      'among', 'amount', 'amused', 'analyst', 'anchor', 'ancient', 'anger', 'angle',
-      'angry', 'animal', 'ankle', 'announce', 'annual', 'another', 'answer', 'antenna'
-    ];
-    
-    const phrase = [];
+    const words = wordlist as string[];
+    const phrase: string[] = [];
+    const randomValues = new Uint32Array(12);
+    crypto.getRandomValues(randomValues);
+
     for (let i = 0; i < 12; i++) {
-      phrase.push(words[Math.floor(Math.random() * words.length)]);
+      const index = randomValues[i] % words.length;
+      phrase.push(words[index]);
     }
-    
+
     return phrase;
   }
 
