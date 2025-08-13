@@ -9,7 +9,10 @@ export type LogEntry = {
 
 export const logEmitter = new EventEmitter();
 
-export const MAX_LOGS = 1000;
+// Allow overriding the default log cap via environment variable.
+// Falls back to 1000 entries if the variable is not set or invalid.
+const envMax = Number.parseInt(process.env.LOG_MAX_ENTRIES ?? '', 10);
+export const MAX_LOGS = Number.isFinite(envMax) && envMax > 0 ? envMax : 1000;
 const logs: LogEntry[] = [];
 
 function addLog(level: LogEntry['level'], args: unknown[]) {
