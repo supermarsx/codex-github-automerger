@@ -43,25 +43,59 @@ export class SocketService {
   private pairTokenListeners: Set<(token: string) => void> = new Set();
   private pairResultListeners: Set<(success: boolean) => void> = new Set();
   private pingListeners: Set<(latency: number) => void> = new Set();
+  private reconnectTimeout: NodeJS.Timeout | null = null;
+  private reconnectDelay = 1000;
+  private autoReconnect: boolean;
 
-  constructor() {
+  constructor(autoReconnect = true) {
     this.clientId = this.generateClientId();
     this.logger = logger;
+    this.autoReconnect = autoReconnect;
   }
 
   private handleSocketConnect = () => {
     this.logger.logDebug('socket', 'Connected to server');
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    this.reconnectDelay = 1000;
     this.connectListeners.forEach(cb => cb());
   };
 
   private handleSocketDisconnect = () => {
     this.logger.logDebug('socket', 'Disconnected from server');
     this.disconnectListeners.forEach(cb => cb());
+    if (!this.autoReconnect) return;
+    this.scheduleReconnect();
   };
 
-  static getInstance(): SocketService {
+  private registerSocketEventHandlers() {
+    if (!this.socket) return;
+    if ('onConnect' in this.socket) {
+      (this.socket as any).onConnect(this.handleSocketConnect);
+    }
+    if ('onDisconnect' in this.socket) {
+      (this.socket as any).onDisconnect(this.handleSocketDisconnect);
+    }
+  }
+
+  private scheduleReconnect() {
+    if (this.reconnectTimeout) return;
+    this.logger.logDebug('socket', 'Scheduling reconnect', { delay: this.reconnectDelay });
+    this.reconnectTimeout = setTimeout(async () => {
+      this.reconnectTimeout = null;
+      const success = await this.reconnect();
+      if (!success && this.autoReconnect) {
+        this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000);
+        this.scheduleReconnect();
+      }
+    }, this.reconnectDelay);
+  }
+
+  static getInstance(autoReconnect = true): SocketService {
     if (!SocketService.instance) {
-      SocketService.instance = new SocketService();
+      SocketService.instance = new SocketService(autoReconnect);
     }
     return SocketService.instance;
   }
@@ -87,13 +121,7 @@ export class SocketService {
         });
         const useReal = (import.meta as any).env?.VITE_USE_REAL_SOCKET === 'true';
         this.socket = useReal ? new RealSocket(socketUrl) : new BasicSocket();
-
-        if ('onConnect' in this.socket) {
-          (this.socket as any).onConnect(this.handleSocketConnect);
-        }
-        if ('onDisconnect' in this.socket) {
-          (this.socket as any).onDisconnect(this.handleSocketDisconnect);
-        }
+        this.registerSocketEventHandlers();
 
         const connected = await new Promise<boolean>(resolve => {
           let off: () => void = () => {};
@@ -422,6 +450,11 @@ export class SocketService {
       clearInterval(this.pingInterval);
       this.pingInterval = null;
     }
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    this.reconnectDelay = 1000;
     this.pairedClients.clear();
     this.pendingPairings.clear();
   }
@@ -434,9 +467,9 @@ export class SocketService {
 
 let instance: SocketService | null = null;
 
-export function getSocketService(): SocketService {
+export function getSocketService(autoReconnect = true): SocketService {
   if (!instance) {
-    instance = SocketService.getInstance();
+    instance = SocketService.getInstance(autoReconnect);
   }
   return instance;
 }
