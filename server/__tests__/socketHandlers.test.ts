@@ -95,6 +95,11 @@ describe('socket handlers', () => {
       client.emit('fetchRepos', { token: 't', owner: '' }, resolve);
     });
     expect(resp2).toEqual({ ok: true, data: ['repo'] });
+
+    const resp3 = await new Promise<any>(resolve => {
+      client.emit('fetchReposByKey', { token: 't', owner: '' }, resolve);
+    });
+    expect(resp3).toEqual({ ok: true, data: ['repo'] });
   });
 
   it('honours synced protected branches', async () => {

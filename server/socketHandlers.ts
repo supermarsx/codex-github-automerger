@@ -52,6 +52,27 @@ function cleanupPairings(): void {
   }
 }
 
+async function handleFetchRepos(
+  event: string,
+  socket: ExtendedSocket,
+  params: any,
+  cb: (arg0: any) => void
+): Promise<void> {
+  logger.debug('socket', `${event} received`, { clientId: socket.clientId });
+  if (!requirePaired(socket, cb)) return;
+  try {
+    const svc = createGitHubService(params.token);
+    const repos = await svc.fetchRepositories({
+      owner: params.owner || '',
+      visibility: params.visibility,
+      affiliation: params.affiliation
+    });
+    cb({ ok: true, data: repos });
+  } catch (err: any) {
+    cb({ ok: false, error: err.message });
+  }
+}
+
 export let cleanupTimer: NodeJS.Timeout;
 
 export function registerSocketHandlers(io: Server, app: express.Express): NodeJS.Timeout {
@@ -158,21 +179,10 @@ io.on('connection', (socket: Socket) => {
       cb({ ok: false, error: err.message });
     }
   });
-  socket.on('fetchRepos', async (params, cb = () => {}) => {
-    logger.debug('socket', 'fetchRepos received', { clientId: s.clientId });
-    if (!requirePaired(s, cb)) return;
-    try {
-      const svc = createGitHubService(params.token);
-      const repos = await svc.fetchRepositories({
-        owner: params.owner || '',
-        visibility: params.visibility,
-        affiliation: params.affiliation
-      });
-      cb({ ok: true, data: repos });
-    } catch (err) {
-      cb({ ok: false, error: err.message });
-    }
-  });
+  const fetchReposListener = (event: string) => (params, cb = () => {}) =>
+    handleFetchRepos(event, s, params, cb);
+  socket.on('fetchRepos', fetchReposListener('fetchRepos'));
+  socket.on('fetchReposByKey', fetchReposListener('fetchReposByKey'));
 
   socket.on('fetchPullRequests', async (params, cb = () => {}) => {
     logger.debug('socket', 'fetchPullRequests received', { clientId: s.clientId });
