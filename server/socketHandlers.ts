@@ -12,7 +12,7 @@ import { createGitHubService } from './github.js';
 import { subscribeRepo, unsubscribeRepo, getWatcher } from './watchers.js';
 import { logger } from './logger.js';
 import { getClientConfig, setClientConfig } from './config.js';
-import { matchesPattern } from './utils/patterns.js';
+import { matchesPattern } from './shared/matchesPattern.js';
 
 const pairedClients = new Set<string>();
 const pendingPairings = new Map<string, { socket: ExtendedSocket; clientId: string | null; expiry: number }>();

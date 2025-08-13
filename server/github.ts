@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import { matchesPattern } from './utils/patterns.js';
+import { matchesPattern } from './shared/matchesPattern.js';
 
 export class RateLimitError extends Error {
   reset: number;

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { hexToHSL, matchesPattern } from '@/lib/utils';
+import { hexToHSL } from '@/lib/utils';
+import { matchesPattern } from '../../shared/matchesPattern';
 
 describe('hexToHSL', () => {
   it('converts 6-digit hex codes to HSL', () => {
