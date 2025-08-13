@@ -139,6 +139,21 @@ describe('socket handlers', () => {
     expect(svcMock.deleteBranch).not.toHaveBeenCalled();
   }, 10000);
 
+  it('returns branch not found error', async () => {
+    const token = await new Promise<string>(resolve => {
+      client.once('pair_token', ({ token }) => resolve(token));
+      client.emit('pair_request', { clientId: 'c1' });
+    });
+    await request.post(`/pairings/${token}/approve`).send({ secret: 'secret' });
+
+    svcMock.deleteBranch.mockRejectedValueOnce(new Error('branch not found'));
+
+    const resp = await new Promise<any>(resolve => {
+      client.emit('deleteBranch', { token: 't', owner: 'o', repo: 'r', branch: 'missing' }, resolve);
+    });
+    expect(resp).toEqual({ ok: false, error: 'branch not found' });
+  });
+
   it('loads config before handlers run', async () => {
     fs.writeFileSync(configPath, JSON.stringify({ c1: { protectedBranches: ['keep'] } }, null, 2));
     const cfgMod = await import('../config.ts');
