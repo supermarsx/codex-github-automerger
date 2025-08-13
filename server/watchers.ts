@@ -5,6 +5,8 @@ import { logger } from './logger.js';
 import { matchesPattern } from './utils/patterns.js';
 
 const DEFAULT_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS || '60000', 10);
+const MAX_INTERVAL = parseInt(process.env.POLL_MAX_INTERVAL_MS || '300000', 10);
+const BACKOFF_MULTIPLIER = parseFloat(process.env.POLL_BACKOFF_MULTIPLIER || '2');
 const CACHE_TTL = parseInt(process.env.CACHE_TTL_MS || '300000', 10);
 const ALERT_HISTORY_LIMIT = parseInt(process.env.ALERT_HISTORY_LIMIT || '100', 10);
 
@@ -23,9 +25,11 @@ export interface Watcher {
   lastEvent: string | null;
   alerts: Set<number>;
   interval: number;
+  baseInterval: number;
   timer: NodeJS.Timeout | null;
   isPolling: boolean;
   pauseUntil?: number;
+  failureCount: number;
   config: WatcherConfig;
   pullRequests: any[];
   strayBranches: string[];
@@ -87,9 +91,11 @@ export function subscribeRepo(
       lastEvent: null,
       alerts: new Set(),
       interval: interval || DEFAULT_INTERVAL,
+      baseInterval: interval || DEFAULT_INTERVAL,
       timer: null,
       isPolling: false,
       pauseUntil: 0,
+      failureCount: 0,
       config: { ...config },
       pullRequests: [],
       strayBranches: [],
@@ -100,9 +106,11 @@ export function subscribeRepo(
   } else {
     watcher.token = token;
     watcher.config = { ...watcher.config, ...config };
-    if (interval && interval !== watcher.interval) {
+    if (interval && interval !== watcher.baseInterval) {
       clearInterval(watcher.timer);
       watcher.interval = interval;
+      watcher.baseInterval = interval;
+      watcher.failureCount = 0;
       watcher.timer = setInterval(() => {
         if (!watcher.isPolling) pollRepo(watcher);
       }, watcher.interval);
@@ -203,6 +211,18 @@ async function pollRepo(watcher: Watcher): Promise<void> {
       // ignore activity fetch errors
     }
     cacheEntry.timestamp = Date.now();
+    if (watcher.failureCount > 0 || watcher.interval !== watcher.baseInterval) {
+      watcher.failureCount = 0;
+      if (watcher.interval !== watcher.baseInterval) {
+        watcher.interval = watcher.baseInterval;
+        if (watcher.timer) {
+          clearInterval(watcher.timer);
+          watcher.timer = setInterval(() => {
+            if (!watcher.isPolling) pollRepo(watcher);
+          }, watcher.interval);
+        }
+      }
+    }
   } catch (err: any) {
     if (err instanceof RateLimitError) {
       const wait = err.reset - Date.now();
@@ -214,6 +234,23 @@ async function pollRepo(watcher: Watcher): Promise<void> {
     } else {
       logger.error('Polling error for', repoKey, err?.message);
       serveCache(watcher, cacheEntry);
+    }
+    watcher.failureCount++;
+    const newInterval = Math.min(
+      Math.ceil(watcher.interval * BACKOFF_MULTIPLIER),
+      MAX_INTERVAL
+    );
+    if (newInterval !== watcher.interval) {
+      watcher.interval = newInterval;
+      if (watcher.timer) {
+        clearInterval(watcher.timer);
+        watcher.timer = setInterval(() => {
+          if (!watcher.isPolling) pollRepo(watcher);
+        }, watcher.interval);
+      }
+      logger.warn(
+        `Polling interval increased to ${watcher.interval}ms for ${repoKey} after ${watcher.failureCount} failures`
+      );
     }
   } finally {
     watcher.isPolling = false;
@@ -285,5 +322,7 @@ export const __test = {
   ALERT_HISTORY_LIMIT,
   cleanCache,
   CACHE_TTL,
-  CACHE_CLEANUP_INTERVAL
+  CACHE_CLEANUP_INTERVAL,
+  MAX_INTERVAL,
+  BACKOFF_MULTIPLIER
 };

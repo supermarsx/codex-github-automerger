@@ -86,6 +86,9 @@ The dashboard remembers whether you last used light or dark mode. This preferenc
 
 The Node.js server polls GitHub for repository updates. The polling interval can
 be tuned with the `POLL_INTERVAL_MS` environment variable (default: `60000` ms).
+If polling fails repeatedly the server now applies an exponential backoff,
+doubling the interval up to `POLL_MAX_INTERVAL_MS` (default: `300000` ms). The
+backoff factor can be controlled with `POLL_BACKOFF_MULTIPLIER`.
 Webhook configurations are stored in `server/webhooks.json`. Set the
 `WEBHOOK_STORAGE_PATH` variable to change this location.
 
@@ -124,6 +127,6 @@ npm run dev
 The script builds the server and then starts it on `PORT` (default `3001`) while
 launching the Vite dev server concurrently. You can still customise
 `POLL_INTERVAL_MS`, `CACHE_TTL_MS`, `STRAY_BRANCH_CACHE_TTL_MS`,
-`WEBHOOK_STORAGE_PATH` and `PAIR_SECRET` using environment variables. GitHub
+`POLL_MAX_INTERVAL_MS`, `POLL_BACKOFF_MULTIPLIER`, `WEBHOOK_STORAGE_PATH` and `PAIR_SECRET` using environment variables. GitHub
 Personal Access Tokens can be provided through the UI itself or by setting the
 `GITHUB_TOKEN` environment variable before starting the server.
