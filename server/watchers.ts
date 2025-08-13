@@ -1,5 +1,5 @@
 import type { Socket } from 'socket.io';
-import { createGitHubService } from './github.js';
+import { createGitHubService, RateLimitError } from './github.js';
 import { WebhookService } from './webhooks.js';
 import { logger } from './logger.js';
 import { matchesPattern } from './utils/patterns.js';
@@ -25,6 +25,7 @@ export interface Watcher {
   interval: number;
   timer: NodeJS.Timeout | null;
   isPolling: boolean;
+  pauseUntil?: number;
   config: WatcherConfig;
   pullRequests: any[];
   strayBranches: string[];
@@ -88,6 +89,7 @@ export function subscribeRepo(
       interval: interval || DEFAULT_INTERVAL,
       timer: null,
       isPolling: false,
+      pauseUntil: 0,
       config: { ...config },
       pullRequests: [],
       strayBranches: [],
@@ -142,6 +144,8 @@ export function unsubscribeRepo(
 
 async function pollRepo(watcher: Watcher): Promise<void> {
   if (watcher.isPolling) return;
+  if (watcher.pauseUntil && Date.now() < watcher.pauseUntil) return;
+  watcher.pauseUntil = 0;
   watcher.isPolling = true;
   const { token, owner, repo } = watcher;
   cleanCache();
@@ -183,22 +187,34 @@ async function pollRepo(watcher: Watcher): Promise<void> {
     try {
       watcher.pullRequests = await svc.fetchPullRequests(owner, repo);
     } catch (err) {
+      if (err instanceof RateLimitError) throw err;
       // ignore pull request errors
     }
     try {
       watcher.strayBranches = await svc.fetchStrayBranches(owner, repo);
     } catch (err) {
+      if (err instanceof RateLimitError) throw err;
       // ignore stray branch errors
     }
     try {
       watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
     } catch (err) {
+      if (err instanceof RateLimitError) throw err;
       // ignore activity fetch errors
     }
     cacheEntry.timestamp = Date.now();
   } catch (err: any) {
-    logger.error('Polling error for', repoKey, err?.message);
-    serveCache(watcher, cacheEntry);
+    if (err instanceof RateLimitError) {
+      const wait = err.reset - Date.now();
+      watcher.pauseUntil = err.reset;
+      logger.warn(
+        `Rate limit reached for ${repoKey}, retrying in ${Math.ceil(Math.max(wait, 0) / 1000)}s`
+      );
+      if (wait > 0) setTimeout(() => pollRepo(watcher), wait);
+    } else {
+      logger.error('Polling error for', repoKey, err?.message);
+      serveCache(watcher, cacheEntry);
+    }
   } finally {
     watcher.isPolling = false;
   }
