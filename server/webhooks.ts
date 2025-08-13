@@ -26,6 +26,17 @@ export interface WebhookPayload {
 const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'webhooks.json');
 
+let cache: WebhookFile | null = null;
+
+export async function loadCache(force = false): Promise<WebhookFile> {
+  if (force || cache === null) {
+    cache = await readConfigs();
+  }
+  return cache!;
+}
+
+await loadCache();
+
 async function readConfigs(): Promise<WebhookFile> {
   try {
     const data = await fs.readFile(STORAGE_PATH, 'utf8');
@@ -41,19 +52,26 @@ async function writeConfigs(list: WebhookFile): Promise<void> {
 
 export class WebhookService {
   static async getWebhooks(): Promise<WebhookFile> {
-    return readConfigs();
+    return loadCache();
+  }
+
+  static async reload(): Promise<WebhookFile> {
+    return loadCache(true);
   }
 
   static async saveWebhook(webhook: StoredWebhook): Promise<void> {
-    const webhooks = await readConfigs();
+    const webhooks = await loadCache();
     const idx = webhooks.findIndex(w => w.id === webhook.id);
-    if (idx >= 0) webhooks[idx] = webhook; else webhooks.push(webhook);
+    if (idx >= 0) webhooks[idx] = webhook;
+    else webhooks.push(webhook);
+    cache = webhooks;
     await writeConfigs(webhooks);
   }
 
   static async deleteWebhook(id: string): Promise<void> {
-    const webhooks = await readConfigs();
-    await writeConfigs(webhooks.filter(w => w.id !== id));
+    const webhooks = await loadCache();
+    cache = webhooks.filter(w => w.id !== id);
+    await writeConfigs(cache);
   }
 
   static generateSignature(payload: string, secret: string): string {
@@ -94,7 +112,7 @@ export class WebhookService {
     repository: string,
     data: any
   ): Promise<void> {
-    const webhooks = (await readConfigs()).filter(w =>
+    const webhooks = (await loadCache()).filter(w =>
       w.active && (w.events.includes(event) || w.events.includes('all_events'))
     );
     const payload: WebhookPayload = {
