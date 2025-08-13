@@ -14,6 +14,7 @@ describe('checkUserscriptUpdates', () => {
 
   it('returns hasUpdate true when newer version available', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => ({ tag_name: 'v1.1.0' })
     });
     vi.stubGlobal('fetch', fetchMock);
@@ -25,11 +26,26 @@ describe('checkUserscriptUpdates', () => {
 
   it('returns hasUpdate false when up to date', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
       json: async () => ({ tag_name: 'v1.0.0' })
     });
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await checkUserscriptUpdates();
     expect(result).toEqual({ hasUpdate: false });
+  });
+
+  it('returns hasUpdate false when response not ok', async () => {
+    const jsonMock = vi.fn();
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jsonMock
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await checkUserscriptUpdates();
+    expect(result).toEqual({ hasUpdate: false });
+    expect(jsonMock).not.toHaveBeenCalled();
   });
 });
