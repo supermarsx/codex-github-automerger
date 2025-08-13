@@ -35,9 +35,16 @@ export class GitHubService {
     owner: string,
     repo: string,
     branch: string,
-    protectedPatterns: string[] = []
+    protectedPatterns: string[] = [],
+    allowedPatterns: string[] = []
   ): Promise<boolean> {
-    return this.emit('deleteBranch', { owner, repo, branch, protectedPatterns });
+    return this.emit('deleteBranch', {
+      owner,
+      repo,
+      branch,
+      protectedPatterns,
+      allowedPatterns
+    });
   }
 
   fetchStrayBranches(owner: string, repo: string): Promise<string[]> {

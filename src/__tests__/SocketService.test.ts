@@ -69,3 +69,25 @@ describe('SocketService initialization', () => {
     svc.disconnect();
   });
 });
+
+describe('deleteBranch', () => {
+  it('forwards protected and allowed patterns to the server', async () => {
+    const { SocketService } = await import('../services/SocketService.ts');
+    const svc = new SocketService();
+    const reqSpy = vi
+      .spyOn(svc as any, 'request')
+      .mockResolvedValue({} as any);
+    await svc.deleteBranch('t', 'o', 'r', 'b', ['p'], ['a']);
+    expect(reqSpy).toHaveBeenCalledWith(
+      'deleteBranch',
+      expect.objectContaining({
+        token: 't',
+        owner: 'o',
+        repo: 'r',
+        branch: 'b',
+        protectedPatterns: ['p'],
+        allowedPatterns: ['a']
+      })
+    );
+  });
+});

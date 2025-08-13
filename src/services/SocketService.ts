@@ -330,9 +330,17 @@ export class SocketService {
     owner: string,
     repo: string,
     branch: string,
-    protectedPatterns: string[] = []
+    protectedPatterns: string[] = [],
+    allowedPatterns: string[] = []
   ): Promise<any> {
-    return this.request('deleteBranch', { token, owner, repo, branch, protectedPatterns });
+    return this.request('deleteBranch', {
+      token,
+      owner,
+      repo,
+      branch,
+      protectedPatterns,
+      allowedPatterns
+    });
   }
 
   async fetchStrayBranches(token: string, owner: string, repo: string): Promise<any> {

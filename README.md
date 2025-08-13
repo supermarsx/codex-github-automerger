@@ -109,8 +109,9 @@ After a client pairs with the server it should emit a `syncConfig` Socket.IO
 message containing its configuration (for example a list of protected branch
 patterns). The server stores this data per client in `server/config.json` and
 uses the settings when handling actions such as `fetchStrayBranches` and
-`deleteBranch`. The file persists across restarts so important settings remain
-available.
+`deleteBranch`. Deletion requests may also include their own `protectedPatterns`
+and `allowedPatterns` arrays to further control which branches can be removed.
+The file persists across restarts so important settings remain available.
 
 ## Running the server and UI together
 
