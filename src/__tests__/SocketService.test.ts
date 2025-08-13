@@ -15,7 +15,7 @@ describe('SocketService initialization', () => {
     const { logger } = await import('../services/Logger');
     const infoSpy = vi.spyOn(logger, 'logInfo').mockImplementation(() => {});
     const svc = new SocketService();
-    const ok = svc.initialize('example.com', 1234, 1);
+    const ok = await svc.initialize('example.com', 1234, 1);
     expect(ok).toBe(true);
     expect(infoSpy).toHaveBeenCalledWith(
       'socket',
@@ -36,14 +36,16 @@ describe('SocketService initialization', () => {
           disconnect: vi.fn(),
           sendMessage: vi.fn(),
           sendRequest: vi.fn(),
-          onMessage: vi.fn()
+          onMessage: vi.fn(),
+          onConnect: vi.fn().mockImplementation(() => () => {}),
+          onDisconnect: vi.fn().mockImplementation(() => () => {})
         }))
       };
     });
     const { SocketService } = await import('../services/SocketService.ts');
     const { logger } = await import('../services/Logger');
     const svc = new SocketService();
-    const ok = svc.initialize('host', 1111, 2);
+    const ok = await svc.initialize('host', 1111, 2);
     expect(ok).toBe(false);
     expect(connectMock).toHaveBeenCalledTimes(3);
   });
@@ -58,7 +60,7 @@ describe('SocketService initialization', () => {
       socketServerPort: 9876,
       socketMaxRetries: 0
     }));
-    svc.initialize();
+    await svc.initialize();
     expect(debugSpy).toHaveBeenCalledWith(
       'socket',
       'attempting connection',

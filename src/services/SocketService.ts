@@ -70,12 +70,13 @@ export class SocketService {
     return `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  initialize(address?: string, port?: number, maxRetries?: number): boolean {
+  async initialize(address?: string, port?: number, maxRetries?: number): Promise<boolean> {
     const cfg = this.configSupplier ? this.configSupplier() : null;
     this.address = address ?? cfg?.socketServerAddress ?? 'localhost';
     this.port = port ?? cfg?.socketServerPort ?? 8080;
     this.maxRetries = maxRetries ?? cfg?.socketMaxRetries ?? 5;
     const socketUrl = `http://${this.address}:${this.port}`;
+    const CONNECT_TIMEOUT_MS = 500;
     this.connectionAttempts = 0;
 
     while (this.connectionAttempts <= this.maxRetries) {
@@ -85,9 +86,7 @@ export class SocketService {
           url: socketUrl
         });
         const useReal = (import.meta as any).env?.VITE_USE_REAL_SOCKET === 'true';
-        this.socket = useReal
-          ? new RealSocket(socketUrl)
-          : new BasicSocket();
+        this.socket = useReal ? new RealSocket(socketUrl) : new BasicSocket();
 
         if ('onConnect' in this.socket) {
           (this.socket as any).onConnect(this.handleSocketConnect);
@@ -96,9 +95,21 @@ export class SocketService {
           (this.socket as any).onDisconnect(this.handleSocketDisconnect);
         }
 
-        this.socket.connect();
+        const connected = await new Promise<boolean>(resolve => {
+          let off: () => void = () => {};
+          const timeout = setTimeout(() => {
+            off();
+            resolve(false);
+          }, CONNECT_TIMEOUT_MS);
+          off = (this.socket as any).onConnect(() => {
+            clearTimeout(timeout);
+            off();
+            resolve(true);
+          });
+          this.socket!.connect();
+        });
 
-        if (!this.socket.isConnected) throw new Error('connection failed');
+        if (!connected) throw new Error('connection failed');
 
         this.logger.logInfo('socket', 'Socket service initialized', {
           clientId: this.clientId,
@@ -150,6 +161,7 @@ export class SocketService {
 
         return true;
       } catch (error) {
+        this.socket?.disconnect();
         this.connectionAttempts += 1;
         this.logger.logError('socket', 'Connection attempt failed', {
           attempt: this.connectionAttempts,
@@ -423,9 +435,9 @@ export class SocketService {
     this.pendingPairings.clear();
   }
 
-  reconnect(): void {
+  reconnect(): Promise<boolean> {
     this.logger.logDebug('socket', 'reconnect called');
-    this.initialize(this.address, this.port, this.maxRetries);
+    return this.initialize(this.address, this.port, this.maxRetries);
   }
 }
 
