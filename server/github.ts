@@ -1,6 +1,14 @@
 import { Octokit } from '@octokit/rest';
 import { matchesPattern } from './utils/patterns.js';
 
+export class RateLimitError extends Error {
+  reset: number;
+  constructor(reset: number) {
+    super('GitHub API rate limit exceeded');
+    this.reset = reset;
+  }
+}
+
 const STRAY_CACHE_TTL = parseInt(
   process.env.STRAY_BRANCH_CACHE_TTL_MS || '300000',
   10
@@ -30,6 +38,19 @@ const MERGEABLE_TIMEOUT_MS = parseInt(
 
 export function createGitHubService(token) {
   const octokit = new Octokit({ auth: token });
+
+  if ((octokit as any).hook?.error) {
+    (octokit as any).hook.error('request', async (err: any) => {
+      if (
+        err.status === 403 &&
+        err.response?.headers?.['x-ratelimit-remaining'] === '0'
+      ) {
+        const reset = parseInt(err.response.headers['x-ratelimit-reset'] || '0', 10) * 1000;
+        throw new RateLimitError(reset);
+      }
+      throw err;
+    });
+  }
 
   return {
     octokit,

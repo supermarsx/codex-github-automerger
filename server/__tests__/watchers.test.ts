@@ -6,7 +6,8 @@ let alertsMock: any;
 let createGitHubServiceMock: any;
 
 vi.mock('../github.ts', () => ({
-  createGitHubService: (...args: any[]) => createGitHubServiceMock(...args)
+  createGitHubService: (...args: any[]) => createGitHubServiceMock(...args),
+  RateLimitError: class {}
 }));
 
 describe('watchers cache', () => {
