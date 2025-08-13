@@ -2,21 +2,28 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { WebhookService, type StoredWebhook } from '../webhooks.ts';
-import { logger } from '../logger.ts';
+import { encryptSecret } from '../utils/encryption.ts';
+import type { StoredWebhook } from '../webhooks.ts';
 
+let WebhookService: typeof import('../webhooks.ts').WebhookService;
+let logger: typeof import('../logger.ts').logger;
 let tmpDir: string;
 let storagePath: string;
 
-beforeEach(() => {
+beforeEach(async () => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'web-'));
   storagePath = path.join(tmpDir, 'webhooks.json');
   fs.writeFileSync(storagePath, '[]');
   process.env.WEBHOOK_STORAGE_PATH = storagePath;
+  process.env.WEBHOOK_SECRET_KEY = 'test-key-1234567890-test-key';
+  vi.resetModules();
+  ({ WebhookService } = await import('../webhooks.ts'));
+  ({ logger } = await import('../logger.ts'));
 });
 
 afterEach(() => {
   delete process.env.WEBHOOK_STORAGE_PATH;
+  delete process.env.WEBHOOK_SECRET_KEY;
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
@@ -31,7 +38,7 @@ describe('WebhookService signatures', () => {
 });
 
 describe('WebhookService storage', () => {
-  it('persists webhooks to disk', async () => {
+  it('persists webhooks to disk with encrypted secrets', async () => {
     const hook: StoredWebhook = {
       id: '1',
       name: 'test',
@@ -45,10 +52,31 @@ describe('WebhookService storage', () => {
     await WebhookService.saveWebhook(hook);
     const all = await WebhookService.getWebhooks();
     expect(all).toEqual([hook]);
+    const raw = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+    expect(raw[0].secret).not.toBe('s');
+    expect(raw[0].secret.startsWith('enc:')).toBe(true);
 
     await WebhookService.deleteWebhook('1');
     const empty = await WebhookService.getWebhooks();
     expect(empty).toEqual([]);
+  });
+
+  it('migrates plaintext secrets', async () => {
+    const plain: StoredWebhook = {
+      id: 'p1',
+      name: 'plain',
+      url: 'http://example.com',
+      secret: 'plain',
+      events: ['a'],
+      active: true,
+      created: new Date().toISOString()
+    };
+    fs.writeFileSync(storagePath, JSON.stringify([plain], null, 2));
+    await WebhookService.reload();
+    const loaded = await WebhookService.getWebhooks();
+    expect(loaded[0].secret).toBe('plain');
+    const raw = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+    expect(raw[0].secret.startsWith('enc:')).toBe(true);
   });
 });
 
@@ -125,5 +153,19 @@ describe('WebhookService triggerWebhook', () => {
     expect(stored[0].lastTriggered).toBeUndefined();
 
     await WebhookService.deleteWebhook(hook.id);
+  });
+
+  it('uses decrypted secret when triggering', async () => {
+    const hook = makeHook('enc1');
+    const encHook = { ...hook, secret: encryptSecret(hook.secret) };
+
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const res = await WebhookService.triggerWebhook(encHook, payload);
+    expect(res).toEqual({ success: true });
+    const sentSig = fetchMock.mock.calls[0][1].headers['X-Hub-Signature-256'];
+    const expectedSig = WebhookService.generateSignature(JSON.stringify(payload), hook.secret);
+    expect(sentSig).toBe(`sha256=${expectedSig}`);
   });
 });
