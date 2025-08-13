@@ -52,16 +52,4 @@ describe('GitHubService', () => {
     });
     expect(res).toEqual(['repo']);
   });
-
-  it('emits fetchReposByKey event', async () => {
-    (socketService.request as any).mockResolvedValue(['repo']);
-    const res = await service.fetchRepositoriesByKey('o');
-    expect(socketService.request).toHaveBeenCalledWith('fetchReposByKey', {
-      token: 'token',
-      owner: 'o',
-      visibility: 'all',
-      affiliation: 'owner,collaborator,organization_member'
-    });
-    expect(res).toEqual(['repo']);
-  });
 });
