@@ -11,6 +11,9 @@ export interface UpdateCheckResult {
 export async function checkUserscriptUpdates(): Promise<UpdateCheckResult> {
   try {
     const response = await fetch(UPDATE_API);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch latest release: ${response.status}`);
+    }
     const data = await response.json();
     const latestVersion = (data.tag_name || data.version || '').replace(/^v/, '');
     const currentVersion: string | undefined = (globalThis as any).GM_info?.script?.version;
