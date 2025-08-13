@@ -35,7 +35,7 @@ describe('checkUserscriptUpdates', () => {
     expect(result).toEqual({ hasUpdate: false });
   });
 
-  it('returns hasUpdate false when response not ok', async () => {
+  it('returns error when response not ok', async () => {
     const jsonMock = vi.fn();
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
@@ -45,7 +45,7 @@ describe('checkUserscriptUpdates', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     const result = await checkUserscriptUpdates();
-    expect(result).toEqual({ hasUpdate: false });
+    expect(result).toEqual({ hasUpdate: false, error: 'Failed to fetch latest release: 500' });
     expect(jsonMock).not.toHaveBeenCalled();
   });
 });
