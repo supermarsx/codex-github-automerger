@@ -82,6 +82,10 @@ The dashboard keeps a running history of actions in the **Logs** tab. You can do
 
 The dashboard remembers whether you last used light or dark mode. This preference is stored locally so the interface loads with your chosen theme on your next visit.
 
+## Recovery phrase generation
+
+Recovery phrases are derived from the official BIP39 English word list and use `crypto.getRandomValues` for secure randomness.
+
 ## Server configuration
 
 The Node.js server polls GitHub for repository updates. The polling interval can
