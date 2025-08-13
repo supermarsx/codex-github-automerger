@@ -3,6 +3,7 @@ export const UPDATE_API = 'https://api.github.com/repos/lovable-dev/codex-github
 export interface UpdateCheckResult {
   hasUpdate: boolean;
   latestVersion?: string;
+  error?: string;
 }
 
 /**
@@ -12,7 +13,7 @@ export async function checkUserscriptUpdates(): Promise<UpdateCheckResult> {
   try {
     const response = await fetch(UPDATE_API);
     if (!response.ok) {
-      throw new Error(`Failed to fetch latest release: ${response.status}`);
+      return { hasUpdate: false, error: `Failed to fetch latest release: ${response.status}` };
     }
     const data = await response.json();
     const latestVersion = (data.tag_name || data.version || '').replace(/^v/, '');
@@ -21,8 +22,8 @@ export async function checkUserscriptUpdates(): Promise<UpdateCheckResult> {
     if (latestVersion && currentVersion && isVersionGreater(latestVersion, currentVersion)) {
       return { hasUpdate: true, latestVersion };
     }
-  } catch {
-    // ignore network or parsing errors
+  } catch (e) {
+    return { hasUpdate: false, error: e instanceof Error ? e.message : String(e) };
   }
 
   return { hasUpdate: false };
