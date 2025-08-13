@@ -140,6 +140,7 @@ describe('deleteBranch', () => {
     getBranch.mockRejectedValue({ status: 404 });
     const svc = createGitHubService('t');
     await expect(svc.deleteBranch('o', 'r', 'b')).rejects.toThrow('branch not found');
+    expect(getBranch).toHaveBeenCalledWith({ owner: 'o', repo: 'r', branch: 'b' });
     expect(deleteRef).not.toHaveBeenCalled();
   });
 });

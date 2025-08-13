@@ -137,8 +137,9 @@ export function createGitHubService(token) {
       let data;
       try {
         ({ data } = await octokit.rest.repos.getBranch({ owner, repo, branch }));
-      } catch (err: any) {
-        if (err.status === 404) {
+      } catch (err: unknown) {
+        // Normalize missing branch errors from the GitHub API
+        if ((err as any)?.status === 404) {
           throw new Error('branch not found');
         }
         throw err;

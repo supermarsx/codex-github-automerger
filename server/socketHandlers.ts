@@ -258,16 +258,21 @@ io.on('connection', (socket: Socket) => {
       cb({ ok: true });
     } catch (err: any) {
       logger.info('Deletion blocked for', branch, '-', err?.message);
-      if (err.message === 'branch protected') {
-        cb({ ok: false, error: 'branch protected' });
-      } else if (err.message === 'branch not in stray list') {
-        cb({ ok: false, error: 'branch not in stray list' });
-      } else if (err.message === 'branch not allowed') {
-        cb({ ok: false, error: 'branch not allowed' });
-      } else if (err.message === 'branch not found') {
-        cb({ ok: false, error: 'branch not found' });
-      } else {
-        cb({ ok: false, error: err.message });
+      switch (err.message) {
+        case 'branch protected':
+          cb({ ok: false, error: 'branch protected' });
+          break;
+        case 'branch not in stray list':
+          cb({ ok: false, error: 'branch not in stray list' });
+          break;
+        case 'branch not allowed':
+          cb({ ok: false, error: 'branch not allowed' });
+          break;
+        case 'branch not found':
+          cb({ ok: false, error: 'branch not found' });
+          break;
+        default:
+          cb({ ok: false, error: err.message });
       }
     }
   });
