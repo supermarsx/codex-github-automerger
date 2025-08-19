@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import fetch from 'cross-fetch';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Github, Server, Key, Lock } from 'lucide-react';
@@ -38,8 +39,15 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     logInfo('system', 'Checking connection status');
 
     try {
-      setGithubConnected(activeApiKeys > 0);
-      setPublicApiConnected(activeApiKeys > 0);
+      const backendUrl = `http://${globalConfig.socketServerAddress}:${globalConfig.socketServerPort}/logs`;
+
+      const [apiRes, githubRes] = await Promise.all([
+        fetch(backendUrl, { method: 'HEAD' }),
+        fetch('https://api.github.com/rate_limit')
+      ]);
+
+      setPublicApiConnected(apiRes.ok);
+      setGithubConnected(githubRes.ok);
     } catch (error) {
       console.error('Connection check failed:', error);
       setGithubConnected(false);
@@ -48,7 +56,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
     } finally {
       setIsRefreshing(false);
     }
-  }, [activeApiKeys]);
+  }, [globalConfig.socketServerAddress, globalConfig.socketServerPort, logInfo]);
 
   // Periodic server checks
   useEffect(() => {
