@@ -78,6 +78,24 @@ describe('WebhookService storage', () => {
     const raw = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
     expect(raw[0].secret.startsWith('enc:')).toBe(true);
   });
+
+  it('handles concurrent saves without corrupting the file', async () => {
+    const hooks: StoredWebhook[] = Array.from({ length: 5 }, (_, i) => ({
+      id: String(i),
+      name: `t${i}`,
+      url: 'http://example.com',
+      secret: `s${i}`,
+      events: ['a'],
+      active: true,
+      created: new Date().toISOString()
+    }));
+
+    await Promise.all(hooks.map(h => WebhookService.saveWebhook(h)));
+    const raw = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+    expect(raw).toHaveLength(hooks.length);
+    const ids = raw.map((r: any) => r.id).sort();
+    expect(ids).toEqual(hooks.map(h => h.id).sort());
+  });
 });
 
 describe('WebhookService triggerWebhook', () => {
