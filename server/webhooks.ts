@@ -26,6 +26,7 @@ export interface WebhookPayload {
 
 const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
   path.join(process.cwd(), 'server', 'webhooks.json');
+const LOCK_PATH = `${STORAGE_PATH}.lock`;
 
 const FETCH_TIMEOUT_MS = 5000;
 
@@ -65,11 +66,32 @@ async function readConfigs(): Promise<WebhookFile> {
   }
 }
 
+async function acquireLock(): Promise<void> {
+  while (true) {
+    try {
+      await fs.mkdir(LOCK_PATH);
+      return;
+    } catch (err: any) {
+      if (err.code === 'EEXIST') {
+        await new Promise(res => setTimeout(res, 50));
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+async function releaseLock(): Promise<void> {
+  await fs.rm(LOCK_PATH, { recursive: true, force: true });
+}
+
 async function writeConfigs(list: WebhookFile): Promise<void> {
   const toWrite = process.env.WEBHOOK_SECRET_KEY
     ? list.map(w => ({ ...w, secret: encryptSecret(w.secret) }))
     : list;
-  await fs.writeFile(STORAGE_PATH, JSON.stringify(toWrite, null, 2));
+  const tmpPath = `${STORAGE_PATH}.${process.pid}.${Date.now()}.tmp`;
+  await fs.writeFile(tmpPath, JSON.stringify(toWrite, null, 2));
+  await fs.rename(tmpPath, STORAGE_PATH);
 }
 
 export class WebhookService {
@@ -83,18 +105,29 @@ export class WebhookService {
   }
 
   static async saveWebhook(webhook: StoredWebhook): Promise<void> {
-    const webhooks = await loadCache();
-    const idx = webhooks.findIndex(w => w.id === webhook.id);
-    if (idx >= 0) webhooks[idx] = webhook;
-    else webhooks.push(webhook);
-    cache = webhooks;
-    await writeConfigs(webhooks);
+    await acquireLock();
+    try {
+      const webhooks = await loadCache(true);
+      const idx = webhooks.findIndex(w => w.id === webhook.id);
+      if (idx >= 0) webhooks[idx] = webhook;
+      else webhooks.push(webhook);
+      await writeConfigs(webhooks);
+      cache = webhooks;
+    } finally {
+      await releaseLock();
+    }
   }
 
   static async deleteWebhook(id: string): Promise<void> {
-    const webhooks = await loadCache();
-    cache = webhooks.filter(w => w.id !== id);
-    await writeConfigs(cache);
+    await acquireLock();
+    try {
+      const webhooks = await loadCache(true);
+      const filtered = webhooks.filter(w => w.id !== id);
+      await writeConfigs(filtered);
+      cache = filtered;
+    } finally {
+      await releaseLock();
+    }
   }
 
   static generateSignature(payload: string, secret: string): string {
