@@ -8,6 +8,7 @@ afterEach(() => {
   vi.clearAllMocks();
   vi.unmock('../services/BasicSocket.ts');
   vi.useRealTimers();
+  vi.unstubAllEnvs();
 });
 
 describe('SocketService initialization', () => {
@@ -84,6 +85,55 @@ describe('SocketService initialization', () => {
       'attempting connection',
       expect.objectContaining({ url: 'http://cfg.host:9876' })
     );
+    svc.disconnect();
+  });
+});
+
+describe('SocketService reconnect behavior', () => {
+  it('only fires one connect handler after multiple reconnects', async () => {
+    vi.stubEnv('VITE_USE_REAL_SOCKET', 'false');
+    class MockSocket {
+      isConnected = false;
+      latency = 0;
+      private connectCbs = new Set<() => void>();
+      private disconnectCbs = new Set<() => void>();
+      connect() {
+        this.isConnected = true;
+        this.connectCbs.forEach(cb => cb());
+      }
+      disconnect() {
+        this.isConnected = false;
+        this.disconnectCbs.forEach(cb => cb());
+      }
+      sendMessage = vi.fn().mockReturnValue(true);
+      sendRequest = vi.fn();
+      onMessage = vi.fn().mockReturnValue(() => {});
+      onConnect(cb: () => void) {
+        this.connectCbs.add(cb);
+        return () => this.connectCbs.delete(cb);
+      }
+      onDisconnect(cb: () => void) {
+        this.disconnectCbs.add(cb);
+        return () => this.disconnectCbs.delete(cb);
+      }
+    }
+    vi.doMock('../services/BasicSocket.ts', () => ({ BasicSocket: MockSocket }));
+    const { SocketService } = await import('../services/SocketService.ts');
+    const svc = new SocketService(false);
+    const handler = vi.fn();
+    svc.onConnect(handler);
+
+    await svc.initialize();
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    svc.disconnect();
+    await svc.reconnect();
+    expect(handler).toHaveBeenCalledTimes(2);
+
+    svc.disconnect();
+    await svc.reconnect();
+    expect(handler).toHaveBeenCalledTimes(3);
+
     svc.disconnect();
   });
 });
