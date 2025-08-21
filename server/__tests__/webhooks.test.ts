@@ -24,6 +24,7 @@ beforeEach(async () => {
 afterEach(() => {
   delete process.env.WEBHOOK_STORAGE_PATH;
   delete process.env.WEBHOOK_SECRET_KEY;
+  delete process.env.WEBHOOK_MAX_ATTEMPTS;
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
@@ -211,5 +212,55 @@ describe('WebhookService triggerWebhook', () => {
     const sentSig = fetchMock.mock.calls[0][1].headers['X-Hub-Signature-256'];
     const expectedSig = WebhookService.generateSignature(JSON.stringify(payload), hook.secret);
     expect(sentSig).toBe(`sha256=${expectedSig}`);
+  });
+
+  it('retries failed calls and eventually succeeds', async () => {
+    const hook = makeHook('r1');
+    await WebhookService.saveWebhook(hook);
+
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'fail' })
+      .mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+    vi.stubGlobal('fetch', fetchMock);
+    const warnSpy = vi.spyOn(logger, 'warn');
+
+    vi.useFakeTimers();
+    const resPromise = WebhookService.triggerWebhook(hook, payload);
+    await vi.advanceTimersByTimeAsync(1000); // backoff before retry
+    const res = await resPromise;
+
+    expect(res).toEqual({ success: true });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const stored = await WebhookService.getWebhooks();
+    expect(stored[0].lastTriggered).toBeDefined();
+    vi.useRealTimers();
+    await WebhookService.deleteWebhook(hook.id);
+  });
+
+  it('stops after max retries when failures persist', async () => {
+    process.env.WEBHOOK_MAX_ATTEMPTS = '2';
+    const hook = makeHook('r2');
+    await WebhookService.saveWebhook(hook);
+
+    const fetchMock = vi.fn().mockRejectedValue(new Error('net fail'));
+    vi.stubGlobal('fetch', fetchMock);
+    const warnSpy = vi.spyOn(logger, 'warn');
+    const errSpy = vi.spyOn(logger, 'error');
+
+    vi.useFakeTimers();
+    const resPromise = WebhookService.triggerWebhook(hook, payload);
+    await vi.advanceTimersByTimeAsync(1000);
+    const res = await resPromise;
+
+    expect(res).toEqual({ success: false, error: 'net fail' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(errSpy).toHaveBeenCalled();
+    const stored = await WebhookService.getWebhooks();
+    expect(stored[0].lastTriggered).toBeUndefined();
+    vi.useRealTimers();
+    await WebhookService.deleteWebhook(hook.id);
   });
 });
