@@ -120,7 +120,9 @@ patterns). The server stores this data per client in `server/config.json` and
 uses the settings when handling actions such as `fetchStrayBranches` and
 `deleteBranch`. Deletion requests may also include their own `protectedPatterns`
 and `allowedPatterns` arrays to further control which branches can be removed.
-The file persists across restarts so important settings remain available.
+Configuration updates are deep merged, allowing nested arrays and objects to be
+combined instead of replaced. The file persists across restarts so important
+settings remain available.
 
 ## Running the server and UI together
 

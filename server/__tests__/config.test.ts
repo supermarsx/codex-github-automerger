@@ -45,4 +45,12 @@ describe('client config storage', () => {
     await loadModule();
     expect(mod.getClientConfig('c1')).toEqual({ foo: 'bar' });
   });
+
+  it('deep merges nested config', async () => {
+    await mod.setClientConfig('c1', { nested: { arr: [1], obj: { a: true } } });
+    await mod.setClientConfig('c1', { nested: { arr: [2], obj: { b: true } } });
+    expect(mod.getClientConfig('c1')).toEqual({
+      nested: { arr: [1, 2], obj: { a: true, b: true } }
+    });
+  });
 });
