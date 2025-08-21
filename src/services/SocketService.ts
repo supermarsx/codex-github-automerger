@@ -49,6 +49,8 @@ export class SocketService {
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private reconnectDelay = 1000;
   private autoReconnect: boolean;
+  private socketConnectUnsubscribes: (() => void)[] = [];
+  private socketDisconnectUnsubscribes: (() => void)[] = [];
 
   constructor(autoReconnect = true) {
     this.clientId = this.generateClientId();
@@ -76,11 +78,20 @@ export class SocketService {
   private registerSocketEventHandlers() {
     if (!this.socket) return;
     if ('onConnect' in this.socket) {
-      (this.socket as any).onConnect(this.handleSocketConnect);
+      const off = (this.socket as any).onConnect(this.handleSocketConnect);
+      if (typeof off === 'function') this.socketConnectUnsubscribes.push(off);
     }
     if ('onDisconnect' in this.socket) {
-      (this.socket as any).onDisconnect(this.handleSocketDisconnect);
+      const off = (this.socket as any).onDisconnect(this.handleSocketDisconnect);
+      if (typeof off === 'function') this.socketDisconnectUnsubscribes.push(off);
     }
+  }
+
+  private cleanupSocketEventHandlers() {
+    this.socketConnectUnsubscribes.forEach(off => off());
+    this.socketConnectUnsubscribes = [];
+    this.socketDisconnectUnsubscribes.forEach(off => off());
+    this.socketDisconnectUnsubscribes = [];
   }
 
   private scheduleReconnect() {
@@ -118,6 +129,7 @@ export class SocketService {
     this.currentRetryDelay = this.baseRetryDelay;
 
     while (this.connectionAttempts <= this.maxRetries) {
+      this.cleanupSocketEventHandlers();
       try {
         this.logger.logDebug('socket', 'attempting connection', {
           attempt: this.connectionAttempts + 1,
@@ -198,6 +210,7 @@ export class SocketService {
         return true;
       } catch (error) {
         this.socket?.disconnect();
+        this.cleanupSocketEventHandlers();
         this.connectionAttempts += 1;
         this.logger.logError('socket', 'Connection attempt failed', {
           attempt: this.connectionAttempts,
@@ -217,6 +230,7 @@ export class SocketService {
     }
 
     this.socket = null;
+    this.cleanupSocketEventHandlers();
     this.logger.logError('socket', 'Failed to initialize socket service', {
       retries: this.maxRetries
     });
@@ -487,6 +501,7 @@ export class SocketService {
 
   reconnect(): Promise<boolean> {
     this.logger.logDebug('socket', 'reconnect called');
+    this.cleanupSocketEventHandlers();
     return this.initialize(this.address, this.port, this.maxRetries);
   }
 }
