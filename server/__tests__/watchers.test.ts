@@ -114,6 +114,20 @@ describe('watchers cache', () => {
     expect(eventsMock).toHaveBeenCalledTimes(2);
   });
 
+  it('fetches alerts in parallel with events', async () => {
+    let resolveEvents: (v: any) => void;
+    eventsMock.mockReturnValue(new Promise(r => { resolveEvents = r; }));
+    alertsMock.mockResolvedValue({ data: [] });
+
+    const poll = __test.pollRepo(watcher);
+    await Promise.resolve();
+
+    expect(alertsMock).toHaveBeenCalledTimes(1);
+
+    resolveEvents({ data: [] });
+    await poll;
+  });
+
   it('evicts old alerts when limit exceeded', async () => {
     const limit = __test.ALERT_HISTORY_LIMIT;
     const alerts = Array.from({ length: limit + 1 }, (_, i) => ({
