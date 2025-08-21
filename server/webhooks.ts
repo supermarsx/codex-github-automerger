@@ -29,6 +29,7 @@ const STORAGE_PATH = process.env.WEBHOOK_STORAGE_PATH ||
 const LOCK_PATH = `${STORAGE_PATH}.lock`;
 
 const FETCH_TIMEOUT_MS = 5000;
+const DEFAULT_MAX_RETRY_ATTEMPTS = 3;
 
 let cache: WebhookFile | null = null;
 
@@ -148,34 +149,50 @@ export class WebhookService {
     webhook: StoredWebhook,
     payload: WebhookPayload
   ): Promise<{ success: boolean; error?: string }> {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    try {
-      const secret = decryptSecret(webhook.secret);
-      const signature = this.generateSignature(JSON.stringify(payload), secret);
-      const res = await fetch(webhook.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Hub-Signature-256': `sha256=${signature}`,
-          'User-Agent': 'AutoMerger-Webhook/1.0'
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      await this.saveWebhook({ ...webhook, lastTriggered: new Date().toISOString() });
-      return { success: true };
-    } catch (err: any) {
-      clearTimeout(timeout);
-      if (err.name === 'AbortError') {
-        logger.error('Webhook trigger timeout');
-        return { success: false, error: 'Request timed out' };
+    const secret = decryptSecret(webhook.secret);
+    const body = JSON.stringify(payload);
+    const signature = this.generateSignature(body, secret);
+    const maxAttempts = Number(process.env.WEBHOOK_MAX_ATTEMPTS || DEFAULT_MAX_RETRY_ATTEMPTS);
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      try {
+        const res = await fetch(webhook.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Hub-Signature-256': `sha256=${signature}`,
+            'User-Agent': 'AutoMerger-Webhook/1.0'
+          },
+          body,
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        await this.saveWebhook({ ...webhook, lastTriggered: new Date().toISOString() });
+        return { success: true };
+      } catch (err: any) {
+        clearTimeout(timeout);
+        if (err.name === 'AbortError') {
+          logger.error('Webhook trigger timeout');
+          return { success: false, error: 'Request timed out' };
+        }
+        if (attempt < maxAttempts) {
+          const delay = 2 ** (attempt - 1) * 1000;
+          logger.warn(
+            `Webhook trigger attempt ${attempt} failed: ${err.message}. Retrying in ${delay}ms`
+          );
+          await new Promise(res => setTimeout(res, delay));
+        } else {
+          logger.error('Webhook trigger error:', err);
+          return { success: false, error: err.message };
+        }
       }
-      logger.error('Webhook trigger error:', err);
-      return { success: false, error: err.message };
     }
+    return { success: false, error: 'Failed to trigger webhook' };
   }
 
   static async triggerWebhooks(
