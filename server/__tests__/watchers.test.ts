@@ -199,6 +199,34 @@ describe('subscribeRepo', () => {
     expect(watcher.token).toBe('t2');
     expect(createGitHubServiceMock).toHaveBeenLastCalledWith('t2');
   });
+
+  it('deep merges nested config values', async () => {
+    eventsMock.mockResolvedValue({ data: [] });
+    alertsMock.mockResolvedValue({ data: [] });
+
+    subscribeRepo(socket, {
+      token: 't',
+      owner: 'o',
+      repo: 'r',
+      config: { nested: { arr: ['a'], obj: { a: 1 } } }
+    });
+    await Promise.resolve();
+    const first = getWatcher('o', 'r')!;
+    while (first.isPolling) {
+      await Promise.resolve();
+    }
+
+    subscribeRepo(socket, {
+      token: 't',
+      owner: 'o',
+      repo: 'r',
+      config: { nested: { arr: ['b'], obj: { b: 2 } } }
+    });
+    const watcher = getWatcher('o', 'r');
+    expect(watcher.config).toEqual({
+      nested: { arr: ['a', 'b'], obj: { a: 1, b: 2 } }
+    });
+  });
 });
 
 describe('cache cleanup', () => {

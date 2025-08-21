@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import type { WatcherConfig } from './watchers.js';
+import { deepMerge } from './utils/deepMerge.js';
 
 const STORAGE_PATH =
   process.env.CONFIG_STORAGE_PATH ||
@@ -35,7 +36,7 @@ export async function setClientConfig(
   clientId: string,
   cfg: WatcherConfig
 ): Promise<void> {
-  configs[clientId] = { ...configs[clientId], ...cfg } as WatcherConfig;
+  configs[clientId] = deepMerge(configs[clientId] || {}, cfg);
   await save();
 }
 
