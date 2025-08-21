@@ -93,6 +93,8 @@ be tuned with the `POLL_INTERVAL_MS` environment variable (default: `60000` ms).
 If polling fails repeatedly the server now applies an exponential backoff,
 doubling the interval up to `POLL_MAX_INTERVAL_MS` (default: `300000` ms). The
 backoff factor can be controlled with `POLL_BACKOFF_MULTIPLIER`.
+Polling now fetches events, alerts, pull requests, stray branches and recent
+activity in parallel, reducing the time required for each poll cycle.
 Webhook configurations are stored in `server/webhooks.json`. Set the
 `WEBHOOK_STORAGE_PATH` variable to change this location. If
 `WEBHOOK_SECRET_KEY` is provided, webhook secrets are encrypted on disk using

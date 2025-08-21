@@ -166,51 +166,82 @@ async function pollRepo(watcher: Watcher): Promise<void> {
     repoCache.set(repoKey, cacheEntry);
   }
   try {
-    const { data: events } = await svc.octokit.rest.activity.listRepoEvents({ owner, repo, per_page: 10 });
-    for (const event of events.reverse()) {
-      if (watcher.lastEvent && BigInt(event.id) <= BigInt(watcher.lastEvent)) continue;
-      watcher.lastEvent = event.id;
-      handleEvent(watcher, event);
-    }
-    const { data: alerts } = await svc.octokit.rest.dependabot.listAlertsForRepo({ owner, repo, state: 'open', per_page: 10 });
-    const { minAlertSeverity } = watcher.config || {};
-    const order = { low: 1, medium: 2, high: 3, critical: 4 };
-    for (const alert of alerts) {
-      if (
-        minAlertSeverity &&
-        order[alert.security_vulnerability.severity || 'low'] < order[minAlertSeverity]
-      ) {
-        continue;
+    const eventsPromise = (async () => {
+      const { data: events } = await svc.octokit.rest.activity.listRepoEvents({
+        owner,
+        repo,
+        per_page: 10
+      });
+      for (const event of events.reverse()) {
+        if (watcher.lastEvent && BigInt(event.id) <= BigInt(watcher.lastEvent)) continue;
+        watcher.lastEvent = event.id;
+        handleEvent(watcher, event);
       }
-      if (!watcher.alerts.has(alert.number)) {
-        watcher.alerts.add(alert.number);
-        while (watcher.alerts.size > ALERT_HISTORY_LIMIT) {
-          const oldest = watcher.alerts.values().next().value;
-          watcher.alerts.delete(oldest);
-        }
-        broadcast(watcher, 'security.alert', alert);
-      }
-    }
+    })();
 
-    // store additional repo state for caching
-    try {
-      watcher.pullRequests = await svc.fetchPullRequests(owner, repo);
-    } catch (err) {
-      if (err instanceof RateLimitError) throw err;
-      // ignore pull request errors
-    }
-    try {
-      watcher.strayBranches = await svc.fetchStrayBranches(owner, repo);
-    } catch (err) {
-      if (err instanceof RateLimitError) throw err;
-      // ignore stray branch errors
-    }
-    try {
-      watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
-    } catch (err) {
-      if (err instanceof RateLimitError) throw err;
-      // ignore activity fetch errors
-    }
+    const alertsPromise = (async () => {
+      const { data: alerts } = await svc.octokit.rest.dependabot.listAlertsForRepo({
+        owner,
+        repo,
+        state: 'open',
+        per_page: 10
+      });
+      const { minAlertSeverity } = watcher.config || {};
+      const order = { low: 1, medium: 2, high: 3, critical: 4 } as const;
+      for (const alert of alerts) {
+        if (
+          minAlertSeverity &&
+          order[alert.security_vulnerability.severity || 'low'] < order[minAlertSeverity]
+        ) {
+          continue;
+        }
+        if (!watcher.alerts.has(alert.number)) {
+          watcher.alerts.add(alert.number);
+          while (watcher.alerts.size > ALERT_HISTORY_LIMIT) {
+            const oldest = watcher.alerts.values().next().value;
+            watcher.alerts.delete(oldest);
+          }
+          broadcast(watcher, 'security.alert', alert);
+        }
+      }
+    })();
+
+    const pullRequestsPromise = (async () => {
+      try {
+        watcher.pullRequests = await svc.fetchPullRequests(owner, repo);
+      } catch (err) {
+        if (err instanceof RateLimitError) throw err;
+        // ignore pull request errors
+      }
+    })();
+
+    const strayBranchesPromise = (async () => {
+      try {
+        watcher.strayBranches = await svc.fetchStrayBranches(owner, repo);
+      } catch (err) {
+        if (err instanceof RateLimitError) throw err;
+        // ignore stray branch errors
+      }
+    })();
+
+    const activityPromise = (async () => {
+      try {
+        watcher.activityEvents = await svc.fetchRecentActivity([{ owner, name: repo }]);
+      } catch (err) {
+        if (err instanceof RateLimitError) throw err;
+        // ignore activity fetch errors
+      }
+    })();
+
+    // run all fetches in parallel
+    await Promise.all([
+      eventsPromise,
+      alertsPromise,
+      pullRequestsPromise,
+      strayBranchesPromise,
+      activityPromise
+    ]);
+
     cacheEntry.timestamp = Date.now();
     if (watcher.failureCount > 0 || watcher.interval !== watcher.baseInterval) {
       watcher.failureCount = 0;
